@@ -1,5 +1,6 @@
 Folders:
 obj/
+.DS_Store
 
 # Prerequisites
 *.d
