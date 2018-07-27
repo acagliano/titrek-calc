@@ -1,0 +1,21 @@
+Opened convpng.ini
+
+--- Group icons (C) ---
+Using built-in xlibc palette ...
+warning: might ignore transparent color value for a fixed palette.
+Transparent Color Index : 0
+Transparent Color : 0x0000
+5:
+ tactical : converted! (822 > 69 bytes)
+ ship_alert : converted! (1002 > 69 bytes)
+ power_alert : converted! (402 > 80 bytes)
+ shield_alert : converted! (1002 > 102 bytes)
+ torpedo_alert : converted! (502 > 70 bytes)
+
+Converted in 0 s
+
+[warning] image quality might be too low.
+please try grouping similar images, reducing image colors, 
+or selecting a better palette if conversion is not ideal.
+
+Finished!
