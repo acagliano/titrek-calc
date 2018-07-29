@@ -37,7 +37,7 @@ void PrintHeader(char *text, char x, char y, char xtextOff, char ytextOff){
 
 
 void DrawGUI(){
-    const char *version = "v0.0.35 alpha";
+    const char *version = "v0.0.41 alpha";
     char yPos = 230;
     gfx_FillScreen(148);
     gfx_SetColor(74);
@@ -72,36 +72,22 @@ void DrawGUI(){
     gfx_BlitBuffer();
 }
 
-void GUI_UpdateIcons(Module_t* ShipModules){
-    char i;
-    gfx_DrawShipStatusIcon(true);
-    gfx_DrawShieldStatusIcon(true);
-    gfx_DrawInventoryStatusIcon(true);
-    gfx_BlitBuffer();
-}
 
-void gfx_DrawShipStatusIcon(bool status){
-    // status will be false for compromised, or true for good
-    gfx_sprite_t *uncompressed;
-    if(uncompressed = gfx_MallocSprite(ship_alert_width, ship_alert_height)){
-        gfx_SetColor(36);
-        if(status == false) gfx_SetColor(224);
-        gfx_FillRectangle(70, 203, ship_alert_width, ship_alert_height);
-        dzx7_Standard(ship_alert_compressed, uncompressed);
-        gfx_TransparentSprite(uncompressed, 70, 203);
-        free(uncompressed);
-    }
-}
-
-void gfx_DrawShieldStatusIcon(bool status){
+void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields){
     // status will be false for compromised, or true for good
     gfx_sprite_t *uncompressed;
     if(uncompressed = gfx_MallocSprite(shield_alert_width, shield_alert_height)){
         gfx_SetColor(36);
-        if(status == false) gfx_SetColor(224);
-        gfx_FillRectangle(10, 203, shield_alert_width, shield_alert_height);
+        if(shields->health * 100 / shields->maxHealth < 50) gfx_SetColor(197);
+        if(shields->health * 100 / shields->maxHealth < 25) gfx_SetColor(224);
+        if(shields->health * 100 / shields->maxHealth == 0 || !shields->online) gfx_SetColor(148);
+        gfx_FillRectangle(10, 195, shield_alert_width, shield_alert_height);
+        gfx_SetColor(74);
+        if(integrity->health * 100 / integrity->maxHealth < 25) gfx_SetColor(224);
+        gfx_FillRectangle(16, 204, 16, 12);
+        gfx_FillRectangle(32, 209, 10, 3);
         dzx7_Standard(shield_alert_compressed, uncompressed);
-        gfx_TransparentSprite(uncompressed, 10, 203);
+        gfx_TransparentSprite(uncompressed, 10, 195);
         free(uncompressed);
     }
 }
@@ -126,9 +112,9 @@ void gfx_DrawInventoryStatusIcon(bool status){
     if(uncompressed = gfx_MallocSprite(torpedo_alert_width, torpedo_alert_height)){
         gfx_SetColor(36);
         if(status == false) gfx_SetColor(224);
-        gfx_FillRectangle(280 - torpedo_alert_width, 203, torpedo_alert_width, torpedo_alert_height);
+        gfx_FillRectangle(290 - torpedo_alert_width, 203, torpedo_alert_width, torpedo_alert_height);
         dzx7_Standard(torpedo_alert_compressed, uncompressed);
-        gfx_TransparentSprite(uncompressed, 280 - torpedo_alert_width, 203);
+        gfx_TransparentSprite(uncompressed, 290 - torpedo_alert_width, 203);
         free(uncompressed);
     }
 }

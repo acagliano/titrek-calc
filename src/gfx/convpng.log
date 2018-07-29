@@ -5,14 +5,13 @@ Using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 Transparent Color Index : 0
 Transparent Color : 0x0000
-5:
+4:
  tactical : converted! (822 > 69 bytes)
- ship_alert : converted! (1002 > 69 bytes)
- power_alert : converted! (402 > 80 bytes)
- shield_alert : converted! (1002 > 102 bytes)
- torpedo_alert : converted! (502 > 70 bytes)
+ power_alert : converted! (402 > 61 bytes)
+ shield_alert : converted! (1742 > 171 bytes)
+ torpedo_alert : converted! (502 > 52 bytes)
 
-Converted in 0 s
+Converted in 1 s
 
 [warning] image quality might be too low.
 please try grouping similar images, reducing image colors, 

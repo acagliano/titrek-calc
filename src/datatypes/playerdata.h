@@ -17,6 +17,18 @@ enum InventoryItemTypes {
     it_deuterium
 };
 
+enum timers {
+    timer_power,
+    timer_corebreach,
+    timer_lifesupport,
+    timer_repair
+};
+
+#define POWER_INTERVAL 5
+#define CORE_BREACH_TIMER 1000
+#define LIFE_SUPPORT_TIMER 1000
+#define REPAIR_INTERVAL 10
+
 #define COORD_X 0
 #define COORD_Y 1
 #define COORD_Z 2
@@ -43,12 +55,14 @@ typedef struct inventory_t {
 typedef struct {
     Position_t position;
     Inventory_t inventory[20];
-    char powFreq;
+    short timers[4];
     int money;
     char modulation;
     char Achievements[8];
     char ScreenSelected;  // default, status, power, tactical, chat, sensors
     char moduleSelected;
+    char moduleRepairing;
+    char deathreason;
     char weaponMode;
     char refreshRate;
 } Player_t;

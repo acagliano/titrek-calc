@@ -4,7 +4,9 @@
 enum pointertypes {
     shield,
     integrity,
-    auxiliary
+    auxiliary,
+    core,
+    lifesupport
 };
 
 Module_t* init_SetPointer(Module_t *ShipModules, char type){
@@ -24,6 +26,12 @@ Module_t* init_SetPointer(Module_t *ShipModules, char type){
             case auxiliary:
                 if(module->modtype == mt_system && module->techtype == tt_auxiliary && module->online)
                     response = &ShipModules[i];
+                break;
+            case core:
+                if(module->modtype == mt_system && module->techtype == tt_warpcore) response = &ShipModules[i];
+                break;
+            case lifesupport:
+                if(module->modtype == mt_system && module->techtype == tt_lifesupport) response = &ShipModules[i];
                 break;
         }
     }

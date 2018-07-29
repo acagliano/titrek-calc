@@ -61,13 +61,13 @@ typedef struct {
     char techname[11];
     bool online;      // used for everything  is module online
     bool upgradeable;   // flag to specify if a module may be upgraded
-    unsigned char powerDraw;      // used for everything  module power consumption
-    unsigned char powerDefault;
+    char powerDraw;      // used for everything  module power consumption
+    char powerDefault;
     int powerReserve;      // used for everything  module power reserve
-    unsigned char health, maxHealth;
+    short health, maxHealth;
     union stats {
-        weapstats_t weapstats;
         sysstats_t sysstats;
+        weapstats_t weapstats;
         shieldstats_t shieldstats;
     } stats;
 } Module_t;
