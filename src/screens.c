@@ -7,7 +7,7 @@
 #include "equates.h"
 
 
-void GUI_PowerReport(Module_t *ShipModules, char selected) {
+void GUI_PowerReport(Module_t *ShipModules, char selected, char speed) {
     char counter = 1, i;
     gfx_WipeScreen();
     PrintHeader("Power Allocation", xStart+1, yStart+1, 80, 2);
@@ -22,13 +22,19 @@ void GUI_PowerReport(Module_t *ShipModules, char selected) {
             gfx_PrintStringXY(module->techname, xStart+10, yStart+((counter+2)*9));
            
             lcars_DrawHealthBar(currpower, 2, xStart+80, yStart+((counter+2)*9), true);
-            if(module->online)
-                lcars_DrawHealthBar(powersett, 4, xStart+177, yStart+((counter+2)*9), true);
-            else {
+            if(module->online) {
+                if((module->techtype == tt_warpdrive && speed < 5) || (module->techtype == tt_impulsedrive && (speed == 0 || speed > 4))){
+                    gfx_SetTextFGColor(229);
+                    gfx_PrintStringXY("inactive", xStart+185, yStart+((counter+2)*9));
+                } else if(module->modtype == mt_ejectedcore){
+                    gfx_SetTextFGColor(229);
+                    gfx_PrintStringXY("ejected", xStart+185, yStart+((counter+2)*9));
+                } else lcars_DrawHealthBar(powersett, 4, xStart+177, yStart+((counter+2)*9), true);
+            } else {
                 gfx_SetTextFGColor(224);
                 gfx_PrintStringXY("offline", xStart+185, yStart+((counter+2)*9));
-                gfx_SetTextFGColor(255);
             }
+            gfx_SetTextFGColor(255);
             gfx_Line(xStart+176, yStart+19, xStart+176, yStart+((counter+3)*9));
             counter++;
         }
@@ -51,17 +57,19 @@ void GUI_StatusReport(Module_t *ShipModules, char selected, char repairing) {
             int health = module->health*100/module->maxHealth;
             gfx_SetColor(36);
             if(!module->online) gfx_SetColor(224);
+            if(repairing == i) gfx_SetColor(229);
             gfx_Circle(xStart+18, yStart+3+((counter+1)*9), 1);
             gfx_Circle(xStart+18, yStart+3+((counter+1)*9), 2);
             gfx_PrintStringXY(module->techname, xStart+25, yStart+((counter+1)*9));
-            lcars_DrawHealthBar(health, 1, xStart+120, yStart+((counter+1)*9), true);
+            if(module->modtype == mt_ejectedcore) gfx_PrintStringXY("core ejected", xStart+120, yStart+((counter+1)*9));
+            else lcars_DrawHealthBar(health, 1, xStart+120, yStart+((counter+1)*9), true);
             gfx_Line(xStart+228, yStart+17, xStart+228, yStart+((counter+2)*9));
             counter++;
         }
     }
     gfx_SetColor(247);
     gfx_FillRectangle(xStart+10, yStart+(selected+2)*9, 4, 7);
-    if(repairing) gfx_FillRectangle(xStart+4, yStart+(repairing+1)*9+1, 7, 5);
+    if(repairing != -1) gfx_FillRectangle(xStart+4, (repairing+2)*9+1+yStart, 7, 5);
     gfx_BlitBuffer();
 }
 

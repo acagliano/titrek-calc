@@ -26,7 +26,7 @@ enum timers {
 
 #define POWER_INTERVAL 5
 #define CORE_BREACH_TIMER 1000
-#define LIFE_SUPPORT_TIMER 1000
+#define LIFE_SUPPORT_TIMER 2000
 #define REPAIR_INTERVAL 10
 
 #define COORD_X 0
@@ -59,6 +59,7 @@ typedef struct {
     int money;
     char modulation;
     char Achievements[8];
+    char iconStates[2];
     char ScreenSelected;  // default, status, power, tactical, chat, sensors
     char moduleSelected;
     char moduleRepairing;

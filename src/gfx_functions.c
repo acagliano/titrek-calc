@@ -5,6 +5,7 @@
 #include "gfx/icons.h"
 #include "gfx_functions.h"
 #include "datatypes/shipmodules.h"
+#include "datatypes/playerdata.h"
 
 void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){
     gfx_SetColor(0);
@@ -37,7 +38,7 @@ void PrintHeader(char *text, char x, char y, char xtextOff, char ytextOff){
 
 
 void DrawGUI(){
-    const char *version = "v0.0.41 alpha";
+    const char *version = "v0.47 alpha";
     char yPos = 230;
     gfx_FillScreen(148);
     gfx_SetColor(74);
@@ -60,7 +61,7 @@ void DrawGUI(){
     gfx_FillRectangle(2, 2, 316, 14);
     gfx_SetTextFGColor(197);
     gfx_SetTextBGColor(16);
-    gfx_PrintStringXY("Star Trek Multiplayer ", 28, 5);
+    gfx_PrintStringXY("Star Trek Multiplayer ", 32, 5);
     gfx_PrintString(version);
     gfx_SetTextFGColor(255);
     gfx_SetTextBGColor(0);
@@ -76,14 +77,16 @@ void DrawGUI(){
 void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields){
     // status will be false for compromised, or true for good
     gfx_sprite_t *uncompressed;
+    char shieldhealth = shields->health * 100 / shields->maxHealth;
+    char integhealth = integrity->health * 100 / integrity->maxHealth;
     if(uncompressed = gfx_MallocSprite(shield_alert_width, shield_alert_height)){
-        gfx_SetColor(36);
-        if(shields->health * 100 / shields->maxHealth < 50) gfx_SetColor(197);
-        if(shields->health * 100 / shields->maxHealth < 25) gfx_SetColor(224);
-        if(shields->health * 100 / shields->maxHealth == 0 || !shields->online) gfx_SetColor(148);
+        gfx_SetColor(30);
+        if(shieldhealth < 50) gfx_SetColor(247);
+        if(shieldhealth < 25) gfx_SetColor(224);
+        if(shieldhealth == 0 || !shields->online) gfx_SetColor(148);
         gfx_FillRectangle(10, 195, shield_alert_width, shield_alert_height);
         gfx_SetColor(74);
-        if(integrity->health * 100 / integrity->maxHealth < 25) gfx_SetColor(224);
+        if(integhealth < 25) gfx_SetColor(224);
         gfx_FillRectangle(16, 204, 16, 12);
         gfx_FillRectangle(32, 209, 10, 3);
         dzx7_Standard(shield_alert_compressed, uncompressed);
@@ -92,19 +95,6 @@ void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields){
     }
 }
 
-void gfx_DrawPowerStatusIcon(bool status){
-    // status will be false for compromised, or true for good
-    gfx_sprite_t *uncompressed;
-    if(uncompressed = gfx_MallocSprite(power_alert_width, power_alert_height)){
-        gfx_SetColor(36);
-        if(status == false) gfx_SetColor(224);
-        gfx_FillRectangle(310 - power_alert_width, 203, power_alert_width, power_alert_height);
-        dzx7_Standard(power_alert_compressed, uncompressed);
-        gfx_TransparentSprite(uncompressed, 310 - power_alert_width, 203);
-        free(uncompressed);
-        gfx_BlitBuffer();
-    }
-}
 
 void gfx_DrawInventoryStatusIcon(bool status){
     // status will be false for compromised, or true for good
@@ -112,9 +102,81 @@ void gfx_DrawInventoryStatusIcon(bool status){
     if(uncompressed = gfx_MallocSprite(torpedo_alert_width, torpedo_alert_height)){
         gfx_SetColor(36);
         if(status == false) gfx_SetColor(224);
-        gfx_FillRectangle(290 - torpedo_alert_width, 203, torpedo_alert_width, torpedo_alert_height);
+        gfx_FillRectangle(225 - torpedo_alert_width, 203, torpedo_alert_width, torpedo_alert_height);
         dzx7_Standard(torpedo_alert_compressed, uncompressed);
-        gfx_TransparentSprite(uncompressed, 290 - torpedo_alert_width, 203);
+        gfx_TransparentSprite(uncompressed, 225 - torpedo_alert_width, 203);
         free(uncompressed);
     }
+}
+
+void gfx_DrawCoreBreachAlert(bool status){
+    gfx_sprite_t *uncompressed;
+    if(uncompressed = gfx_MallocSprite(breach_alert_width, breach_alert_height)){
+        gfx_SetColor(224);
+        if(!status) gfx_SetColor(148);
+        gfx_FillRectangle(285 - breach_alert_width, 203, breach_alert_width, breach_alert_height);
+        dzx7_Standard(breach_alert_compressed, uncompressed);
+        gfx_TransparentSprite(uncompressed, 285 - breach_alert_width, 203);
+        free(uncompressed);
+    }
+}
+
+void gfx_DrawLifeSupportAlert(bool status){
+    gfx_sprite_t *uncompressed;
+    if(uncompressed = gfx_MallocSprite(lifesupport_alert_width, lifesupport_alert_height)){
+        gfx_SetColor(224);
+        if(!status) gfx_SetColor(148);
+        gfx_FillRectangle(260 - lifesupport_alert_width, 203, lifesupport_alert_width, lifesupport_alert_height);
+        dzx7_Standard(lifesupport_alert_compressed, uncompressed);
+        gfx_TransparentSprite(uncompressed, 260 - lifesupport_alert_width, 203);
+        free(uncompressed);
+    }
+}
+
+void gfx_DrawSpeedIndicator(char speed){
+    char i, tierspeed, difference;
+    char warpspeeds[10] = {5, 7, 10, 14, 19, 25, 32, 40, 49, 50};
+    bool warpspeed = (speed > 4);
+    unsigned char yPos = 191, xPos = xStart + 56;
+    gfx_SetTextFGColor(0);
+    gfx_SetTextBGColor(148);
+    // impulse speed bar
+    gfx_SetColor(148);
+    gfx_FillRectangle(xPos-5, yPos-2, 220, 10);
+    gfx_FillRectangle(xPos+1, yPos+9, 88, 12);
+    gfx_SetColor(224);
+    gfx_FillRectangle(xPos, yPos, 60, 7);
+    gfx_SetColor(23);
+    gfx_FillRectangle(xPos+60, yPos, 126, 7);
+    gfx_SetColor(0);
+    for(i=0; i<=3; i++) gfx_Line(i * 15 + xPos, yPos, i * 15 + xPos, yPos+8);
+    for(i=0; i<=9; i++) gfx_Line(i * 14 + xPos+60, yPos, i * 14 + xPos+60, yPos+8);
+    gfx_Rectangle(xPos, yPos+7, 186, 2);
+    gfx_Rectangle(xPos, yPos+8, 90, 14);
+    gfx_SetColor(239);
+    gfx_SetTextXY(xPos+5, yPos+12);
+    if(!warpspeed){
+        if(!speed) gfx_PrintString("Full Stop");
+        else {
+            gfx_PrintUInt(speed,1);
+            gfx_PrintString("/4 Impulse");
+        }
+        gfx_FillRectangle(xPos, yPos, speed * 15, 7);
+        gfx_FillRectangle(speed * 15 + xPos - 2, yPos-1, 5, 9);
+    } else {
+        unsigned char barlen;
+        for(i = 0; i < 9; i++)
+            if(warpspeeds[i] > speed) break;
+        gfx_PrintString("Warp ");
+        gfx_PrintUInt(i, 1);
+        gfx_PrintString(".");
+        tierspeed = warpspeeds[i-1];
+        difference = warpspeeds[i] - tierspeed;
+        gfx_PrintUInt((speed - tierspeed) * 10 / difference, 1);
+        barlen = (i * 14) + ((speed - tierspeed) * 14 / difference) + 60;
+      //  gfx_FillRectangle(xPos, yPos, barlen, 7);
+        gfx_FillRectangle(barlen + xPos - 2, yPos-1, 5, 9);
+    }
+    gfx_SetTextFGColor(255);
+    gfx_SetTextBGColor(0);
 }

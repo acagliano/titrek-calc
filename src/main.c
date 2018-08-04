@@ -22,12 +22,14 @@
 // stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 #include <fileioc.h>
 #include <graphx.h>
+#include <decompress.h>
 
 
 
 /* Put your function prototypes here */
 void printText(const char *text, uint8_t x, uint8_t y);
 
+#include "gfx/icons.h"
 #include "gfx_functions.h"
 #include "datatypes/shipmodules.h"
 #include "datatypes/playerdata.h"
@@ -40,7 +42,7 @@ void printText(const char *text, uint8_t x, uint8_t y);
 
 Player_t player[1] = {0};
 Module_t ShipModules[20] = {0};
-Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL, *lifesupport = NULL, *warpcore = NULL;
+Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL, *lifesupport = NULL, *warpcore = NULL, *warpdrive = NULL;
 const char *GameSave = "TrekSave";
 
 void main(void) {
@@ -62,7 +64,7 @@ void main(void) {
         module->techtype = i;
         module->health = 50;
         module->maxHealth = 50;
-        module->powerReserve = 128;
+        module->powerReserve = 256;
         module->powerDraw = 5;
         module->powerDefault = 5;
         switch(i){
@@ -90,6 +92,7 @@ void main(void) {
                 break;
             case tt_warpdrive:
                 module->modtype = mt_system;
+                module->stats.sysstats.topSpeed =14;
                 strcpy(module->techname, "WarpDrive");
                 break;
             case tt_impulsedrive:
@@ -118,14 +121,18 @@ void main(void) {
     auxpower = init_SetPointer(&ShipModules, 2);   // return pointer to auxiliary
     warpcore = init_SetPointer(&ShipModules, 3);   // return pointer to core
     lifesupport = init_SetPointer(&ShipModules, 4);   // return pointer to life support
+    warpdrive = init_SetPointer(&ShipModules, 5);   // return pointer to warpdrive
     boot_ClearVRAM();
     DrawGUI(&ShipModules);
     player->ScreenSelected = SCRN_POWER;
     player->timers[timer_power] = POWER_INTERVAL;
+    player->moduleRepairing = -1;
 
     do
     {
+        char corestability, lifesupporthealth, speed = player->position.speed;
         key = os_GetCSC();
+        
        
         if(key == sk_Clear) break;
        
@@ -176,6 +183,16 @@ void main(void) {
                     break;
             }
         }
+        if(key == sk_Mul && player->position.speed < 5) player->position.speed = 5;
+        
+        if(key == sk_Div && player->position.speed >= 5) player->position.speed = 0;
+        
+        if( key == sk_Add && speed < 49)
+            if(speed < warpdrive->stats.sysstats.topSpeed)
+                if(speed < 4 || speed >= 5) player->position.speed++;
+        
+        if( key == sk_Sub && speed > 0)
+            if(speed > 5 || speed <= 4) player->position.speed--;
         
         if( key == sk_Yequ ){
             if(player->ScreenSelected == SCRN_TACTICAL) player->ScreenSelected = SCRN_VIEW;
@@ -188,11 +205,27 @@ void main(void) {
                 module->online = !module->online;
             }
             if(player->ScreenSelected == SCRN_STATUS){
-                if(player->moduleRepairing == player->moduleSelected + 1) player->moduleRepairing = 0;
-                else player->moduleRepairing = player->moduleSelected + 1;
+                Module_t* module = &ShipModules[player->moduleSelected];
+                if(player->moduleRepairing == player->moduleSelected){
+                    player->moduleRepairing = -1;
+                    module->online = true;
+                }
+                else {
+                    player->moduleRepairing = player->moduleSelected;
+                    module->online = false;
+                    module->powerDraw = module->powerDefault;
+                }
             }
         }
         
+        if( key == sk_Del ){
+            Module_t *module = &ShipModules[player->moduleSelected];
+            if(module->techtype == tt_warpcore && player->timers[timer_corebreach]){
+                module->modtype = mt_ejectedcore;
+                player->timers[timer_corebreach] = 0;
+                warpcore = NULL;
+            }
+        }
         
         if( key == sk_Window ){
             if(player->ScreenSelected == SCRN_STATUS) player->ScreenSelected = SCRN_VIEW;
@@ -209,7 +242,7 @@ void main(void) {
             char i;
             char damage = randInt(4,6);
             char drv = shields->stats.shieldstats.resistance * shields->powerDraw * shields->health / shields->powerDefault / shields->maxHealth;
-            char int_drv = integrity->health * 100 / integrity->maxHealth;
+            char int_drv = integrity->health * integrity->powerDraw * 100 / integrity->maxHealth / integrity->powerDefault;
             if(shields->online){
                 shields->health -= damage;
                 if(shields->health < 0) shields->health = 0;
@@ -245,19 +278,19 @@ void main(void) {
                  GUI_StatusReport(&ShipModules, player->moduleSelected, player->moduleRepairing);
                 break;
             case SCRN_POWER:
-                GUI_PowerReport(&ShipModules, player->moduleSelected);
+                GUI_PowerReport(&ShipModules, player->moduleSelected, player->position.speed);
                 break;
         }
         if(player->timers[timer_power] == 0){
             PROC_PowerDraw(&ShipModules, player->moduleRepairing);
-            PROC_PowerCycle(&ShipModules, player->moduleRepairing);
+            PROC_PowerCycle(&ShipModules, warpcore, player->moduleRepairing, &player);
             player->timers[timer_power] = POWER_INTERVAL;
         }
         else player->timers[timer_power]--;
         
         if(player->timers[timer_repair] == 0){
-            if(player->moduleRepairing){
-                Module_t* repair = &ShipModules[player->moduleRepairing - 1];
+            if(player->moduleRepairing != -1){
+                Module_t* repair = &ShipModules[player->moduleRepairing];
                 if(!repair->online && repair->health < repair->maxHealth && repair->powerReserve)
                     repair->health++;
                 player->timers[timer_repair] = REPAIR_INTERVAL;
@@ -265,28 +298,34 @@ void main(void) {
         }
         else player->timers[timer_repair]--;
         
-        gfx_DrawShipStatusIcon(integrity, shields);
-        gfx_DrawInventoryStatusIcon(true);
-        gfx_BlitBuffer();
+       
         
-        if(!warpcore->health || !warpcore->online){
-            player->timers[timer_corebreach]++;
+        corestability = warpcore->health * 100 / warpcore->maxHealth;
+        lifesupporthealth = lifesupport->health * 100 / lifesupport->maxHealth;
+        if(warpcore){
+            if(corestability <= 25){
+                if(randInt(0, corestability * 10) == 0 && !player->timers[timer_corebreach])
+                    player->timers[timer_corebreach]++;
+            } else if(corestability > 50) player->timers[timer_corebreach] = 0;
+            if(player->timers[timer_corebreach]) player->timers[timer_corebreach]++;
             if(player->timers[timer_corebreach] == CORE_BREACH_TIMER){
                 player->deathreason = 1;
                 break;
             }
-        } else
-            player->timers[timer_corebreach] = 0;
-        
-        if(!lifesupport->health || !lifesupport->online){
+        }
+        if((lifesupporthealth == 0 || !lifesupport->online) & !player->timers[timer_lifesupport])
             player->timers[timer_lifesupport]++;
-            if(player->timers[timer_lifesupport] == LIFE_SUPPORT_TIMER){
-                player->deathreason = 2;
-                break;
-            }
-        } else
-            player->timers[timer_lifesupport] = 0;
-        
+        else if(lifesupporthealth > 50 && lifesupport->online) player->timers[timer_lifesupport] = 0;
+        if(player->timers[timer_lifesupport]) player->timers[timer_lifesupport]++;
+        if(player->timers[timer_lifesupport] == LIFE_SUPPORT_TIMER){
+            player->deathreason = 2;
+            break;
+        }
+        gfx_DrawLifeSupportAlert(player->timers[timer_lifesupport] != 0);
+        gfx_DrawCoreBreachAlert(player->timers[timer_corebreach] != 0);
+        gfx_DrawShipStatusIcon(integrity, shields);
+        gfx_DrawSpeedIndicator(player->position.speed);
+        gfx_BlitBuffer();
     }
     while(key != sk_Clear);
     gfx_SetDrawScreen();
@@ -295,6 +334,8 @@ void main(void) {
     
     // Cleanup
     ti_CloseAll();
+    gfx_SetTextFGColor(0);
+    gfx_SetTextBGColor(255);
     switch(player->deathreason){
         case 1:
             gfx_PrintStringXY("Warp Core has breached!", 1, 0);
@@ -303,6 +344,7 @@ void main(void) {
             gfx_PrintStringXY("Life Support has failed!", 1, 0);
             break;
     }
+    gfx_PrintStringXY("Thanks for testing!!", 1, 10);
     os_GetKey();
     gfx_End();
 	prgm_CleanUp();

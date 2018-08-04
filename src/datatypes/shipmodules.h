@@ -11,7 +11,8 @@ enum modtype {
     mt_system = 1,
     mt_weapon,
     mt_shield,
-    mt_tech
+    mt_tech,
+    mt_ejectedcore
 };
 
 enum techtype {
