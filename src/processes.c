@@ -56,12 +56,19 @@ void PROC_PowerDraw(Module_t *ShipModules, char repairing){
            (module->techtype == tt_shield ||
             module->techtype == tt_integrity ||
             module->techtype == tt_lifesupport ||
-            module->techtype == tt_sensor ||
-            module->techtype == tt_comms)) ||
+            module->techtype == tt_sensor)) ||
            (i == repairing)
            ){
                module->powerReserve -= module->powerDraw;
                if(module->powerReserve <= 0) Module_NoPower(module);
         }
     }
+}
+
+
+void PROC_AnglesToVectors(Position_t *pos){
+    char xzangle = pos->angles[0], yangle = pos->angles[1];
+    //pos->vectors[0] = x vector
+    //pos->vectors[1] = y vector
+    //pos->vectors[2] = z vector
 }

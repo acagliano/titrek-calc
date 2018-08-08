@@ -31,10 +31,12 @@ void printText(const char *text, uint8_t x, uint8_t y);
 
 #include "gfx/icons.h"
 #include "gfx_functions.h"
+#include "datatypes/mapdata.h"
 #include "datatypes/shipmodules.h"
 #include "datatypes/playerdata.h"
 #include "processes.h"
 #include "initialize.h"
+#include "mapfuncs.h"
 
 #include "screens.h"
 
@@ -42,6 +44,7 @@ void printText(const char *text, uint8_t x, uint8_t y);
 
 Player_t player[1] = {0};
 Module_t ShipModules[20] = {0};
+MapData_t* MapMain;
 Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL, *lifesupport = NULL, *warpcore = NULL, *warpdrive = NULL;
 const char *GameSave = "TrekSave";
 
@@ -49,7 +52,8 @@ void main(void) {
     char SavePtr;
     char i;
     char key = 0;
-    malloc(0);
+    char mapslot;
+    MapMain = calloc(10, sizeof(MapData_t));
     ti_CloseAll();
     gfx_Begin();
     gfx_SetDrawBuffer();
@@ -58,7 +62,7 @@ void main(void) {
     gfx_SetTextTransparentColor(1);
     gfx_SetTransparentColor(0);
 	/* Fill in the body of the main function here */
-    for(i = 0; i <= 8; i++){
+    for(i = 0; i < 8; i++){
         Module_t *module = &ShipModules[i];
         module->online = true;
         module->techtype = i;
@@ -92,7 +96,7 @@ void main(void) {
                 break;
             case tt_warpdrive:
                 module->modtype = mt_system;
-                module->stats.sysstats.topSpeed =14;
+                module->stats.sysstats.topSpeed = 6;
                 strcpy(module->techname, "WarpDrive");
                 break;
             case tt_impulsedrive:
@@ -106,10 +110,6 @@ void main(void) {
             case tt_sensor:
                 module->modtype = mt_system;
                 strcpy(module->techname, "Sensors");
-                break;
-            case tt_comms:
-                module->modtype = mt_system;
-                strcpy(module->techname, "Comms");
                 break;
             default:
                 module->modtype = mt_system;
@@ -127,10 +127,31 @@ void main(void) {
     player->ScreenSelected = SCRN_POWER;
     player->timers[timer_power] = POWER_INTERVAL;
     player->moduleRepairing = -1;
-
+    if((mapslot = map_LocateSlot(MapMain)) >= 0){
+        MapData_t *slot = &MapMain[mapslot];
+        // assign ship data to slot
+        slot->entitytype = et_ship;
+        slot->mobile = false;
+        slot->entitystats.e_ship.health = 50;
+        slot->entitystats.e_ship.maxHealth = 50;
+        slot->entitystats.e_ship.shield = 50;
+        slot->entitystats.e_ship.shieldMax = 50;
+        slot->position.coords[0] = randInt(0,256) << 8;
+        slot->position.coords[1] = randInt(0,256) << 8;
+        slot->position.coords[2] = randInt(0,256) << 8;
+    }
     do
     {
         char corestability, lifesupporthealth, speed = player->position.speed;
+        char topspeed = warpdrive->stats.sysstats.topSpeed;
+        unsigned char warppow = warpdrive->powerDraw * 100 / warpdrive->powerDefault;
+        if( warppow > 100) topspeed += (warppow / 10 - 10) / 2;
+        else topspeed = topspeed * warppow / 100;
+        if(topspeed < 5) topspeed = 5;
+        if(speed > topspeed) {
+            player->position.speed = topspeed;
+            speed = topspeed;
+        }
         key = os_GetCSC();
         
        
@@ -139,6 +160,10 @@ void main(void) {
         if( key == sk_Down){
             Module_t* module;
             switch(player->ScreenSelected){
+                case SCRN_VIEW:
+                    player->position.angles[1]++;
+                    PROC_AnglesToVectors(&player->position);
+                    break;
                 case SCRN_POWER:
                 case SCRN_STATUS:
                     player->moduleSelected++;
@@ -150,6 +175,10 @@ void main(void) {
         
         if( key == sk_Up){
             switch(player->ScreenSelected){
+                case SCRN_VIEW:
+                    player->position.angles[1]--;
+                    PROC_AnglesToVectors(&player->position);
+                    break;
                 case SCRN_POWER:
                 case SCRN_STATUS:
                     player->moduleSelected--;
@@ -161,6 +190,10 @@ void main(void) {
         if( key == sk_Right){
             Module_t* module;
             switch(player->ScreenSelected){
+                case SCRN_VIEW:
+                    player->position.angles[0]++;
+                    PROC_AnglesToVectors(&player->position);
+                    break;
                 case SCRN_POWER:
                     module = &ShipModules[player->moduleSelected];
                     if(module->techtype != tt_warpcore){
@@ -174,6 +207,10 @@ void main(void) {
         if( key == sk_Left){
             Module_t* module;
             switch(player->ScreenSelected){
+                case SCRN_VIEW:
+                    player->position.angles[0]--;
+                    PROC_AnglesToVectors(&player->position);
+                    break;
                 case SCRN_POWER:
                     module = &ShipModules[player->moduleSelected];
                     if(module->techtype != tt_warpcore){
@@ -183,12 +220,15 @@ void main(void) {
                     break;
             }
         }
-        if(key == sk_Mul && player->position.speed < 5) player->position.speed = 5;
         
-        if(key == sk_Div && player->position.speed >= 5) player->position.speed = 0;
+        if(key == sk_Mul){
+            if(player->position.speed < 5) player->position.speed = 5;
+            else player->position.speed = 0;
+        }
         
-        if( key == sk_Add && speed < 49)
-            if(speed < warpdrive->stats.sysstats.topSpeed)
+        
+        if( key == sk_Add && speed < 54)
+            if(speed < topspeed)
                 if(speed < 4 || speed >= 5) player->position.speed++;
         
         if( key == sk_Sub && speed > 0)
@@ -269,7 +309,7 @@ void main(void) {
         
         switch(player->ScreenSelected){
             case SCRN_VIEW:
-                DrawGUI();
+                GUI_ViewScreen(MapMain, &player->position);
                 break;
             case SCRN_TACTICAL:
                 GUI_TacticalReport(&ShipModules, shields);
@@ -324,7 +364,7 @@ void main(void) {
         gfx_DrawLifeSupportAlert(player->timers[timer_lifesupport] != 0);
         gfx_DrawCoreBreachAlert(player->timers[timer_corebreach] != 0);
         gfx_DrawShipStatusIcon(integrity, shields);
-        gfx_DrawSpeedIndicator(player->position.speed);
+        gfx_DrawSpeedIndicator(player->position.speed, topspeed);
         gfx_BlitBuffer();
     }
     while(key != sk_Clear);

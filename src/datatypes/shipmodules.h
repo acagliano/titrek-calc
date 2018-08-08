@@ -24,7 +24,6 @@ enum techtype {
     tt_impulsedrive,
     tt_transporter,
     tt_sensor,
-    tt_comms,
     tt_phaser,
     tt_torpedo,
     tt_auxiliary

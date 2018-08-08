@@ -4,8 +4,15 @@
 #include "equates.h"
 #include "gfx/icons.h"
 #include "gfx_functions.h"
+#include "datatypes/mapdata.h"
 #include "datatypes/shipmodules.h"
 #include "datatypes/playerdata.h"
+
+typedef struct {
+    char type;
+    long distance;
+    char angleOffsets[2];
+} RenderItem_t;
 
 void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){
     gfx_SetColor(0);
@@ -38,7 +45,7 @@ void PrintHeader(char *text, char x, char y, char xtextOff, char ytextOff){
 
 
 void DrawGUI(){
-    const char *version = "v0.47 alpha";
+    const char *version = "v0.49 alpha";
     char yPos = 230;
     gfx_FillScreen(148);
     gfx_SetColor(74);
@@ -84,13 +91,13 @@ void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields){
         if(shieldhealth < 50) gfx_SetColor(247);
         if(shieldhealth < 25) gfx_SetColor(224);
         if(shieldhealth == 0 || !shields->online) gfx_SetColor(148);
-        gfx_FillRectangle(10, 195, shield_alert_width, shield_alert_height);
+        gfx_FillRectangle(10, 193, shield_alert_width, shield_alert_height);
         gfx_SetColor(74);
         if(integhealth < 25) gfx_SetColor(224);
-        gfx_FillRectangle(16, 204, 16, 12);
-        gfx_FillRectangle(32, 209, 10, 3);
+        gfx_FillRectangle(16, 202, 16, 12);
+        gfx_FillRectangle(32, 207, 10, 3);
         dzx7_Standard(shield_alert_compressed, uncompressed);
-        gfx_TransparentSprite(uncompressed, 10, 195);
+        gfx_TransparentSprite(uncompressed, 10, 193);
         free(uncompressed);
     }
 }
@@ -133,11 +140,11 @@ void gfx_DrawLifeSupportAlert(bool status){
     }
 }
 
-void gfx_DrawSpeedIndicator(char speed){
+void gfx_DrawSpeedIndicator(char speed, char maxspeed){
     char i, tierspeed, difference;
-    char warpspeeds[10] = {5, 7, 10, 14, 19, 25, 32, 40, 49, 50};
+    char warpspeeds[11] = {5, 7, 10, 14, 19, 25, 32, 40, 49, 59, 60};
     bool warpspeed = (speed > 4);
-    unsigned char yPos = 191, xPos = xStart + 56;
+    unsigned char yPos = 191, xPos = xStart + 56, limitbarlen = 0;
     gfx_SetTextFGColor(0);
     gfx_SetTextBGColor(148);
     // impulse speed bar
@@ -147,22 +154,42 @@ void gfx_DrawSpeedIndicator(char speed){
     gfx_SetColor(224);
     gfx_FillRectangle(xPos, yPos, 60, 7);
     gfx_SetColor(23);
-    gfx_FillRectangle(xPos+60, yPos, 126, 7);
+    gfx_FillRectangle(xPos+60, yPos, 140, 7);
     gfx_SetColor(0);
     for(i=0; i<=3; i++) gfx_Line(i * 15 + xPos, yPos, i * 15 + xPos, yPos+8);
     for(i=0; i<=9; i++) gfx_Line(i * 14 + xPos+60, yPos, i * 14 + xPos+60, yPos+8);
-    gfx_Rectangle(xPos, yPos+7, 186, 2);
+    for(i = 0; i < 9; i++)
+        if(warpspeeds[i] > maxspeed) break;
+    tierspeed = warpspeeds[i-1];
+    difference = warpspeeds[i] - tierspeed;
+    limitbarlen = (i * 14) + ((maxspeed - tierspeed) * 14 / difference);
+    gfx_SetColor(24);
+    gfx_FillRectangle(xPos + 60, yPos, limitbarlen, 3);
+    gfx_SetColor(0);
+    //  gfx_FillRectangle(xPos, yPos, barlen, 7);
+    //gfx_FillRectangle(barlen + xPos - 2, yPos-1, 5, 9);
+    gfx_Rectangle(xPos, yPos+7, 200, 2);
     gfx_Rectangle(xPos, yPos+8, 90, 14);
     gfx_SetColor(239);
-    gfx_SetTextXY(xPos+5, yPos+12);
+    gfx_SetTextXY(xPos+3, yPos+12);
     if(!warpspeed){
         if(!speed) gfx_PrintString("Full Stop");
         else {
-            gfx_PrintUInt(speed,1);
-            gfx_PrintString("/4 Impulse");
+            switch(speed){
+                case 2:
+                    gfx_PrintString("Half Impulse");
+                    break;
+                case 4:
+                    gfx_PrintString("Full Impulse");
+                    break;
+                default:
+                    gfx_PrintUInt(speed,1);
+                    gfx_PrintString("/4 Impulse");
+                    break;
+            }
+            gfx_FillRectangle(xPos, yPos, speed * 15, 7);
+            gfx_FillRectangle(speed * 15 + xPos - 2, yPos-1, 5, 9);
         }
-        gfx_FillRectangle(xPos, yPos, speed * 15, 7);
-        gfx_FillRectangle(speed * 15 + xPos - 2, yPos-1, 5, 9);
     } else {
         unsigned char barlen;
         for(i = 0; i < 9; i++)
@@ -179,4 +206,23 @@ void gfx_DrawSpeedIndicator(char speed){
     }
     gfx_SetTextFGColor(255);
     gfx_SetTextBGColor(0);
+}
+
+
+void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
+    char i;
+    int player_x = playerpos->coords[0], player_y = playerpos->coords[1], player_z = playerpos->coords[2];
+    int item_x, item_y, item_z;
+    long distance;
+    for(i=0; i<(sizeof(map)/sizeof(MapData_t)), i++){
+        MapData_t *item = &map[i];
+        item_x = item->coords[0];
+        item_y = item->coords[1];
+        item_z = item->coords[2];
+        if((distance = r_GetDistance(item_x - player_x, item_y - player_y, item_z - player_z)) <= RENDER_DISTANCE){
+            unsigned char playervect_zx, playervect_y;
+            char vectordiff_xz, vectordiff_y;
+            if(//within 45 degrees on both vectors)
+        }
+    }
 }
