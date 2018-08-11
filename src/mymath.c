@@ -5,7 +5,7 @@ long r_GetDistance(short xdiff, short ydiff, short zdiff){
     return distance;
 }
 
-int8_t byteCos(uint8_t x){
+signed char byteCos(unsigned char x){
     if (x&128) return ~cosLUT[x&127];
     return cosLUT[x];
 }
