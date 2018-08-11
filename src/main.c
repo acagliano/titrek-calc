@@ -37,6 +37,7 @@ void printText(const char *text, uint8_t x, uint8_t y);
 #include "processes.h"
 #include "initialize.h"
 #include "mapfuncs.h"
+#include "mymath.h"
 
 #include "screens.h"
 
@@ -54,6 +55,7 @@ void main(void) {
     char key = 0;
     char mapslot;
     MapMain = calloc(10, sizeof(MapData_t));
+    srandom(rtc_Time());
     ti_CloseAll();
     gfx_Begin();
     gfx_SetDrawBuffer();
@@ -75,20 +77,24 @@ void main(void) {
             case tt_shield:
                 module->modtype = mt_shield;
                 strcpy(module->techname, "Shields");
+                module->location = 0;
                 module->stats.shieldstats.resistance = 5;
                 module->stats.shieldstats.modulation = randInt(0, 255);
                 break;
             case tt_integrity:
                 module->modtype = mt_system;
+                module->location = 0;
                 module->stats.sysstats.resistance = 1;
                 strcpy(module->techname, "Integrity");
                 break;
             case tt_lifesupport:
                 module->modtype = mt_system;
+                module->location = aft;
                 strcpy(module->techname, "LifeSupp");
                 break;
             case tt_warpcore:
                 module->modtype = mt_system;
+                module->location = aft;
                 strcpy(module->techname, "WarpCore");
                 module->powerReserve = 256;
                 module->stats.sysstats.powerOut = 50;
@@ -96,19 +102,23 @@ void main(void) {
                 break;
             case tt_warpdrive:
                 module->modtype = mt_system;
-                module->stats.sysstats.topSpeed = 6;
+                module->location = nacelles;
+                module->stats.sysstats.topSpeed = 11;
                 strcpy(module->techname, "WarpDrive");
                 break;
             case tt_impulsedrive:
                 module->modtype = mt_system;
+                module->location = aft;
                 strcpy(module->techname, "ImpulseDr");
                 break;
             case tt_transporter:
                 module->modtype = mt_system;
+                module->location = saucer;
                 strcpy(module->techname, "Transport");
                 break;
             case tt_sensor:
                 module->modtype = mt_system;
+                module->location = saucer;
                 strcpy(module->techname, "Sensors");
                 break;
             default:
@@ -124,7 +134,7 @@ void main(void) {
     warpdrive = init_SetPointer(&ShipModules, 5);   // return pointer to warpdrive
     boot_ClearVRAM();
     DrawGUI(&ShipModules);
-    player->ScreenSelected = SCRN_POWER;
+    player->ScreenSelected = SCRN_STATUS;
     player->timers[timer_power] = POWER_INTERVAL;
     player->moduleRepairing = -1;
     if((mapslot = map_LocateSlot(MapMain)) >= 0){
@@ -196,7 +206,7 @@ void main(void) {
                     break;
                 case SCRN_POWER:
                     module = &ShipModules[player->moduleSelected];
-                    if(module->techtype != tt_warpcore){
+                    if(module->techtype != tt_warpcore && module->techtype != tt_lifesupport){
                         module->powerDraw++;
                         if(module->powerDraw > 2 * module->powerDefault) module->powerDraw--;
                     }
@@ -213,7 +223,7 @@ void main(void) {
                     break;
                 case SCRN_POWER:
                     module = &ShipModules[player->moduleSelected];
-                    if(module->techtype != tt_warpcore){
+                    if(module->techtype != tt_warpcore && module->techtype != tt_lifesupport){
                         module->powerDraw--;
                         if(module->powerDraw < 1) module->powerDraw++;
                     }
@@ -222,17 +232,17 @@ void main(void) {
         }
         
         if(key == sk_Mul){
-            if(player->position.speed < 5) player->position.speed = 5;
+            if(player->position.speed < 10) player->position.speed = 10;
             else player->position.speed = 0;
         }
         
         
         if( key == sk_Add && speed < 54)
             if(speed < topspeed)
-                if(speed < 4 || speed >= 5) player->position.speed++;
+                if(speed < 4 || speed >= 10) player->position.speed++;
         
         if( key == sk_Sub && speed > 0)
-            if(speed > 5 || speed <= 4) player->position.speed--;
+            if(speed > 10 || speed <= 4) player->position.speed--;
         
         if( key == sk_Yequ ){
             if(player->ScreenSelected == SCRN_TACTICAL) player->ScreenSelected = SCRN_VIEW;
@@ -300,16 +310,31 @@ void main(void) {
                 if(damage < 0) damage = 0;
             }
             for(i = 0; i < 2; i++){
-                Module_t* module = &ShipModules[randInt(2,12)];
+                Module_t* module = &ShipModules[randInt(2,7)];
                 module->health -= damage;
                 if(module->health <= 0) module->health = 0;
+                if((module->health * 100 / module->maxHealth) < 50) {
+                    if(module->location){
+                    switch(module->location){
+                        case nacelles:
+                            player->damagesection[nacelles-1] = true;
+                            break;
+                        case aft:
+                            player->damagesection[aft-1] = true;
+                            break;
+                        case saucer:
+                            player->damagesection[saucer-1] = true;
+                            break;
+                    }
+                    }
+                }
             }
         }
         
         
         switch(player->ScreenSelected){
             case SCRN_VIEW:
-                GUI_ViewScreen(MapMain, &player->position);
+                //GUI_ViewScreen(MapMain, &player->position);
                 break;
             case SCRN_TACTICAL:
                 GUI_TacticalReport(&ShipModules, shields);
@@ -333,6 +358,21 @@ void main(void) {
                 Module_t* repair = &ShipModules[player->moduleRepairing];
                 if(!repair->online && repair->health < repair->maxHealth && repair->powerReserve)
                     repair->health++;
+                if(repair->health * 100 / repair->maxHealth >= 50){
+                    if(repair->location){
+                    switch(repair->location){
+                        case nacelles:
+                            player->damagesection[nacelles-1] = false;
+                            break;
+                        case aft:
+                            player->damagesection[aft-1] = false;
+                            break;
+                        case saucer:
+                            player->damagesection[saucer-1] = false;
+                            break;
+                    }
+                    }
+                }
                 player->timers[timer_repair] = REPAIR_INTERVAL;
             }
         }
@@ -363,7 +403,7 @@ void main(void) {
         }
         gfx_DrawLifeSupportAlert(player->timers[timer_lifesupport] != 0);
         gfx_DrawCoreBreachAlert(player->timers[timer_corebreach] != 0);
-        gfx_DrawShipStatusIcon(integrity, shields);
+        gfx_DrawShipStatusIcon(integrity, shields, &player);
         gfx_DrawSpeedIndicator(player->position.speed, topspeed);
         gfx_BlitBuffer();
     }
@@ -385,6 +425,7 @@ void main(void) {
             break;
     }
     gfx_PrintStringXY("Thanks for testing!!", 1, 10);
+    free(MapMain);
     os_GetKey();
     gfx_End();
 	prgm_CleanUp();

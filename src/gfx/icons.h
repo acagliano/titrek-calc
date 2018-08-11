@@ -17,7 +17,11 @@ extern uint8_t power_alert_compressed[47];
 #define shield_alert_width 60
 #define shield_alert_height 29
 #define shield_alert_size 1742
-extern uint8_t shield_alert_compressed[171];
+extern uint8_t shield_alert_compressed[185];
+#define shield_alert_bg_width 60
+#define shield_alert_bg_height 29
+#define shield_alert_bg_size 1742
+extern uint8_t shield_alert_bg_compressed[154];
 #define torpedo_alert_width 25
 #define torpedo_alert_height 20
 #define torpedo_alert_size 502

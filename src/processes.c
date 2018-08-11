@@ -68,7 +68,8 @@ void PROC_PowerDraw(Module_t *ShipModules, char repairing){
 
 void PROC_AnglesToVectors(Position_t *pos){
     char xzangle = pos->angles[0], yangle = pos->angles[1];
-    //pos->vectors[0] = x vector
-    //pos->vectors[1] = y vector
+    pos->vectors[0] = byteCos(xzangle) * byteCos(yangle);
+    pos->vectors[1] = byteSin(xzangle) * byteCos(yangle);
+    pos->vectors[2] = byteSin(yangle);
     //pos->vectors[2] = z vector
 }

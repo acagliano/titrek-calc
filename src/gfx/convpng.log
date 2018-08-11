@@ -5,10 +5,11 @@ Using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 Transparent Color Index : 0
 Transparent Color : 0x0000
-6:
+7:
  tactical : converted! (822 > 69 bytes)
  power_alert : converted! (402 > 47 bytes)
- shield_alert : converted! (1742 > 171 bytes)
+ shield_alert : converted! (1742 > 185 bytes)
+ shield_alert_bg : converted! (1742 > 154 bytes)
  torpedo_alert : converted! (502 > 52 bytes)
  lifesupport_alert : converted! (402 > 38 bytes)
  breach_alert : converted! (402 > 86 bytes)

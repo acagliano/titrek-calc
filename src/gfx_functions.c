@@ -45,7 +45,7 @@ void PrintHeader(char *text, char x, char y, char xtextOff, char ytextOff){
 
 
 void DrawGUI(){
-    const char *version = "v0.49 alpha";
+    const char *version = "v0.50 alpha";
     char yPos = 230;
     gfx_FillScreen(148);
     gfx_SetColor(74);
@@ -81,7 +81,7 @@ void DrawGUI(){
 }
 
 
-void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields){
+void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields, Player_t *player){
     // status will be false for compromised, or true for good
     gfx_sprite_t *uncompressed;
     char shieldhealth = shields->health * 100 / shields->maxHealth;
@@ -92,12 +92,18 @@ void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields){
         if(shieldhealth < 25) gfx_SetColor(224);
         if(shieldhealth == 0 || !shields->online) gfx_SetColor(148);
         gfx_FillRectangle(10, 193, shield_alert_width, shield_alert_height);
-        gfx_SetColor(74);
-        if(integhealth < 25) gfx_SetColor(224);
-        gfx_FillRectangle(16, 202, 16, 12);
-        gfx_FillRectangle(32, 207, 10, 3);
+        dzx7_Standard(shield_alert_bg_compressed, uncompressed);
+        gfx_TransparentSprite(uncompressed, 10, 193);
         dzx7_Standard(shield_alert_compressed, uncompressed);
         gfx_TransparentSprite(uncompressed, 10, 193);
+        gfx_SetColor(224);
+        if(player->damagesection[nacelles-1]) {
+            gfx_FillRectangle(45, 193+5, 18, 2);
+            gfx_FillRectangle(45, 193+22, 18, 2);
+        }
+        if(player->damagesection[aft-1]) gfx_FillRectangle(36, 193+13, 10, 3);
+        if(integhealth < 50) gfx_FillCircle(23, 193+14, 3);
+        if(integhealth <= 0) gfx_FillCircle(23, 193+14, 5);
         free(uncompressed);
     }
 }
@@ -142,14 +148,15 @@ void gfx_DrawLifeSupportAlert(bool status){
 
 void gfx_DrawSpeedIndicator(char speed, char maxspeed){
     char i, tierspeed, difference;
-    char warpspeeds[11] = {5, 7, 10, 14, 19, 25, 32, 40, 49, 59, 60};
-    bool warpspeed = (speed > 4);
+    char warpspeeds[11] = {10, 12, 15, 19, 24, 30, 37, 45, 54, 64, 65};
+    bool warpspeed = (speed > 9);
     unsigned char yPos = 191, xPos = xStart + 56, limitbarlen = 0;
     gfx_SetTextFGColor(0);
-    gfx_SetTextBGColor(148);
+    gfx_SetTextBGColor(247);
     // impulse speed bar
     gfx_SetColor(148);
     gfx_FillRectangle(xPos-5, yPos-2, 220, 10);
+    gfx_SetColor(247);
     gfx_FillRectangle(xPos+1, yPos+9, 88, 12);
     gfx_SetColor(224);
     gfx_FillRectangle(xPos, yPos, 60, 7);
@@ -209,7 +216,7 @@ void gfx_DrawSpeedIndicator(char speed, char maxspeed){
 }
 
 
-void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
+/*void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
     char i;
     int player_x = playerpos->coords[0], player_y = playerpos->coords[1], player_z = playerpos->coords[2];
     int item_x, item_y, item_z;
@@ -225,4 +232,4 @@ void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
             if(//within 45 degrees on both vectors)
         }
     }
-}
+}*/

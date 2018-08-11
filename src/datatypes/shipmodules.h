@@ -29,6 +29,12 @@ enum techtype {
     tt_auxiliary
 };
 
+enum locations {
+    // 0 is not going to trigger alert
+    saucer = 1,
+    aft,
+    nacelles
+};
  // MODULE STATS STRUCTS
 
 typedef struct {
@@ -65,6 +71,7 @@ typedef struct {
     char powerDefault;
     int powerReserve;      // used for everything  module power reserve
     short health, maxHealth;
+    char location;
     union stats {
         sysstats_t sysstats;
         weapstats_t weapstats;

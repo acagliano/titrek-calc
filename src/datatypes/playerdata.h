@@ -1,7 +1,7 @@
 
 #ifndef playerdata_H
 #define playerdata_H
-
+#include <stdbool.h>
 
 enum Achievements {
     achieve_NoDamage,   // defeat an enemy ship without taking structure damage (shields dont count)
@@ -60,6 +60,7 @@ typedef struct {
     char modulation;
     char Achievements[8];
     char iconStates[2];
+    bool damagesection[3];
     char ScreenSelected;  // default, status, power, tactical, chat, sensors
     char moduleSelected;
     char moduleRepairing;
