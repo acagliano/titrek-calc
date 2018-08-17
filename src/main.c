@@ -59,17 +59,18 @@ enum {
     k_Left,
     k_Right,
     k_Add,
-    k_Sub
+    k_Sub,
+    k_2nd
 };
 Player_t player[1] = {0};
 Module_t ShipModules[20] = {0};
 MapData_t* MapMain;
-Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL, *lifesupport = NULL, *warpcore = NULL, *warpdrive = NULL;
+Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL, *lifesupport = NULL, *warpcore = NULL, *warpdrive = NULL, *activeweap = NULL;
 const char *GameSave = "TrekSave";
 
 void main(void) {
     bool loopgame = true, key = false;
-    bool keys_prior[14] = {0};
+    bool keys_prior[15] = {0};
     char SavePtr;
     char i;
     char mapslot;
@@ -83,7 +84,7 @@ void main(void) {
     gfx_SetTextTransparentColor(1);
     gfx_SetTransparentColor(0);
 	/* Fill in the body of the main function here */
-    for(i = 0; i < 8; i++){
+    for(i = 0; i < 10; i++){
         Module_t *module = &ShipModules[i];
         module->online = true;
         module->techtype = i;
@@ -140,6 +141,15 @@ void main(void) {
                 module->location = saucer;
                 strcpy(module->techname, "Sensors");
                 break;
+            case tt_phaser:
+                module->modtype = mt_weapon;
+                module->location = saucer;
+                module->stats.weapstats.damage_shield = 3;
+                module->stats.weapstats.damage_hull = 1;
+                module->stats.weapstats.range = 100;
+                module->stats.weapstats.speed = 10;
+                strcpy(module->techname, "Phasers");
+                break;
             default:
                 module->modtype = mt_system;
                 strcpy(module->techname, "Unsupport");
@@ -151,6 +161,7 @@ void main(void) {
     warpcore = init_SetPointer(&ShipModules, 3);   // return pointer to core
     lifesupport = init_SetPointer(&ShipModules, 4);   // return pointer to life support
     warpdrive = init_SetPointer(&ShipModules, 5);   // return pointer to warpdrive
+    activeweap = init_SetPointer(&ShipModules, 6); // pointer to phasers
     boot_ClearVRAM();
     DrawGUI(&ShipModules);
     player->ScreenSelected = SCRN_STATUS;
@@ -233,6 +244,23 @@ void main(void) {
             }
         }
         keys_prior[k_Del] = key;
+        key = kb_Data[1] & kb_2nd;
+        if( key && (!keys_prior[k_2nd] || player->tick % 5 == 0) ){
+            if(activeweap && activeweap->health > 0){
+                int power = activeweap->powerReserve;
+                if(power >= 64 && (((activeweap->stats.weapstats.charge + 1) * activeweap->powerDraw) < power)){
+                    activeweap->stats.weapstats.charge++;
+                }
+            }
+        }
+        if(!key && keys_prior[k_2nd]){
+            if(activeweap){ //fire phaser
+                activeweap->powerReserve -= (activeweap->stats.weapstats.charge * activeweap->powerDraw);
+                activeweap->stats.weapstats.charge = 0;
+            }
+        }
+        keys_prior[k_2nd] = key;
+        
         kb_ScanGroup(6);
         key = kb_Data[6] & kb_Mul;
         if( key && !keys_prior[k_Mul]){

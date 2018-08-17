@@ -254,7 +254,7 @@ void gfx_DrawSpeedIndicator(char speed, char maxspeed){
     }
     // heapsort renderbuffer
     for(i = 0; i < (sizeof(renderbuffer) / sizeof(RenderItem_t)); i++){
-        RenderItem_t *render = renderbuff_start;
+        RenderItem_t *render = renderbuff_start[i];
         gfx_sprite_t* sprite;
         gfx_sprite_t* scaled;
         char scale_x = (RENDER_DISTANCE - render->distance) * sprite->width / RENDER_DISTANCE;

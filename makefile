@@ -28,6 +28,6 @@ GFXDIR ?= src/gfx
 # Use OS helper functions (Advanced)
 # ----------------------------
 
-USE_FLASH_FUNCTIONS ?= YES
+USE_FLASH_FUNCTIONS ?= NO
 
 include $(CEDEV)/include/.makefile

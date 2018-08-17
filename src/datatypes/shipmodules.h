@@ -22,10 +22,10 @@ enum techtype {
     tt_warpcore,
     tt_warpdrive,
     tt_impulsedrive,
-    tt_transporter,
-    tt_sensor,
     tt_phaser,
     tt_torpedo,
+    tt_transporter,
+    tt_sensor,
     tt_auxiliary
 };
 
@@ -38,8 +38,9 @@ enum locations {
  // MODULE STATS STRUCTS
 
 typedef struct {
-    char weaptype;
-    char damage;
+    unsigned char equipped; // torpedoes only
+    unsigned char charge;  // phasers only
+    char damage_shield, damage_hull;
     char range;
     char speed;
 } weapstats_t;
@@ -73,8 +74,8 @@ typedef struct {
     short health, maxHealth;
     char location;
     union stats {
-        sysstats_t sysstats;
         weapstats_t weapstats;
+        sysstats_t sysstats;
         shieldstats_t shieldstats;
     } stats;
 } Module_t;
