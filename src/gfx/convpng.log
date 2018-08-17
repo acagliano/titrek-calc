@@ -14,6 +14,14 @@ Transparent Color : 0x0000
  lifesupport_alert : converted! (402 > 38 bytes)
  breach_alert : converted! (402 > 86 bytes)
 
+--- Group effects (C) ---
+Using built-in xlibc palette ...
+warning: might ignore transparent color value for a fixed palette.
+Transparent Color Index : 0
+Transparent Color : 0x0000
+1:
+ warp : converted! (9218 > 1560 bytes)
+
 Converted in 0 s
 
 [warning] image quality might be too low.

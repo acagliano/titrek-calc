@@ -1,10 +1,11 @@
 #include <stdbool.h>
 #include <stddef.h>
-#include <decompress.h>
+#include <compression.h>
 #include <graphx.h>
 #include "datatypes/shipmodules.h"
 #include "gfx_functions.h"
 #include "gfx/icons.h"
+#include "mymath.h"
 
 void Module_NoPower(Module_t* module){
     module->powerReserve = 0;
@@ -31,7 +32,7 @@ void PROC_PowerCycle(Module_t *ShipModules, Module_t *warpcore, char repairing, 
            // gfx_DrawPowerStatusIcon(false);
             gfx_sprite_t *uncompressed;
             if(uncompressed = gfx_MallocSprite(power_alert_width, power_alert_height)){
-                dzx7_Standard(power_alert_compressed, uncompressed);
+                zx7_Decompress(uncompressed, power_alert_compressed);
                 gfx_Sprite(uncompressed, 310 - power_alert_width, 203);
                 free(uncompressed);
                 gfx_BlitBuffer();

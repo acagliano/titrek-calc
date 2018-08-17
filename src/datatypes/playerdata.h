@@ -24,6 +24,7 @@ enum timers {
     timer_repair
 };
 
+#define KEY_INTERVAL 1
 #define POWER_INTERVAL 5
 #define CORE_BREACH_TIMER 1000
 #define LIFE_SUPPORT_TIMER 2000
@@ -55,6 +56,7 @@ typedef struct inventory_t {
 typedef struct {
     Position_t position;
     Inventory_t inventory[20];
+    unsigned long tick;
     short timers[4];
     int money;
     char modulation;

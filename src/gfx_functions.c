@@ -1,12 +1,13 @@
 
 #include <graphx.h>
-#include <decompress.h>
+#include <compression.h>
 #include "equates.h"
 #include "gfx/icons.h"
 #include "gfx_functions.h"
 #include "datatypes/mapdata.h"
 #include "datatypes/shipmodules.h"
 #include "datatypes/playerdata.h"
+#include <math.h>
 
 typedef struct {
     char type;
@@ -22,14 +23,14 @@ void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){
     if(text){
         gfx_SetTextXY(x+55+(50*(scale==1))+7-(2*(scale>1)), y);
         gfx_PrintUInt(percent,1+(percent>9)+(percent>99));
-        gfx_PrintString("%  ");
+        gfx_PrintString("% ");
     }
 }
 
 
 void gfx_WipeScreen(){
     gfx_SetColor(0);
-    gfx_FillRectangle(23, 21, 274, 164);
+    gfx_FillRectangle(23, 21, 274, 165);
     gfx_SetTextXY(xStart, yStart);
 }
 
@@ -45,7 +46,7 @@ void PrintHeader(char *text, char x, char y, char xtextOff, char ytextOff){
 
 
 void DrawGUI(){
-    const char *version = "v0.50 alpha";
+    const char *version = "v0.51 alpha";
     char yPos = 230;
     gfx_FillScreen(148);
     gfx_SetColor(74);
@@ -92,9 +93,9 @@ void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields, Player_t *pl
         if(shieldhealth < 25) gfx_SetColor(224);
         if(shieldhealth == 0 || !shields->online) gfx_SetColor(148);
         gfx_FillRectangle(10, 193, shield_alert_width, shield_alert_height);
-        dzx7_Standard(shield_alert_bg_compressed, uncompressed);
+        zx7_Decompress(uncompressed, shield_alert_bg_compressed);
         gfx_TransparentSprite(uncompressed, 10, 193);
-        dzx7_Standard(shield_alert_compressed, uncompressed);
+        zx7_Decompress(uncompressed, shield_alert_compressed);
         gfx_TransparentSprite(uncompressed, 10, 193);
         gfx_SetColor(224);
         if(player->damagesection[nacelles-1]) {
@@ -116,7 +117,7 @@ void gfx_DrawInventoryStatusIcon(bool status){
         gfx_SetColor(36);
         if(status == false) gfx_SetColor(224);
         gfx_FillRectangle(225 - torpedo_alert_width, 203, torpedo_alert_width, torpedo_alert_height);
-        dzx7_Standard(torpedo_alert_compressed, uncompressed);
+        zx7_Decompress(uncompressed, torpedo_alert_compressed);
         gfx_TransparentSprite(uncompressed, 225 - torpedo_alert_width, 203);
         free(uncompressed);
     }
@@ -128,7 +129,7 @@ void gfx_DrawCoreBreachAlert(bool status){
         gfx_SetColor(224);
         if(!status) gfx_SetColor(148);
         gfx_FillRectangle(285 - breach_alert_width, 203, breach_alert_width, breach_alert_height);
-        dzx7_Standard(breach_alert_compressed, uncompressed);
+        zx7_Decompress(uncompressed, breach_alert_compressed);
         gfx_TransparentSprite(uncompressed, 285 - breach_alert_width, 203);
         free(uncompressed);
     }
@@ -140,7 +141,7 @@ void gfx_DrawLifeSupportAlert(bool status){
         gfx_SetColor(224);
         if(!status) gfx_SetColor(148);
         gfx_FillRectangle(260 - lifesupport_alert_width, 203, lifesupport_alert_width, lifesupport_alert_height);
-        dzx7_Standard(lifesupport_alert_compressed, uncompressed);
+        zx7_Decompress(uncompressed, lifesupport_alert_compressed);
         gfx_TransparentSprite(uncompressed, 260 - lifesupport_alert_width, 203);
         free(uncompressed);
     }
@@ -218,18 +219,49 @@ void gfx_DrawSpeedIndicator(char speed, char maxspeed){
 
 /*void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
     char i;
+    RenderItem_t* renderbuffer = NULL, renderbuff_start;
+    double val = 180/PI;
     int player_x = playerpos->coords[0], player_y = playerpos->coords[1], player_z = playerpos->coords[2];
     int item_x, item_y, item_z;
+    int distance_x, distance_y, distance_z;
     long distance;
     for(i=0; i<(sizeof(map)/sizeof(MapData_t)), i++){
         MapData_t *item = &map[i];
-        item_x = item->coords[0];
-        item_y = item->coords[1];
-        item_z = item->coords[2];
-        if((distance = r_GetDistance(item_x - player_x, item_y - player_y, item_z - player_z)) <= RENDER_DISTANCE){
-            unsigned char playervect_zx, playervect_y;
-            char vectordiff_xz, vectordiff_y;
-            if(//within 45 degrees on both vectors)
+        item_x = item->position.coords[0];
+        item_y = item->position.coords[1];
+        item_z = item->position.coords[2];
+        distance_x = item_x - player_x;
+        distance_y = item_y - player_y;
+        distance_z = item_z - player_z;
+        if((distance = r_GetDistance(distance_x, distance_y, distance_z)) <= RENDER_DISTANCE){
+            unsigned char objectvect_xz = (char)(atan2(distance_z / distance_x) * val);
+            unsigned char objectvect_y = (char)(atan2(distance_y / distance_x) * val);
+            char vectordiff_xz = playerpos->angles[0] - objectvect_xz;
+            char vectordiff_y = playerpos->angles[1] - objectvect_y;
+            if(abs(vectordiff_xz) <= 45 && abs(vectordiff_y) <= 45){
+                if(renderbuffer == NULL) {
+                    renderbuffer = malloc(sizeof(RenderItem_t));
+                    renderbuff_start = renderbuffer;
+                }
+                else renderbuffer = realloc(renderbuffer, sizeof(renderbuffer) + sizeof(RenderItem_t));
+                renderbuffer->type = item->entitytype;
+                renderbuffer->distance = distance;
+                renderbuffer->angleOffsets[0] = vectordiff_xz;
+                renderbuffer->angleOffsets[1] = vectordiff_y;
+                renderbuffer++;
+            }
         }
     }
-}*/
+    // heapsort renderbuffer
+    for(i = 0; i < (sizeof(renderbuffer) / sizeof(RenderItem_t)); i++){
+        RenderItem_t *render = renderbuff_start;
+        gfx_sprite_t* sprite;
+        gfx_sprite_t* scaled;
+        char scale_x = (RENDER_DISTANCE - render->distance) * sprite->width / RENDER_DISTANCE;
+        char scale_y = (RENDER_DISTANCE - render->distance) * sprite->height / RENDER_DISTANCE;
+        gfx_ScaleSprite(sprite, scaled);
+        render->type // use this to locate sprite
+    }
+    free(renderbuffer);
+    free(renderbuff_start);
+} */

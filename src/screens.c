@@ -1,5 +1,5 @@
 #include <graphx.h>
-#include <decompress.h>
+#include <compression.h>
 #include "datatypes/shipmodules.h"
 #include "datatypes/playerdata.h"
 #include "gfx_functions.h"
@@ -83,7 +83,7 @@ void GUI_TacticalReport(Module_t *ShipModules, Module_t *shields){
     gfx_WipeScreen();
     PrintHeader("Tactical Report", xStart+1, yStart+1, 80, 2);
     if(uncompressed = gfx_MallocSprite(tactical_width, tactical_height)){
-        dzx7_Standard(tactical_compressed, uncompressed);
+        zx7_Decompress(uncompressed, tactical_compressed);
         gfx_TransparentSprite(uncompressed, xStart + 21, yStart + 25);
         free(uncompressed);
     }

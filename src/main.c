@@ -22,7 +22,8 @@
 // stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 #include <fileioc.h>
 #include <graphx.h>
-#include <decompress.h>
+#include <compression.h>
+#include <keypadc.h>
 
 
 
@@ -38,11 +39,28 @@ void printText(const char *text, uint8_t x, uint8_t y);
 #include "initialize.h"
 #include "mapfuncs.h"
 #include "mymath.h"
+#include "vfx.h"
 
 #include "screens.h"
 
 #include "equates.h"
 
+enum {
+    k_Yequ,
+    k_Window,
+    k_Zoom,
+    k_Trace,
+    k_Graph,
+    k_Mode,
+    k_Del,
+    k_Mul,
+    k_Down,
+    k_Up,
+    k_Left,
+    k_Right,
+    k_Add,
+    k_Sub
+};
 Player_t player[1] = {0};
 Module_t ShipModules[20] = {0};
 MapData_t* MapMain;
@@ -50,9 +68,10 @@ Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL, *lifesupport = NU
 const char *GameSave = "TrekSave";
 
 void main(void) {
+    bool loopgame = true, key = false;
+    bool keys_prior[14] = {0};
     char SavePtr;
     char i;
-    char key = 0;
     char mapslot;
     MapMain = calloc(10, sizeof(MapData_t));
     srandom(rtc_Time());
@@ -103,7 +122,7 @@ void main(void) {
             case tt_warpdrive:
                 module->modtype = mt_system;
                 module->location = nacelles;
-                module->stats.sysstats.topSpeed = 11;
+                module->stats.sysstats.topSpeed = 54;
                 strcpy(module->techname, "WarpDrive");
                 break;
             case tt_impulsedrive:
@@ -153,103 +172,39 @@ void main(void) {
     do
     {
         char corestability, lifesupporthealth, speed = player->position.speed;
+        unsigned char warpdrivehealth = warpdrive->health * 100 / warpdrive->maxHealth;
         char topspeed = warpdrive->stats.sysstats.topSpeed;
         unsigned char warppow = warpdrive->powerDraw * 100 / warpdrive->powerDefault;
         if( warppow > 100) topspeed += (warppow / 10 - 10) / 2;
         else topspeed = topspeed * warppow / 100;
-        if(topspeed < 5) topspeed = 5;
+        topspeed = topspeed * warpdrivehealth / 100;
+        if(topspeed < 10) topspeed = 10;
+        if(warpdrivehealth == 0 || warppow == 0 || !warpdrive->online) topspeed = 4;
         if(speed > topspeed) {
             player->position.speed = topspeed;
             speed = topspeed;
         }
-        key = os_GetCSC();
-        
-       
-        if(key == sk_Clear) break;
-       
-        if( key == sk_Down){
-            Module_t* module;
-            switch(player->ScreenSelected){
-                case SCRN_VIEW:
-                    player->position.angles[1]++;
-                    PROC_AnglesToVectors(&player->position);
-                    break;
-                case SCRN_POWER:
-                case SCRN_STATUS:
-                    player->moduleSelected++;
-                    module = &ShipModules[player->moduleSelected];
-                    if(!module->modtype) player->moduleSelected--;
-                    break;
-            }
+        kb_ScanGroup(1);
+        key = kb_Data[1] & kb_Window;
+        if(key && !keys_prior[k_Window] ){
+            if(player->ScreenSelected == SCRN_STATUS) player->ScreenSelected = SCRN_VIEW;
+            else player->ScreenSelected = SCRN_STATUS;
         }
-        
-        if( key == sk_Up){
-            switch(player->ScreenSelected){
-                case SCRN_VIEW:
-                    player->position.angles[1]--;
-                    PROC_AnglesToVectors(&player->position);
-                    break;
-                case SCRN_POWER:
-                case SCRN_STATUS:
-                    player->moduleSelected--;
-                    if(player->moduleSelected < 0) player->moduleSelected++;
-                    break;
-            }
+        keys_prior[k_Window] = key;
+        key = kb_Data[1] & kb_Trace;
+        if( key && !keys_prior[k_Trace] ){
+            if(player->ScreenSelected == SCRN_POWER) player->ScreenSelected = SCRN_VIEW;
+            else player->ScreenSelected = SCRN_POWER;
         }
-        
-        if( key == sk_Right){
-            Module_t* module;
-            switch(player->ScreenSelected){
-                case SCRN_VIEW:
-                    player->position.angles[0]++;
-                    PROC_AnglesToVectors(&player->position);
-                    break;
-                case SCRN_POWER:
-                    module = &ShipModules[player->moduleSelected];
-                    if(module->techtype != tt_warpcore && module->techtype != tt_lifesupport){
-                        module->powerDraw++;
-                        if(module->powerDraw > 2 * module->powerDefault) module->powerDraw--;
-                    }
-                    break;
-            }
-        }
-        
-        if( key == sk_Left){
-            Module_t* module;
-            switch(player->ScreenSelected){
-                case SCRN_VIEW:
-                    player->position.angles[0]--;
-                    PROC_AnglesToVectors(&player->position);
-                    break;
-                case SCRN_POWER:
-                    module = &ShipModules[player->moduleSelected];
-                    if(module->techtype != tt_warpcore && module->techtype != tt_lifesupport){
-                        module->powerDraw--;
-                        if(module->powerDraw < 1) module->powerDraw++;
-                    }
-                    break;
-            }
-        }
-        
-        if(key == sk_Mul){
-            if(player->position.speed < 10) player->position.speed = 10;
-            else player->position.speed = 0;
-        }
-        
-        
-        if( key == sk_Add && speed < 54)
-            if(speed < topspeed)
-                if(speed < 4 || speed >= 10) player->position.speed++;
-        
-        if( key == sk_Sub && speed > 0)
-            if(speed > 10 || speed <= 4) player->position.speed--;
-        
-        if( key == sk_Yequ ){
+        keys_prior[k_Trace] = key;
+        key = kb_Data[1] & kb_Yequ;
+        if( key && !keys_prior[k_Yequ] ){
             if(player->ScreenSelected == SCRN_TACTICAL) player->ScreenSelected = SCRN_VIEW;
             else player->ScreenSelected = SCRN_TACTICAL;
         }
-        
-        if( key == sk_Mode ){
+        keys_prior[k_Yequ] = key;
+        key = kb_Data[1] & kb_Mode;
+        if( key && !keys_prior[k_Mode] ){
             if(player->ScreenSelected == SCRN_POWER){
                 Module_t* module = &ShipModules[player->moduleSelected];
                 module->online = !module->online;
@@ -267,8 +222,9 @@ void main(void) {
                 }
             }
         }
-        
-        if( key == sk_Del ){
+        keys_prior[k_Mode] = key;
+        key = kb_Data[1] & kb_Del;
+        if( key && !keys_prior[k_Del] ){
             Module_t *module = &ShipModules[player->moduleSelected];
             if(module->techtype == tt_warpcore && player->timers[timer_corebreach]){
                 module->modtype = mt_ejectedcore;
@@ -276,18 +232,24 @@ void main(void) {
                 warpcore = NULL;
             }
         }
-        
-        if( key == sk_Window ){
-            if(player->ScreenSelected == SCRN_STATUS) player->ScreenSelected = SCRN_VIEW;
-            else player->ScreenSelected = SCRN_STATUS;
+        keys_prior[k_Del] = key;
+        kb_ScanGroup(6);
+        key = kb_Data[6] & kb_Mul;
+        if( key && !keys_prior[k_Mul]){
+            if(player->position.speed < 10) player->position.speed = 10;
+            else player->position.speed = 0;
         }
-        
-        if( key == sk_Trace ){
-            if(player->ScreenSelected == SCRN_POWER) player->ScreenSelected = SCRN_VIEW;
-            else player->ScreenSelected = SCRN_POWER;
-        }
-        
-        if( key == sk_Power){
+        keys_prior[k_Mul] = key;
+        key = kb_Data[6] & kb_Add;
+        if( (key && (!keys_prior[k_Add] || player->tick % 5 == 0)) && speed < topspeed)
+            if(speed < topspeed)
+                if(speed < 4 || speed >= 10) player->position.speed++;
+        keys_prior[k_Add] = key;
+        key = kb_Data[6] & kb_Sub;
+        if( (key && (!keys_prior[k_Sub] || player->tick % 5 == 0)) && speed > 0)
+            if(speed > 10 || speed <= 4) player->position.speed--;
+        keys_prior[k_Sub] = key;
+        if( kb_Data[6] & kb_Power){
             //damage random system
             char i;
             char damage = randInt(4,6);
@@ -315,17 +277,125 @@ void main(void) {
                 if(module->health <= 0) module->health = 0;
                 if((module->health * 100 / module->maxHealth) < 50) {
                     if(module->location){
-                    switch(module->location){
-                        case nacelles:
-                            player->damagesection[nacelles-1] = true;
-                            break;
-                        case aft:
-                            player->damagesection[aft-1] = true;
-                            break;
-                        case saucer:
-                            player->damagesection[saucer-1] = true;
-                            break;
+                        switch(module->location){
+                            case nacelles:
+                                player->damagesection[nacelles-1] = true;
+                                break;
+                            case aft:
+                                player->damagesection[aft-1] = true;
+                                break;
+                            case saucer:
+                                player->damagesection[saucer-1] = true;
+                                break;
+                        }
                     }
+                }
+            }
+        }
+        if(kb_Data[6] & kb_Clear) loopgame = false;
+       
+        kb_ScanGroup(7);
+        key = kb_Data[7] & kb_Down;
+        if( key ){
+            Module_t* module;
+            switch(player->ScreenSelected){
+                case SCRN_VIEW:
+                    player->position.angles[1]++;
+                    PROC_AnglesToVectors(&player->position);
+                    break;
+                case SCRN_POWER:
+                case SCRN_STATUS:
+                    if(key && !keys_prior[k_Down]){
+                        player->moduleSelected++;
+                        module = &ShipModules[player->moduleSelected];
+                        if(!module->modtype) player->moduleSelected--;
+                    }
+                    break;
+            }
+        }
+        keys_prior[k_Down] = key;
+        key = kb_Data[7] & kb_Up;
+        if( key ){
+            switch(player->ScreenSelected){
+                case SCRN_VIEW:
+                    player->position.angles[1]--;
+                    PROC_AnglesToVectors(&player->position);
+                    break;
+                case SCRN_POWER:
+                case SCRN_STATUS:
+                    if(key && !keys_prior[k_Up]){
+                        player->moduleSelected--;
+                        if(player->moduleSelected < 0) player->moduleSelected++;
+                    }
+                    break;
+            }
+        }
+        keys_prior[k_Up] = key;
+        key = kb_Data[7] & kb_Right;
+        if( key ){
+            Module_t* module;
+            switch(player->ScreenSelected){
+                case SCRN_VIEW:
+                    player->position.angles[0]++;
+                    PROC_AnglesToVectors(&player->position);
+                    break;
+                case SCRN_POWER:
+                    if(key && !keys_prior[k_Right]){
+                        module = &ShipModules[player->moduleSelected];
+                        if(module->techtype != tt_warpcore && module->techtype != tt_lifesupport){
+                            module->powerDraw++;
+                            if(module->powerDraw > 2 * module->powerDefault) module->powerDraw--;
+                        }
+                    }
+                    break;
+            }
+        }
+        keys_prior[k_Right] = key;
+        key = kb_Data[7] & kb_Left;
+        if( key){
+        Module_t* module;
+        switch(player->ScreenSelected){
+            case SCRN_VIEW:
+                player->position.angles[0]--;
+                PROC_AnglesToVectors(&player->position);
+                break;
+            case SCRN_POWER:
+                    if(key && !keys_prior[k_Left]){
+                        module = &ShipModules[player->moduleSelected];
+                        if(module->techtype != tt_warpcore && module->techtype != tt_lifesupport){
+                            module->powerDraw--;
+                            if(module->powerDraw < 1) module->powerDraw++;
+                        }
+                    }
+                    break;
+            }
+        }
+        keys_prior[k_Left] = key;
+      
+        if(player->tick % POWER_INTERVAL == 0){
+            PROC_PowerDraw(&ShipModules, player->moduleRepairing);
+            PROC_PowerCycle(&ShipModules, warpcore, player->moduleRepairing, &player);
+            player->timers[timer_power] = POWER_INTERVAL;
+        }
+        
+        if(player->tick % REPAIR_INTERVAL == 0){
+            if(player->moduleRepairing != -1){
+                Module_t* repair = &ShipModules[player->moduleRepairing];
+                if(!repair->online && repair->health < repair->maxHealth && repair->powerReserve)
+                    repair->health++;
+                if(repair->health * 100 / repair->maxHealth >= 50){
+                    if(repair->location){
+                        switch(repair->location){
+                            case nacelles:
+                                player->damagesection[nacelles-1] = false;
+                                break;
+                            case aft:
+                                player->damagesection[aft-1] = false;
+                                break;
+                            case saucer:
+                                player->damagesection[saucer-1] = false;
+                                break;
+                        }
                     }
                 }
             }
@@ -334,7 +404,10 @@ void main(void) {
         
         switch(player->ScreenSelected){
             case SCRN_VIEW:
-                //GUI_ViewScreen(MapMain, &player->position);
+                gfx_WipeScreen();
+                gfx_SetClipRegion(23, 22, 297, 186);
+                if(speed >= 10) GUI_RenderWarp(speed);
+                gfx_SetClipRegion(0, 0, 320, 240);
                 break;
             case SCRN_TACTICAL:
                 GUI_TacticalReport(&ShipModules, shields);
@@ -346,37 +419,8 @@ void main(void) {
                 GUI_PowerReport(&ShipModules, player->moduleSelected, player->position.speed);
                 break;
         }
-        if(player->timers[timer_power] == 0){
-            PROC_PowerDraw(&ShipModules, player->moduleRepairing);
-            PROC_PowerCycle(&ShipModules, warpcore, player->moduleRepairing, &player);
-            player->timers[timer_power] = POWER_INTERVAL;
-        }
-        else player->timers[timer_power]--;
         
-        if(player->timers[timer_repair] == 0){
-            if(player->moduleRepairing != -1){
-                Module_t* repair = &ShipModules[player->moduleRepairing];
-                if(!repair->online && repair->health < repair->maxHealth && repair->powerReserve)
-                    repair->health++;
-                if(repair->health * 100 / repair->maxHealth >= 50){
-                    if(repair->location){
-                    switch(repair->location){
-                        case nacelles:
-                            player->damagesection[nacelles-1] = false;
-                            break;
-                        case aft:
-                            player->damagesection[aft-1] = false;
-                            break;
-                        case saucer:
-                            player->damagesection[saucer-1] = false;
-                            break;
-                    }
-                    }
-                }
-                player->timers[timer_repair] = REPAIR_INTERVAL;
-            }
-        }
-        else player->timers[timer_repair]--;
+       
         
        
         
@@ -406,8 +450,9 @@ void main(void) {
         gfx_DrawShipStatusIcon(integrity, shields, &player);
         gfx_DrawSpeedIndicator(player->position.speed, topspeed);
         gfx_BlitBuffer();
+        player->tick++;
     }
-    while(key != sk_Clear);
+    while(loopgame);
     gfx_SetDrawScreen();
     boot_ClearVRAM();
     
