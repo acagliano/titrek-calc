@@ -63,7 +63,7 @@ enum {
     k_2nd
 };
 Player_t player[1] = {0};
-Module_t ShipModules[20] = {0};
+Module_t ShipModules[15] = {0};
 MapData_t* MapMain;
 Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL, *lifesupport = NULL, *warpcore = NULL, *warpdrive = NULL, *activeweapon = NULL;
 const char *GameSave = "TrekSave";
@@ -174,8 +174,8 @@ void main(void) {
     activeweapon = init_SetPointer(&ShipModules, tt_phaser, 0); // pointer to phasers
    
     boot_ClearVRAM();
-    DrawGUI(&ShipModules);
-    player->ScreenSelected = SCRN_STATUS;
+    DrawGUI();
+    player->ScreenSelected = SCRN_TACTICAL;
     player->moduleRepairing = -1;
     if((mapslot = map_LocateSlot(MapMain)) >= 0){
         MapData_t *slot = &MapMain[mapslot];
@@ -205,10 +205,10 @@ void main(void) {
             player->position.speed = topspeed;
             speed = topspeed;
         }
-        /*if(/*activeweap != init_SetPointer(&ShipModules, tt_phaser, 0) || warpdrive != init_SetPointer(&ShipModules, tt_warpdrive, 0)) {
+        if(!player->tick && activeweapon != init_SetPointer(&ShipModules, tt_phaser, 0)) {
             player->deathreason = 3;
             break;
-        } */
+        }
         kb_ScanGroup(1);
         key = kb_Data[1] & kb_Window;
         if(key && !keys_prior[k_Window] ){
@@ -228,6 +228,7 @@ void main(void) {
             else player->ScreenSelected = SCRN_TACTICAL;
         }
         keys_prior[k_Yequ] = key;
+        
         key = kb_Data[1] & kb_Mode;
         if( key && !keys_prior[k_Mode] ){
             if(player->ScreenSelected == SCRN_POWER){
@@ -235,8 +236,8 @@ void main(void) {
                 module->online = !module->online;
             }
             if(player->ScreenSelected == SCRN_TACTICAL){
-                char i = (activeweapon->techtype == tt_phaser) ? tt_torpedo - 1 : tt_phaser - 1;
-                activeweapon = &ShipModules[i];
+                char i = (activeweapon->techtype == tt_phaser) ? tt_torpedo : tt_phaser;
+                activeweapon = init_SetPointer(&ShipModules, i, 0);
             }
 
             if(player->ScreenSelected == SCRN_STATUS){
@@ -253,6 +254,7 @@ void main(void) {
             }
         }
         keys_prior[k_Mode] = key;
+        
         key = kb_Data[1] & kb_Del;
         if( key && !keys_prior[k_Del] ){
             Module_t *module = &ShipModules[player->moduleSelected];
@@ -263,25 +265,26 @@ void main(void) {
             }
         }
         keys_prior[k_Del] = key;
-        /*
+        
         key = kb_Data[1] & kb_2nd;
         if( key && (!keys_prior[k_2nd] || player->tick % 5 == 0) ){
-            if(activeweap && (activeweap->health > 0)){
-                int power = activeweap->powerReserve;
-                char maxCharge = activeweap->stats.weapstats.maxCharge;
-                if((power >= (maxCharge * activeweap->powerDraw)) && (activeweap->stats.weapstats.charge < maxCharge)){
-                    activeweap->stats.weapstats.charge++;
+            if(activeweapon && (activeweapon->health > 0)){
+                int power = activeweapon->powerReserve;
+                char charge = activeweapon->stats.weapstats.charge;
+                char maxCharge = activeweapon->stats.weapstats.maxCharge;
+                if((power >= ((charge + 1) * activeweapon->powerDraw)) && (charge < maxCharge)){
+                    activeweapon->stats.weapstats.charge++;
                 }
             }
         }
         if(!key && keys_prior[k_2nd]){
-            if(activeweap){ //fire phaser
-                activeweap->powerReserve -= (activeweap->stats.weapstats.charge * activeweap->powerDraw);
-                activeweap->stats.weapstats.charge = 0;
+            if(activeweapon){ //fire phaser
+                activeweapon->powerReserve -= (activeweapon->stats.weapstats.charge * activeweapon->powerDraw);
+                activeweapon->stats.weapstats.charge = 0;
             }
         }
         keys_prior[k_2nd] = key;
-        */
+    
         kb_ScanGroup(6);
         key = kb_Data[6] & kb_Mul;
         if( key && !keys_prior[k_Mul]){
@@ -298,6 +301,7 @@ void main(void) {
         if( (key && (!keys_prior[k_Sub] || player->tick % 5 == 0)) && speed > 0)
             if(speed > 10 || speed <= 4) player->position.speed--;
         keys_prior[k_Sub] = key;
+        
         if( kb_Data[6] & kb_Power){
             //damage random system
             char i;

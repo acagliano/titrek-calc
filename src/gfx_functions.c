@@ -46,7 +46,7 @@ void PrintHeader(char *text, char x, char y, char xtextOff, char ytextOff){
 
 
 void DrawGUI(){
-    const char *version = "v0.53 alpha";
+    const char *version = "v0.54 alpha";
     char yPos = 230;
     gfx_FillScreen(148);
     gfx_SetColor(74);
