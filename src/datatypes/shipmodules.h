@@ -38,8 +38,8 @@ enum locations {
  // MODULE STATS STRUCTS
 
 typedef struct {
-    unsigned char equipped; // torpedoes only
-    unsigned char charge;  // phasers only
+    char equipped; // torpedoes only
+    char charge, maxCharge;  // phasers only
     char damage_shield, damage_hull;
     char range;
     char speed;
@@ -73,7 +73,7 @@ typedef struct {
     int powerReserve;      // used for everything  module power reserve
     short health, maxHealth;
     char location;
-    union stats {
+    union {
         weapstats_t weapstats;
         sysstats_t sysstats;
         shieldstats_t shieldstats;

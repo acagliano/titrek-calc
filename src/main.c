@@ -144,6 +144,8 @@ void main(void) {
             case tt_phaser:
                 module->modtype = mt_weapon;
                 module->location = saucer;
+                module->stats.weapstats.charge = 0;
+                module->stats.weapstats.maxCharge = 10;
                 module->stats.weapstats.damage_shield = 3;
                 module->stats.weapstats.damage_hull = 1;
                 module->stats.weapstats.range = 100;
@@ -162,6 +164,7 @@ void main(void) {
     lifesupport = init_SetPointer(&ShipModules, 4);   // return pointer to life support
     warpdrive = init_SetPointer(&ShipModules, 5);   // return pointer to warpdrive
     activeweap = init_SetPointer(&ShipModules, 6); // pointer to phasers
+    
     boot_ClearVRAM();
     DrawGUI(&ShipModules);
     player->ScreenSelected = SCRN_STATUS;
@@ -244,11 +247,13 @@ void main(void) {
             }
         }
         keys_prior[k_Del] = key;
+        
         key = kb_Data[1] & kb_2nd;
         if( key && (!keys_prior[k_2nd] || player->tick % 5 == 0) ){
-            if(activeweap && activeweap->health > 0){
+            if(activeweap && (activeweap->health > 0)){
                 int power = activeweap->powerReserve;
-                if(power >= 64 && (((activeweap->stats.weapstats.charge + 1) * activeweap->powerDraw) < power)){
+                char maxCharge = activeweap->stats.weapstats.maxCharge;
+                if((power >= (maxCharge * activeweap->powerDraw)) && (activeweap->stats.weapstats.charge < maxCharge)){
                     activeweap->stats.weapstats.charge++;
                 }
             }
