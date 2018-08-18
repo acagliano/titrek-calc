@@ -18,14 +18,13 @@ enum InventoryItemTypes {
 };
 
 enum timers {
-    timer_power,
     timer_corebreach,
-    timer_lifesupport,
-    timer_repair
+    timer_lifesupport
 };
 
 #define KEY_INTERVAL 1
 #define POWER_INTERVAL 5
+#define CORE_RECHARGE_TIMER 20
 #define CORE_BREACH_TIMER 1000
 #define LIFE_SUPPORT_TIMER 2000
 #define REPAIR_INTERVAL 10

@@ -16,7 +16,7 @@ void GUI_PowerReport(Module_t *ShipModules, char selected, char speed) {
     
     for(i = 0; i < 20; i++){
         Module_t *module = &ShipModules[i];
-        if(module->techtype != 0){
+        if(module->techtype){
             int currpower = module->powerReserve*100/255;
             int powersett = module->powerDraw*100/module->powerDefault;
             gfx_PrintStringXY(module->techname, xStart+10, yStart+((counter+2)*9));
@@ -53,7 +53,7 @@ void GUI_StatusReport(Module_t *ShipModules, char selected, char repairing) {
     
     for(i = 0; i < 20; i++){
         Module_t *module = &ShipModules[i];
-        if(module->techtype != 0){
+        if(module->techtype){
             int health = module->health*100/module->maxHealth;
             gfx_SetColor(36);
             if(!module->online) gfx_SetColor(224);
@@ -130,13 +130,13 @@ void GUI_TacticalReport(Module_t *ShipModules, Module_t *shields, Module_t *acti
     gfx_PrintStringXY("N", xStart+3, yStart+ 137);
     gfx_PrintStringXY("S", xStart+3, yStart+ 146);
     gfx_SetTextBGColor(0);
-    for(i = 6; i <=7; i++){
+    for(i = tt_phaser - 1; i < tt_torpedo; i++){
         Module_t *weap = &ShipModules[i];
         bool armed = false;
         char damage_shield = weap->stats.weapstats.damage_shield,
         damage_hull = weap->stats.weapstats.damage_hull;
-        int rect_start_x = (i-6)*(vWidth>>1)+xStart+20, rect_start_y = yStart+92;
-        if(i == 7) rect_start_x -= 10;
+        int rect_start_x = (i-5)*(vWidth>>1)+xStart+20, rect_start_y = yStart+92;
+        if(i == tt_torpedo - 1) rect_start_x -= 10;
         gfx_SetColor(224);
         gfx_SetTextBGColor(224);
         if(weap == activeweap){
@@ -151,9 +151,11 @@ void GUI_TacticalReport(Module_t *ShipModules, Module_t *shields, Module_t *acti
         gfx_PrintStringXY("Type: ", rect_start_x + 5, rect_start_y + 15);
         gfx_PrintString(weap->stats.weapstats.weapname);
         gfx_PrintStringXY("_Damage_", rect_start_x + 5, rect_start_y + 25);
-        gfx_PrintStringXY("Shields: ", rect_start_x + 8, rect_start_y + 35);
+        gfx_PrintStringXY("Shields: ", rect_start_x + 12, rect_start_y + 36);
+        gfx_PrintStringXY("Hull:    ", rect_start_x + 12, rect_start_y + 46);
+        gfx_SetTextXY(rect_start_x + 70, rect_start_y + 36);
         gfx_PrintUInt(damage_shield, 1 + (damage_shield>9)/* + (modulation>99)*/);
-        gfx_PrintStringXY("Hull:    ", rect_start_x + 8, rect_start_y + 45);
+        gfx_SetTextXY(rect_start_x + 70, rect_start_y + 46);
         gfx_PrintUInt(damage_hull, 1 + (damage_hull>9)/* + (modulation>99)*/);
         
     }

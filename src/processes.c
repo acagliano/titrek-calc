@@ -39,7 +39,7 @@ void PROC_PowerCycle(Module_t *ShipModules, Module_t *warpcore, char repairing, 
             }
             break;
         }
-        if(module->techtype && module->techtype != tt_ejectedcore && module->powerReserve < 256 && i != repairing){
+        if((module->techtype <= tt_sensor) && module->powerReserve < 256 && i != repairing){
             powerout -= module->powerDefault;
             module->powerReserve += module->powerDefault;
             if(module->powerReserve < 64) status = false;
@@ -54,10 +54,7 @@ void PROC_PowerDraw(Module_t *ShipModules, char repairing){
     for(i = 0; i <= 20; i++){
         Module_t* module = &ShipModules[i];
         if((module->online == true &&
-           (module->techtype == tt_shield ||
-            module->techtype == tt_integrity ||
-            module->techtype == tt_lifesupport ||
-            module->techtype == tt_sensor)) ||
+           (module->pdConstant)) ||
            (i == repairing)
            ){
                module->powerReserve -= module->powerDraw;

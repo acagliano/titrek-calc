@@ -65,7 +65,7 @@ enum {
 Player_t player[1] = {0};
 Module_t ShipModules[20] = {0};
 MapData_t* MapMain;
-Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL, *lifesupport = NULL, *warpcore = NULL, *warpdrive = NULL, *activeweap = NULL;
+Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL, *lifesupport = NULL, *warpcore = NULL, *warpdrive = NULL, *activeweapon = NULL;
 const char *GameSave = "TrekSave";
 
 void main(void) {
@@ -93,6 +93,7 @@ void main(void) {
         module->powerReserve = 256;
         module->powerDraw = 5;
         module->powerDefault = 5;
+        module->pdConstant = true;
         switch(i){
             case tt_shield:
                 strcpy(module->techname, "Shields");
@@ -111,6 +112,7 @@ void main(void) {
                 break;
             case tt_warpcore:
                 module->location = aft;
+                module->pdConstant = false;
                 strcpy(module->techname, "WarpCore");
                 module->powerReserve = 256;
                 module->stats.sysstats.powerOut = 50;
@@ -118,26 +120,31 @@ void main(void) {
                 break;
             case tt_warpdrive:
                 module->location = nacelles;
+                module->pdConstant = false;
                 module->stats.sysstats.topSpeed = 11;
                 strcpy(module->techname, "WarpDrive");
                 break;
             case tt_impulsedrive:
                 module->location = aft;
+                module->pdConstant = false;
                 strcpy(module->techname, "ImpulseDr");
                 break;
             case tt_transporter:
                 module->location = saucer;
+                module->pdConstant = false;
                 strcpy(module->techname, "Transport");
                 break;
             case tt_sensor:
                 module->location = saucer;
+                module->pdConstant = false;
                 strcpy(module->techname, "Sensors");
                 break;
             case tt_phaser:
                 module->location = saucer;
+                module->pdConstant = false;
                 module->stats.weapstats.charge = 0;
-                module->stats.weapstats.maxCharge = 10;
-                module->stats.weapstats.damage_shield = 3;
+                module->stats.weapstats.maxCharge = 20;
+                module->stats.weapstats.damage_shield = 2;
                 module->stats.weapstats.damage_hull = 1;
                 module->stats.weapstats.range = 100;
                 module->stats.weapstats.speed = 10;
@@ -146,6 +153,7 @@ void main(void) {
                 break;
             case tt_torpedo:
                 module->location = saucer;
+                module->pdConstant = false;
                 module->stats.weapstats.damage_shield = 1;
                 module->stats.weapstats.damage_hull = 3;
                 module->stats.weapstats.range = 100;
@@ -163,7 +171,7 @@ void main(void) {
     warpcore = init_SetPointer(&ShipModules, tt_warpcore, 0);   // return pointer to core
     lifesupport = init_SetPointer(&ShipModules, tt_lifesupport, 0);   // return pointer to life support
     warpdrive = init_SetPointer(&ShipModules, tt_warpdrive, 0);   // return pointer to warpdrive
-    activeweap = init_SetPointer(&ShipModules, tt_phaser, 0); // pointer to phasers
+    activeweapon = init_SetPointer(&ShipModules, tt_phaser, 0); // pointer to phasers
    
     boot_ClearVRAM();
     DrawGUI(&ShipModules);
@@ -197,10 +205,10 @@ void main(void) {
             player->position.speed = topspeed;
             speed = topspeed;
         }
-        if(activeweap != init_SetPointer(&ShipModules, tt_phaser, 0) || warpdrive != init_SetPointer(&ShipModules, tt_warpdrive, 0)) {
+        /*if(/*activeweap != init_SetPointer(&ShipModules, tt_phaser, 0) || warpdrive != init_SetPointer(&ShipModules, tt_warpdrive, 0)) {
             player->deathreason = 3;
             break;
-        }
+        } */
         kb_ScanGroup(1);
         key = kb_Data[1] & kb_Window;
         if(key && !keys_prior[k_Window] ){
@@ -227,8 +235,8 @@ void main(void) {
                 module->online = !module->online;
             }
             if(player->ScreenSelected == SCRN_TACTICAL){
-                char i = (activeweap == &ShipModules[6]) ? 7 : 6;
-                activeweap = &ShipModules[i];
+                char i = (activeweapon->techtype == tt_phaser) ? tt_torpedo - 1 : tt_phaser - 1;
+                activeweapon = &ShipModules[i];
             }
 
             if(player->ScreenSelected == SCRN_STATUS){
@@ -255,7 +263,7 @@ void main(void) {
             }
         }
         keys_prior[k_Del] = key;
-        
+        /*
         key = kb_Data[1] & kb_2nd;
         if( key && (!keys_prior[k_2nd] || player->tick % 5 == 0) ){
             if(activeweap && (activeweap->health > 0)){
@@ -273,7 +281,7 @@ void main(void) {
             }
         }
         keys_prior[k_2nd] = key;
-        
+        */
         kb_ScanGroup(6);
         key = kb_Data[6] & kb_Mul;
         if( key && !keys_prior[k_Mul]){
@@ -313,7 +321,7 @@ void main(void) {
                 if(damage < 0) damage = 0;
             }
             for(i = 0; i < 2; i++){
-                Module_t* module = &ShipModules[randInt(2,7)];
+                Module_t* module = &ShipModules[randInt(tt_lifesupport,tt_warpcore)];
                 module->health -= damage;
                 if(module->health <= 0) module->health = 0;
                 if((module->health * 100 / module->maxHealth) < 50) {
@@ -441,7 +449,9 @@ void main(void) {
             }
         }
         
-        
+        if(player->tick % CORE_RECHARGE_TIMER == 0)
+            if(warpcore->powerReserve < 256) warpcore->powerReserve++;
+            
         switch(player->ScreenSelected){
             case SCRN_VIEW:
                 gfx_WipeScreen();
@@ -450,7 +460,7 @@ void main(void) {
                 gfx_SetClipRegion(0, 0, 320, 240);
                 break;
             case SCRN_TACTICAL:
-                GUI_TacticalReport(&ShipModules, shields, activeweap);
+                GUI_TacticalReport(&ShipModules, shields, activeweapon);
                 break;
             case SCRN_STATUS:
                  GUI_StatusReport(&ShipModules, player->moduleSelected, player->moduleRepairing);

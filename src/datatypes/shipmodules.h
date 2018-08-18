@@ -10,13 +10,13 @@ enum techtype {
     tt_shield = 1,
     tt_integrity,
     tt_lifesupport,
-    tt_warpcore,
     tt_warpdrive,
     tt_impulsedrive,
     tt_phaser,
     tt_torpedo,
     tt_transporter,
     tt_sensor,
+    tt_warpcore,
     tt_auxiliary,
     tt_ejectedcore
 };
@@ -62,6 +62,7 @@ typedef struct {
     bool upgradeable;   // flag to specify if a module may be upgraded
     char powerDraw;      // used for everything  module power consumption
     char powerDefault;
+    bool pdConstant;
     int powerReserve;      // used for everything  module power reserve
     short health, maxHealth;
     char location;
