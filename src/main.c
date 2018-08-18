@@ -84,8 +84,8 @@ void main(void) {
     gfx_SetTextTransparentColor(1);
     gfx_SetTransparentColor(0);
 	/* Fill in the body of the main function here */
-    for(i = 0; i < 10; i++){
-        Module_t *module = &ShipModules[i];
+    for(i = 1; i <= 10; i++){
+        Module_t *module = &ShipModules[i-1];
         module->online = true;
         module->techtype = i;
         module->health = 50;
@@ -95,25 +95,21 @@ void main(void) {
         module->powerDefault = 5;
         switch(i){
             case tt_shield:
-                module->modtype = mt_shield;
                 strcpy(module->techname, "Shields");
                 module->location = 0;
                 module->stats.shieldstats.resistance = 5;
                 module->stats.shieldstats.modulation = randInt(0, 255);
                 break;
             case tt_integrity:
-                module->modtype = mt_system;
                 module->location = 0;
                 module->stats.sysstats.resistance = 1;
                 strcpy(module->techname, "Integrity");
                 break;
             case tt_lifesupport:
-                module->modtype = mt_system;
                 module->location = aft;
                 strcpy(module->techname, "LifeSupp");
                 break;
             case tt_warpcore:
-                module->modtype = mt_system;
                 module->location = aft;
                 strcpy(module->techname, "WarpCore");
                 module->powerReserve = 256;
@@ -121,28 +117,23 @@ void main(void) {
                 module->online = true;
                 break;
             case tt_warpdrive:
-                module->modtype = mt_system;
                 module->location = nacelles;
-                module->stats.sysstats.topSpeed = 54;
+                module->stats.sysstats.topSpeed = 11;
                 strcpy(module->techname, "WarpDrive");
                 break;
             case tt_impulsedrive:
-                module->modtype = mt_system;
                 module->location = aft;
                 strcpy(module->techname, "ImpulseDr");
                 break;
             case tt_transporter:
-                module->modtype = mt_system;
                 module->location = saucer;
                 strcpy(module->techname, "Transport");
                 break;
             case tt_sensor:
-                module->modtype = mt_system;
                 module->location = saucer;
                 strcpy(module->techname, "Sensors");
                 break;
             case tt_phaser:
-                module->modtype = mt_weapon;
                 module->location = saucer;
                 module->stats.weapstats.charge = 0;
                 module->stats.weapstats.maxCharge = 10;
@@ -151,24 +142,32 @@ void main(void) {
                 module->stats.weapstats.range = 100;
                 module->stats.weapstats.speed = 10;
                 strcpy(module->techname, "Phasers");
+                strcpy(module->stats.weapstats.weapname, "PulsPhas");
+                break;
+            case tt_torpedo:
+                module->location = saucer;
+                module->stats.weapstats.damage_shield = 1;
+                module->stats.weapstats.damage_hull = 3;
+                module->stats.weapstats.range = 100;
+                module->stats.weapstats.speed = 5;
+                strcpy(module->techname, "Torpedo");
+                strcpy(module->stats.weapstats.weapname, "PhotTorp");
                 break;
             default:
-                module->modtype = mt_system;
                 strcpy(module->techname, "Unsupport");
         }
     }
-    shields = init_SetPointer(&ShipModules, 0);   // return pointer to shields
-    integrity = init_SetPointer(&ShipModules, 1);   // return pointer to hull integrity
-    auxpower = init_SetPointer(&ShipModules, 2);   // return pointer to auxiliary
-    warpcore = init_SetPointer(&ShipModules, 3);   // return pointer to core
-    lifesupport = init_SetPointer(&ShipModules, 4);   // return pointer to life support
-    warpdrive = init_SetPointer(&ShipModules, 5);   // return pointer to warpdrive
-    activeweap = init_SetPointer(&ShipModules, 6); // pointer to phasers
-    
+    shields = init_SetPointer(&ShipModules, tt_shield, 0);   // return pointer to shields
+    integrity = init_SetPointer(&ShipModules, tt_integrity, 0);   // return pointer to hull integrity
+    auxpower = init_SetPointer(&ShipModules, tt_auxiliary, 0);   // return pointer to auxiliary
+    warpcore = init_SetPointer(&ShipModules, tt_warpcore, 0);   // return pointer to core
+    lifesupport = init_SetPointer(&ShipModules, tt_lifesupport, 0);   // return pointer to life support
+    warpdrive = init_SetPointer(&ShipModules, tt_warpdrive, 0);   // return pointer to warpdrive
+    activeweap = init_SetPointer(&ShipModules, tt_phaser, 0); // pointer to phasers
+   
     boot_ClearVRAM();
     DrawGUI(&ShipModules);
     player->ScreenSelected = SCRN_STATUS;
-    player->timers[timer_power] = POWER_INTERVAL;
     player->moduleRepairing = -1;
     if((mapslot = map_LocateSlot(MapMain)) >= 0){
         MapData_t *slot = &MapMain[mapslot];
@@ -198,6 +197,10 @@ void main(void) {
             player->position.speed = topspeed;
             speed = topspeed;
         }
+        if(activeweap != init_SetPointer(&ShipModules, tt_phaser, 0) || warpdrive != init_SetPointer(&ShipModules, tt_warpdrive, 0)) {
+            player->deathreason = 3;
+            break;
+        }
         kb_ScanGroup(1);
         key = kb_Data[1] & kb_Window;
         if(key && !keys_prior[k_Window] ){
@@ -223,6 +226,11 @@ void main(void) {
                 Module_t* module = &ShipModules[player->moduleSelected];
                 module->online = !module->online;
             }
+            if(player->ScreenSelected == SCRN_TACTICAL){
+                char i = (activeweap == &ShipModules[6]) ? 7 : 6;
+                activeweap = &ShipModules[i];
+            }
+
             if(player->ScreenSelected == SCRN_STATUS){
                 Module_t* module = &ShipModules[player->moduleSelected];
                 if(player->moduleRepairing == player->moduleSelected){
@@ -241,7 +249,7 @@ void main(void) {
         if( key && !keys_prior[k_Del] ){
             Module_t *module = &ShipModules[player->moduleSelected];
             if(module->techtype == tt_warpcore && player->timers[timer_corebreach]){
-                module->modtype = mt_ejectedcore;
+                module->techtype = tt_ejectedcore;
                 player->timers[timer_corebreach] = 0;
                 warpcore = NULL;
             }
@@ -341,7 +349,7 @@ void main(void) {
                     if(key && !keys_prior[k_Down]){
                         player->moduleSelected++;
                         module = &ShipModules[player->moduleSelected];
-                        if(!module->modtype) player->moduleSelected--;
+                        if(!module->techtype) player->moduleSelected--;
                     }
                     break;
             }
@@ -408,7 +416,6 @@ void main(void) {
         if(player->tick % POWER_INTERVAL == 0){
             PROC_PowerDraw(&ShipModules, player->moduleRepairing);
             PROC_PowerCycle(&ShipModules, warpcore, player->moduleRepairing, &player);
-            player->timers[timer_power] = POWER_INTERVAL;
         }
         
         if(player->tick % REPAIR_INTERVAL == 0){
@@ -443,7 +450,7 @@ void main(void) {
                 gfx_SetClipRegion(0, 0, 320, 240);
                 break;
             case SCRN_TACTICAL:
-                GUI_TacticalReport(&ShipModules, shields);
+                GUI_TacticalReport(&ShipModules, shields, activeweap);
                 break;
             case SCRN_STATUS:
                  GUI_StatusReport(&ShipModules, player->moduleSelected, player->moduleRepairing);
@@ -500,6 +507,12 @@ void main(void) {
             break;
         case 2:
             gfx_PrintStringXY("Life Support has failed!", 1, 0);
+            break;
+        case 3:
+            gfx_PrintStringXY("An internal error occured!", 1, 0);
+            break;
+        case 4:
+            gfx_PrintStringXY("Failed to return pointers!", 1, 0);
             break;
     }
     gfx_PrintStringXY("Thanks for testing!!", 1, 10);

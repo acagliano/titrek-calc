@@ -39,7 +39,7 @@ void PROC_PowerCycle(Module_t *ShipModules, Module_t *warpcore, char repairing, 
             }
             break;
         }
-        if(module->modtype && module->modtype != mt_ejectedcore && module->powerReserve < 256 && i != repairing){
+        if(module->techtype && module->techtype != tt_ejectedcore && module->powerReserve < 256 && i != repairing){
             powerout -= module->powerDefault;
             module->powerReserve += module->powerDefault;
             if(module->powerReserve < 64) status = false;

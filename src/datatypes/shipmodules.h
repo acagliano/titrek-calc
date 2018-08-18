@@ -6,17 +6,8 @@
 // ENUMERATIONS OF MODULE TYPES, SUBTYPES
 #define POWER_DEFAULT 5
 
-enum modtype {
-    // 0 is a NULL module
-    mt_system = 1,
-    mt_weapon,
-    mt_shield,
-    mt_tech,
-    mt_ejectedcore
-};
-
 enum techtype {
-    tt_shield,
+    tt_shield = 1,
     tt_integrity,
     tt_lifesupport,
     tt_warpcore,
@@ -26,7 +17,8 @@ enum techtype {
     tt_torpedo,
     tt_transporter,
     tt_sensor,
-    tt_auxiliary
+    tt_auxiliary,
+    tt_ejectedcore
 };
 
 enum locations {
@@ -38,6 +30,7 @@ enum locations {
  // MODULE STATS STRUCTS
 
 typedef struct {
+    char weapname[11];
     char equipped; // torpedoes only
     char charge, maxCharge;  // phasers only
     char damage_shield, damage_hull;
@@ -62,7 +55,6 @@ typedef struct {
 // MODULE DEFAULT STRUCT DECLARATION
 
 typedef struct {
-    char modtype;      // system, weapon, shield, misc
     char techtype;  // module class (for verifiying proper upgrade type)
     char techid;   // for retrieving specific module data
     char techname[11];
