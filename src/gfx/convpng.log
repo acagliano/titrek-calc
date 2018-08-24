@@ -20,11 +20,10 @@ warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
 1:
- enterprise : converted! (16018 > 3245 bytes)
+ splashlogo : converted! (6502 > 1297 bytes)
 
-exporting appvar: TrekVFX.8xp
- enterprise
-compression: (3245 > 3581 bytes)
+exporting appvar: trekvfx.8xp
+ splashlogo
 
 converted in 0 s
 

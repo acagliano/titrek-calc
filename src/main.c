@@ -40,7 +40,7 @@ void printText(const char *text, uint8_t x, uint8_t y);
 #include "mapfuncs.h"
 #include "mymath.h"
 #include "vfx.h"
-#include "gfx/TrekVFX.h"
+#include "gfx/trekvfx.h"
 
 #include "screens.h"
 
@@ -74,19 +74,76 @@ const char *GameSave = "TrekSave";
 void main(void) {
     bool loopgame = true, key = false;
     char looplimit = sizeof(ShipModules) / sizeof(Module_t);
+    bool gfx_initialized, splash_first_loop = true;
+    gfx_sprite_t* uncompressed;
     long tick_test;
     bool keys_prior[15] = {0};
     char SavePtr;
-    char i;
+    char i, j;
     char mapslot;
-    MapMain = calloc(10, sizeof(MapData_t));
     srandom(rtc_Time());
     ti_CloseAll();
     gfx_Begin();
     gfx_SetDrawBuffer();
-    TrekVFX_init();
-    gfx_SetTextFGColor(255);
+    gfx_initialized = trekvfx_init();
+    if(gfx_initialized){
+        if(uncompressed = gfx_MallocSprite(75,116)){
+            gfx_ZeroScreen();
+            zx7_Decompress(uncompressed, splashlogo_compressed);
+            gfx_Sprite(uncompressed, 20, 50);
+            free(uncompressed);
+        }
+    }
+    gfx_SetTextScale(3,3);
+    gfx_SetTextFGColor(26);
     gfx_SetTextBGColor(0);
+    gfx_SetTextTransparentColor(0);
+    gfx_PrintStringXY("Star Trek", 103, 53);
+    gfx_SetTextFGColor(230);
+    gfx_PrintStringXY("Star Trek", 100, 50);
+    gfx_SetTextScale(2,2);
+    gfx_PrintStringXY("Multiplayer", 115, 80);
+    gfx_SetColor(230);
+    gfx_FillRectangle(100, 100, 200, 2);
+    gfx_SetColor(231);
+    gfx_FillRectangle(140, 110, 100, 45);
+    gfx_SetTextScale(1,1);
+    gfx_PrintStringXY("Boldly going where no", 10, 220);
+    gfx_PrintStringXY("calculator has gone before!", 10, 230);
+    gfx_PrintStringXY(trek_version, 240, 230);
+    gfx_SetTextTransparentColor(255);
+    gfx_SetTextFGColor(0);
+    gfx_SetTextBGColor(255);
+    i = 0;
+    do {
+        key = os_GetCSC();
+        if(key == sk_Up) i--;
+        if(key == sk_Down) i++;
+        if(key == sk_Clear) {
+            key = sk_Enter;
+            i = 2;
+        }
+        if(i < 0) i = 2;
+        if(i > 2) i = 0;
+        if(key || splash_first_loop) {
+            gfx_SetColor(231);
+            gfx_FillRectangle(140, 110, 100, 45);
+            gfx_SetColor(229);
+            gfx_FillRectangle(140, i * 15 + 110, 100, 15);
+            gfx_PrintStringXY("Start Demo", 150, 114);
+            gfx_PrintStringXY("Controls", 150, 129);
+            gfx_PrintStringXY("Exit Game", 150, 144);
+            splash_first_loop = false;
+        }
+        gfx_BlitBuffer();
+    } while (key != sk_Enter);
+    
+    if(i == 2) {
+        gfx_End();
+        prgm_CleanUp();
+        return;
+    }
+    gfx_SetTextFGColor(255);
     gfx_SetTextTransparentColor(1);
     gfx_SetTransparentColor(0);
 	/* Fill in the body of the main function here */
@@ -184,7 +241,7 @@ void main(void) {
     lifesupport = init_SetPointer(&ShipModules, looplimit, tt_lifesupport, 0);
     warpdrive = init_SetPointer(&ShipModules, looplimit, tt_warpdrive, 0);
     activeweapon = init_SetPointer(&ShipModules, looplimit, tt_phaser, 0);
-   
+    MapMain = calloc(10, sizeof(MapData_t));
     boot_ClearVRAM();
     DrawGUI();
     player->ScreenSelected = SCRN_TACTICAL;
@@ -574,7 +631,8 @@ void main(void) {
     free(MapMain);
     os_GetKey();
     gfx_End();
-	prgm_CleanUp();
+    prgm_CleanUp();
+    
 }
 
 /* Put other functions here */

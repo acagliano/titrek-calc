@@ -9,7 +9,7 @@
 #include "datatypes/playerdata.h"
 #include <math.h>
 
-const char *trek_version = "v0.57 alpha";
+const char *trek_version = "v0.60 alpha";
 typedef struct {
     char type;
     long distance;
