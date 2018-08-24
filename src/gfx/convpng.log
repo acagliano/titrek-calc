@@ -1,10 +1,10 @@
-Opened convpng.ini
+opened convpng.ini
 
---- Group icons (C) ---
-Using built-in xlibc palette ...
+--- icons (C) ---
+using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
-Transparent Color Index : 0
-Transparent Color : 0x0000
+transparent color index : 0
+transparent color : 0x0000
 7:
  tactical : converted! (822 > 69 bytes)
  power_alert : converted! (402 > 47 bytes)
@@ -14,18 +14,22 @@ Transparent Color : 0x0000
  lifesupport_alert : converted! (402 > 38 bytes)
  breach_alert : converted! (402 > 86 bytes)
 
---- Group effects (C) ---
-Using built-in xlibc palette ...
+--- vfx (C) ---
+using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
-Transparent Color Index : 0
-Transparent Color : 0x0000
+transparent color index : 0
+transparent color : 0x0000
 1:
- warp : converted! (9218 > 1560 bytes)
+ enterprise : converted! (16018 > 3245 bytes)
 
-Converted in 0 s
+exporting appvar: TrekVFX.8xp
+ enterprise
+compression: (3245 > 3581 bytes)
+
+converted in 0 s
 
 [warning] image quality might be too low.
 please try grouping similar images, reducing image colors, 
 or selecting a better palette if conversion is not ideal.
 
-Finished!
+finished!

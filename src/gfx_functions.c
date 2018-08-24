@@ -9,6 +9,7 @@
 #include "datatypes/playerdata.h"
 #include <math.h>
 
+const char *trek_version = "v0.57 alpha";
 typedef struct {
     char type;
     long distance;
@@ -46,7 +47,6 @@ void PrintHeader(char *text, char x, char y, char xtextOff, char ytextOff){
 
 
 void DrawGUI(){
-    const char *version = "v0.54 alpha";
     char yPos = 230;
     gfx_FillScreen(148);
     gfx_SetColor(74);
@@ -59,9 +59,9 @@ void DrawGUI(){
     gfx_FillRectangle(10, 227, 300, 13);
     gfx_PrintStringXY("Tactical", 14, yPos);
     gfx_PrintStringXY("Status", 83, yPos);
-    gfx_PrintStringXY("Inventory", 140, yPos);
-    gfx_PrintStringXY("Power", 226, yPos);
-    gfx_PrintStringXY("Map", 280, yPos);
+    gfx_PrintStringXY("Sensors", 145, yPos);
+    gfx_PrintStringXY("Power", 216, yPos);
+    gfx_PrintStringXY("Chat", 270, yPos);
     gfx_SetTextScale(1,1);
     gfx_SetColor(197);
     gfx_FillRectangle(0, 0, 320, 18);
@@ -70,14 +70,14 @@ void DrawGUI(){
     gfx_SetTextFGColor(197);
     gfx_SetTextBGColor(16);
     gfx_PrintStringXY("Star Trek Multiplayer ", 32, 5);
-    gfx_PrintString(version);
+    gfx_PrintString(trek_version);
     gfx_SetTextFGColor(255);
     gfx_SetTextBGColor(0);
     gfx_SetColor(255);
     gfx_Line(75, 228, 75, 238);
     gfx_Line(135, 228, 135, 238);
-    gfx_Line(218, 228, 218, 238);
-    gfx_Line(270, 228, 270, 238);
+    gfx_Line(208, 228, 208, 238);
+    gfx_Line(260, 228, 260, 238);
     gfx_BlitBuffer();
 }
 
@@ -147,7 +147,7 @@ void gfx_DrawLifeSupportAlert(bool status){
     }
 }
 
-void gfx_DrawSpeedIndicator(char speed, char maxspeed){
+void gfx_DrawSpeedIndicator(char speed, char maxspeed_warp, char maxspeed_impulse){
     char i, tierspeed, difference;
     char warpspeeds[11] = {10, 12, 15, 19, 24, 30, 37, 45, 54, 64, 65};
     bool warpspeed = (speed > 9);
@@ -167,10 +167,10 @@ void gfx_DrawSpeedIndicator(char speed, char maxspeed){
     for(i=0; i<=3; i++) gfx_Line(i * 15 + xPos, yPos, i * 15 + xPos, yPos+8);
     for(i=0; i<=9; i++) gfx_Line(i * 14 + xPos+60, yPos, i * 14 + xPos+60, yPos+8);
     for(i = 0; i < 9; i++)
-        if(warpspeeds[i] > maxspeed) break;
+        if(warpspeeds[i] > maxspeed_warp) break;
     tierspeed = warpspeeds[i-1];
     difference = warpspeeds[i] - tierspeed;
-    limitbarlen = (i * 14) + ((maxspeed - tierspeed) * 14 / difference);
+    limitbarlen = (i * 14) + ((maxspeed_warp - tierspeed) * 14 / difference);
     gfx_SetColor(24);
     gfx_FillRectangle(xPos + 60, yPos, limitbarlen, 3);
     gfx_SetColor(0);
@@ -183,20 +183,16 @@ void gfx_DrawSpeedIndicator(char speed, char maxspeed){
     if(!warpspeed){
         if(!speed) gfx_PrintString("Full Stop");
         else {
-            switch(speed){
-                case 2:
-                    gfx_PrintString("Half Impulse");
-                    break;
-                case 4:
-                    gfx_PrintString("Full Impulse");
-                    break;
-                default:
-                    gfx_PrintUInt(speed,1);
-                    gfx_PrintString("/4 Impulse");
-                    break;
+            if(maxspeed_impulse % speed == 0 && maxspeed_impulse / speed == 1) gfx_PrintString("Full");
+            else if(maxspeed_impulse % speed == 0 && maxspeed_impulse / speed == 2) gfx_PrintString("Half");
+            else {
+                gfx_PrintUInt(speed, 1);
+                gfx_PrintString("/");
+                gfx_PrintUInt(maxspeed_impulse, 1);
             }
-            gfx_FillRectangle(xPos, yPos, speed * 15, 7);
-            gfx_FillRectangle(speed * 15 + xPos - 2, yPos-1, 5, 9);
+            gfx_PrintString(" Impulse");
+            gfx_FillRectangle(xPos, yPos, speed * 60 / maxspeed_impulse , 7);
+            gfx_FillRectangle(speed * 60 / maxspeed_impulse + xPos - 2, yPos-1, 5, 9);
         }
     } else {
         unsigned char barlen;

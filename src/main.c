@@ -40,6 +40,7 @@ void printText(const char *text, uint8_t x, uint8_t y);
 #include "mapfuncs.h"
 #include "mymath.h"
 #include "vfx.h"
+#include "gfx/TrekVFX.h"
 
 #include "screens.h"
 
@@ -65,11 +66,15 @@ enum {
 Player_t player[1] = {0};
 Module_t ShipModules[15] = {0};
 MapData_t* MapMain;
-Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL, *lifesupport = NULL, *warpcore = NULL, *warpdrive = NULL, *activeweapon = NULL;
+Module_t *shields = NULL, *integrity = NULL, *auxpower = NULL;
+Module_t  *lifesupport = NULL, *warpcore = NULL;
+Module_t *warpdrive = NULL, *impulsedrive = NULL, *activeweapon = NULL;
 const char *GameSave = "TrekSave";
 
 void main(void) {
     bool loopgame = true, key = false;
+    char looplimit = sizeof(ShipModules) / sizeof(Module_t);
+    long tick_test;
     bool keys_prior[15] = {0};
     char SavePtr;
     char i;
@@ -79,6 +84,7 @@ void main(void) {
     ti_CloseAll();
     gfx_Begin();
     gfx_SetDrawBuffer();
+    TrekVFX_init();
     gfx_SetTextFGColor(255);
     gfx_SetTextBGColor(0);
     gfx_SetTextTransparentColor(1);
@@ -127,6 +133,9 @@ void main(void) {
             case tt_impulsedrive:
                 module->location = aft;
                 module->pdConstant = false;
+                module->stats.sysstats.topSpeed = 4;
+                module->powerDraw = 4;
+                module->powerDefault = 4;
                 strcpy(module->techname, "ImpulseDr");
                 break;
             case tt_transporter:
@@ -141,15 +150,17 @@ void main(void) {
                 break;
             case tt_phaser:
                 module->location = saucer;
+                module->powerDraw = 10;
+                module->powerDefault = 10;
                 module->pdConstant = false;
                 module->stats.weapstats.charge = 0;
-                module->stats.weapstats.maxCharge = 20;
+                module->stats.weapstats.maxCharge = 10;
                 module->stats.weapstats.damage_shield = 2;
                 module->stats.weapstats.damage_hull = 1;
                 module->stats.weapstats.range = 100;
                 module->stats.weapstats.speed = 10;
                 strcpy(module->techname, "Phasers");
-                strcpy(module->stats.weapstats.weapname, "PulsPhas");
+                strcpy(module->stats.weapstats.weapname, "Pulse");
                 break;
             case tt_torpedo:
                 module->location = saucer;
@@ -159,19 +170,20 @@ void main(void) {
                 module->stats.weapstats.range = 100;
                 module->stats.weapstats.speed = 5;
                 strcpy(module->techname, "Torpedo");
-                strcpy(module->stats.weapstats.weapname, "PhotTorp");
+                strcpy(module->stats.weapstats.weapname, "Photon");
                 break;
             default:
                 strcpy(module->techname, "Unsupport");
         }
     }
-    shields = init_SetPointer(&ShipModules, tt_shield, 0);   // return pointer to shields
-    integrity = init_SetPointer(&ShipModules, tt_integrity, 0);   // return pointer to hull integrity
-    auxpower = init_SetPointer(&ShipModules, tt_auxiliary, 0);   // return pointer to auxiliary
-    warpcore = init_SetPointer(&ShipModules, tt_warpcore, 0);   // return pointer to core
-    lifesupport = init_SetPointer(&ShipModules, tt_lifesupport, 0);   // return pointer to life support
-    warpdrive = init_SetPointer(&ShipModules, tt_warpdrive, 0);   // return pointer to warpdrive
-    activeweapon = init_SetPointer(&ShipModules, tt_phaser, 0); // pointer to phasers
+    shields = init_SetPointer(&ShipModules, looplimit, tt_shield, 0);
+    integrity = init_SetPointer(&ShipModules, looplimit, tt_integrity, 0);
+    auxpower = init_SetPointer(&ShipModules, looplimit, tt_auxiliary, 0);
+    warpcore = init_SetPointer(&ShipModules, looplimit, tt_warpcore, 0);
+    impulsedrive = init_SetPointer(&ShipModules, looplimit, tt_impulsedrive, 0);
+    lifesupport = init_SetPointer(&ShipModules, looplimit, tt_lifesupport, 0);
+    warpdrive = init_SetPointer(&ShipModules, looplimit, tt_warpdrive, 0);
+    activeweapon = init_SetPointer(&ShipModules, looplimit, tt_phaser, 0);
    
     boot_ClearVRAM();
     DrawGUI();
@@ -194,21 +206,28 @@ void main(void) {
     {
         char corestability, lifesupporthealth, speed = player->position.speed;
         unsigned char warpdrivehealth = warpdrive->health * 100 / warpdrive->maxHealth;
-        char topspeed = warpdrive->stats.sysstats.topSpeed;
+        unsigned char impdrivehealth = impulsedrive->health * 100 / impulsedrive->maxHealth;
+        char topspeed_warp = warpdrive->stats.sysstats.topSpeed;
+        char topspeed_impulse = impulsedrive->stats.sysstats.topSpeed;
+        char topspeed;
         unsigned char warppow = warpdrive->powerDraw * 100 / warpdrive->powerDefault;
-        if( warppow > 100) topspeed += (warppow / 10 - 10) / 2;
-        else topspeed = topspeed * warppow / 100;
-        topspeed = topspeed * warpdrivehealth / 100;
-        if(topspeed < 10) topspeed = 10;
-        if(warpdrivehealth == 0 || warppow == 0 || !warpdrive->online) topspeed = 4;
+        unsigned char imppow = impulsedrive->powerDraw * 100 / impulsedrive->powerDefault;
+        if( warppow > 100) topspeed_warp += (warppow / 10 - 10) / 2;
+        else topspeed_warp = topspeed_warp * warppow / 100;
+        if( imppow > 100 ) topspeed_impulse += (imppow / 100);
+        else topspeed_impulse = topspeed_impulse * imppow / 100;
+        topspeed_warp = topspeed_warp * warpdrivehealth / 100;
+        topspeed_impulse = topspeed_impulse * impdrivehealth / 100;
+        if(topspeed_warp < 10) topspeed_warp = 10;
+        if(topspeed_impulse < 2) topspeed_impulse = 2;
+        topspeed = topspeed_warp;
+        if(warpdrivehealth == 0 || warppow == 0 || !warpdrive->online) topspeed = topspeed_impulse;
+        if(speed < 10 && (impdrivehealth == 0 || imppow == 0 || !impulsedrive->online)) topspeed = 0;
         if(speed > topspeed) {
             player->position.speed = topspeed;
             speed = topspeed;
         }
-        if(!player->tick && activeweapon != init_SetPointer(&ShipModules, tt_phaser, 0)) {
-            player->deathreason = 3;
-            break;
-        }
+        
         kb_ScanGroup(1);
         key = kb_Data[1] & kb_Window;
         if(key && !keys_prior[k_Window] ){
@@ -233,18 +252,23 @@ void main(void) {
         if( key && !keys_prior[k_Mode] ){
             if(player->ScreenSelected == SCRN_POWER){
                 Module_t* module = &ShipModules[player->moduleSelected];
+                char health = module->health * 100 / module->maxHealth;
+                char power = module->powerReserve * 100 / 256;
                 module->online = !module->online;
+                if(health < 25 || power < 25) module->online = false;
+                    
             }
             if(player->ScreenSelected == SCRN_TACTICAL){
                 char i = (activeweapon->techtype == tt_phaser) ? tt_torpedo : tt_phaser;
-                activeweapon = init_SetPointer(&ShipModules, i, 0);
+                activeweapon = init_SetPointer(&ShipModules, looplimit, i, 0);
             }
 
             if(player->ScreenSelected == SCRN_STATUS){
                 Module_t* module = &ShipModules[player->moduleSelected];
+                char modhealth = module->health * 100 / module->maxHealth;
                 if(player->moduleRepairing == player->moduleSelected){
                     player->moduleRepairing = -1;
-                    module->online = true;
+                    if(modhealth > 25) module->online = true;
                 }
                 else {
                     player->moduleRepairing = player->moduleSelected;
@@ -267,8 +291,8 @@ void main(void) {
         keys_prior[k_Del] = key;
         
         key = kb_Data[1] & kb_2nd;
-        if( key && (!keys_prior[k_2nd] || player->tick % 5 == 0) ){
-            if(activeweapon && (activeweapon->health > 0)){
+        if( key && (!keys_prior[k_2nd] || player->tick % 2 == 0) ){
+            if(activeweapon && activeweapon->online){
                 int power = activeweapon->powerReserve;
                 char charge = activeweapon->stats.weapstats.charge;
                 char maxCharge = activeweapon->stats.weapstats.maxCharge;
@@ -293,13 +317,14 @@ void main(void) {
         }
         keys_prior[k_Mul] = key;
         key = kb_Data[6] & kb_Add;
-        if( (key && (!keys_prior[k_Add] || player->tick % 5 == 0)) && speed < topspeed)
-            if(speed < topspeed)
-                if(speed < 4 || speed >= 10) player->position.speed++;
+        if( (key && (!keys_prior[k_Add] || player->tick % 5 == 0))){
+            if(speed < 10 && speed < topspeed_impulse) player->position.speed++;
+            if(speed >= 10 && speed < topspeed_warp ) player->position.speed++;
+        }
         keys_prior[k_Add] = key;
         key = kb_Data[6] & kb_Sub;
         if( (key && (!keys_prior[k_Sub] || player->tick % 5 == 0)) && speed > 0)
-            if(speed > 10 || speed <= 4) player->position.speed--;
+            if(speed > 10 || speed <= 9) player->position.speed--;
         keys_prior[k_Sub] = key;
         
         if( kb_Data[6] & kb_Power){
@@ -316,18 +341,21 @@ void main(void) {
             }
             drv = 0;
             if(integrity->online){
-                if(int_drv >= 50) drv = integrity->stats.sysstats.resistance;
-                if(int_drv < 50) drv = 0;
-                if(!int_drv) drv = 0 - integrity->stats.sysstats.resistance;
+                drv = integrity->stats.sysstats.resistance;
+                if(int_drv < 25) drv = drv>>1;
+                if(int_drv == 0) drv = 0;
                 integrity->health -= damage;
                 if(integrity->health < 0) integrity->health = 0;
                 damage -= drv;
                 if(damage < 0) damage = 0;
             }
             for(i = 0; i < 2; i++){
-                Module_t* module = &ShipModules[randInt(tt_lifesupport,tt_warpcore)];
+                Module_t* module = &ShipModules[randInt(tt_lifesupport-1,tt_warpcore-1)];
                 module->health -= damage;
-                if(module->health <= 0) module->health = 0;
+                if(module->health <= 0) {
+                    module->health = 0;
+                    module->online = false;
+                }
                 if((module->health * 100 / module->maxHealth) < 50) {
                     if(module->location){
                         switch(module->location){
@@ -425,11 +453,26 @@ void main(void) {
         }
         keys_prior[k_Left] = key;
       
+        
         if(player->tick % POWER_INTERVAL == 0){
             PROC_PowerDraw(&ShipModules, player->moduleRepairing);
+            if(speed < 10 && speed > 0){
+                impulsedrive->powerReserve -= speed;
+                if(impulsedrive->powerReserve <= 0) {
+                    impulsedrive->powerReserve = 0;
+                    impulsedrive->online = false;
+                }
+            }
+            if(speed >= 10){
+                warpdrive->powerReserve -= (speed / 2);
+                if(warpdrive->powerReserve <= 0) {
+                    warpdrive->powerReserve = 0;
+                    warpdrive->online = false;
+                }
+            }
             PROC_PowerCycle(&ShipModules, warpcore, player->moduleRepairing, &player);
         }
-        
+
         if(player->tick % REPAIR_INTERVAL == 0){
             if(player->moduleRepairing != -1){
                 Module_t* repair = &ShipModules[player->moduleRepairing];
@@ -453,9 +496,10 @@ void main(void) {
             }
         }
         
-        if(player->tick % CORE_RECHARGE_TIMER == 0)
+        if(warpcore && player->tick % CORE_RECHARGE_TIMER == 0)
             if(warpcore->powerReserve < 256) warpcore->powerReserve++;
-            
+        
+        
         switch(player->ScreenSelected){
             case SCRN_VIEW:
                 gfx_WipeScreen();
@@ -467,20 +511,17 @@ void main(void) {
                 GUI_TacticalReport(&ShipModules, shields, activeweapon);
                 break;
             case SCRN_STATUS:
-                 GUI_StatusReport(&ShipModules, player->moduleSelected, player->moduleRepairing);
+                 GUI_StatusReport(&ShipModules, looplimit, player->moduleSelected, player->moduleRepairing);
                 break;
             case SCRN_POWER:
-                GUI_PowerReport(&ShipModules, player->moduleSelected, player->position.speed);
+                GUI_PowerReport(&ShipModules, looplimit, player->moduleSelected, player->position.speed);
                 break;
         }
         
        
-        
-       
-        
-        corestability = warpcore->health * 100 / warpcore->maxHealth;
-        lifesupporthealth = lifesupport->health * 100 / lifesupport->maxHealth;
         if(warpcore){
+            corestability = warpcore->health * 100 / warpcore->maxHealth;
+            lifesupporthealth = lifesupport->health * 100 / lifesupport->maxHealth;
             if(corestability <= 25){
                 if(randInt(0, corestability * 10) == 0 && !player->timers[timer_corebreach])
                     player->timers[timer_corebreach]++;
@@ -502,7 +543,7 @@ void main(void) {
         gfx_DrawLifeSupportAlert(player->timers[timer_lifesupport] != 0);
         gfx_DrawCoreBreachAlert(player->timers[timer_corebreach] != 0);
         gfx_DrawShipStatusIcon(integrity, shields, &player);
-        gfx_DrawSpeedIndicator(player->position.speed, topspeed);
+        gfx_DrawSpeedIndicator(player->position.speed, topspeed_warp, topspeed_impulse);
         gfx_BlitBuffer();
         player->tick++;
     }

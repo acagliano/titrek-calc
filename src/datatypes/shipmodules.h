@@ -14,8 +14,8 @@ enum techtype {
     tt_impulsedrive,
     tt_phaser,
     tt_torpedo,
-    tt_transporter,
     tt_sensor,
+    tt_transporter = 9,
     tt_warpcore,
     tt_auxiliary,
     tt_ejectedcore
@@ -32,6 +32,7 @@ enum locations {
 typedef struct {
     char weapname[11];
     char equipped; // torpedoes only
+    char cooldown;
     char charge, maxCharge;  // phasers only
     char damage_shield, damage_hull;
     char range;
@@ -49,6 +50,10 @@ typedef struct {
 typedef struct {
     char resistance;       // how much damage shield can absorb at 100% before bleedthrough
     char modulation;
+    short healthForward;
+    short healthAft;
+    short healthStarboard;
+    short healthPort;
 } shieldstats_t;
 
 

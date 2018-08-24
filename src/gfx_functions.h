@@ -15,7 +15,8 @@ void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields, Player_t* pl
 void gfx_DrawInventoryStatusIcon(bool status);
 void gfx_DrawCoreBreachAlert(bool status);
 void gfx_DrawLifeSupportAlert(bool status);
-void gfx_DrawSpeedIndicator(char speed, char maxspeed);
+void gfx_DrawSpeedIndicator(char speed, char maxspeed_warp, char maxspeed_impulse);
 //void GUI_ViewScreen(MapData_t *map, Position_t *playerpos);
+extern const char *trek_version;
 
 #endif

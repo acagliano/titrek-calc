@@ -7,14 +7,14 @@
 #include "equates.h"
 
 
-void GUI_PowerReport(Module_t *ShipModules, char selected, char speed) {
+void GUI_PowerReport(Module_t *ShipModules, char limit, char selected, char speed) {
     char counter = 1, i;
     gfx_WipeScreen();
     PrintHeader("Power Allocation", xStart+1, yStart+1, 80, 2);
     gfx_PrintStringXY("Reserve", xStart+90, yStart+18);
     gfx_PrintStringXY("Usage", xStart+195, yStart+18);
     
-    for(i = 0; i < 15; i++){
+    for(i = 0; i < limit; i++){
         Module_t *module = &ShipModules[i];
         if(module->techtype){
             int currpower = module->powerReserve*100/255;
@@ -23,10 +23,7 @@ void GUI_PowerReport(Module_t *ShipModules, char selected, char speed) {
            
             lcars_DrawHealthBar(currpower, 2, xStart+80, yStart+((counter+2)*9), true);
             if(module->online) {
-                if((module->techtype == tt_warpdrive && speed < 5) || (module->techtype == tt_impulsedrive && (speed == 0 || speed > 4))){
-                    gfx_SetTextFGColor(229);
-                    gfx_PrintStringXY("inactive", xStart+185, yStart+((counter+2)*9));
-                } else if(module->techtype == tt_ejectedcore){
+               if(module->techtype == tt_ejectedcore){
                     gfx_SetTextFGColor(229);
                     gfx_PrintStringXY("ejected", xStart+185, yStart+((counter+2)*9));
                 } else lcars_DrawHealthBar(powersett, 4, xStart+177, yStart+((counter+2)*9), true);
@@ -44,13 +41,13 @@ void GUI_PowerReport(Module_t *ShipModules, char selected, char speed) {
 }
 
 
-void GUI_StatusReport(Module_t *ShipModules, char selected, char repairing) {
+void GUI_StatusReport(Module_t *ShipModules, char limit, char selected, char repairing) {
     char counter = 1, i;
     gfx_WipeScreen();
     PrintHeader("Systems Status", xStart+1, yStart+1, 80, 2);
     
     
-    for(i = 0; i < 15; i++){
+    for(i = 0; i < limit; i++){
         Module_t *module = &ShipModules[i];
         if(module->techtype){
             int health = module->health*100/module->maxHealth;
@@ -62,6 +59,7 @@ void GUI_StatusReport(Module_t *ShipModules, char selected, char repairing) {
             gfx_PrintStringXY(module->techname, xStart+25, yStart+((counter+1)*9));
             if(module->techtype == tt_ejectedcore) gfx_PrintStringXY("core ejected", xStart+120, yStart+((counter+1)*9));
             else lcars_DrawHealthBar(health, 1, xStart+120, yStart+((counter+1)*9), true);
+            gfx_SetColor(255);
             gfx_Line(xStart+228, yStart+17, xStart+228, yStart+((counter+2)*9));
             counter++;
         }
@@ -82,6 +80,7 @@ void GUI_TacticalReport(Module_t *ShipModules, Module_t *shields, Module_t *acti
     gfx_WipeScreen();
     PrintHeader("Tactical Report", xStart+1, yStart+1, 80, 2);
     gfx_SetColor(30);
+    gfx_SetTextFGColor(0);
     gfx_SetTextBGColor(30);
     gfx_FillRectangle(xStart+1, yStart+19, 11, 65);
     gfx_PrintStringXY("S", xStart+3, yStart+ 21);
@@ -91,6 +90,7 @@ void GUI_TacticalReport(Module_t *ShipModules, Module_t *shields, Module_t *acti
     gfx_PrintStringXY("L", xStart+3, yStart+ 56);
     gfx_PrintStringXY("D", xStart+3, yStart+ 65);
     gfx_PrintStringXY("S", xStart+3, yStart+ 74);
+    gfx_SetTextFGColor(255);
      gfx_SetTextBGColor(0);
     if(uncompressed = gfx_MallocSprite(tactical_width, tactical_height)){
         zx7_Decompress(uncompressed, tactical_compressed);
@@ -139,22 +139,22 @@ void GUI_TacticalReport(Module_t *ShipModules, Module_t *shields, Module_t *acti
         if(weap == activeweap){
             gfx_SetColor(36);
         }
-        gfx_FillRectangle(rect_start_x, rect_start_y, vWidth/2 - 20, 60);
-        gfx_SetColor(181);
+        gfx_FillRectangle(rect_start_x-1, rect_start_y-1, vWidth/2 - 18, 64);
+        gfx_SetColor(214);
         gfx_SetTextFGColor(0);
-        gfx_SetTextBGColor(181);
-        gfx_FillRectangle(rect_start_x+3, rect_start_y+3, vWidth/2 - 26, 54);
-        gfx_PrintStringXY("Class: ", rect_start_x + 5, rect_start_y + 5);
+        gfx_SetTextBGColor(214);
+        gfx_FillRectangle(rect_start_x+4, rect_start_y+4, vWidth/2 - 28, 54);
+        gfx_PrintStringXY("Class: ", rect_start_x + 6, rect_start_y + 6);
         if(weap->techtype == tt_phaser) gfx_PrintString("Phaser");
         else if(weap->techtype == tt_torpedo) gfx_PrintString("Torpedo");
-        gfx_PrintStringXY("Type: ", rect_start_x + 5, rect_start_y + 15);
+        gfx_PrintStringXY("Type: ", rect_start_x + 6, rect_start_y + 16);
         gfx_PrintString(weap->stats.weapstats.weapname);
-        gfx_PrintStringXY("_Damage_", rect_start_x + 5, rect_start_y + 25);
-        gfx_PrintStringXY("Shields: ", rect_start_x + 12, rect_start_y + 36);
-        gfx_PrintStringXY("Hull:    ", rect_start_x + 12, rect_start_y + 46);
-        gfx_SetTextXY(rect_start_x + 70, rect_start_y + 36);
+        gfx_PrintStringXY("_Damage_", rect_start_x + 6, rect_start_y + 26);
+        gfx_PrintStringXY("Shields: ", rect_start_x + 14, rect_start_y + 37);
+        gfx_PrintStringXY("Hull:    ", rect_start_x + 14, rect_start_y + 47);
+        gfx_SetTextXY(rect_start_x + 72, rect_start_y + 37);
         gfx_PrintUInt(damage_shield, 1 + (damage_shield>9)/* + (modulation>99)*/);
-        gfx_SetTextXY(rect_start_x + 70, rect_start_y + 46);
+        gfx_SetTextXY(rect_start_x + 72, rect_start_y + 47);
         gfx_PrintUInt(damage_hull, 1 + (damage_hull>9)/* + (modulation>99)*/);
         
     }

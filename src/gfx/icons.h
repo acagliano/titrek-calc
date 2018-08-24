@@ -1,5 +1,5 @@
-// Converted using ConvPNG
-// This file contains all the graphics sources for easier inclusion in a project
+// convpng v6.8
+// this file contains all the graphics sources for easy inclusion in a project
 #ifndef __icons__
 #define __icons__
 #include <stdint.h>
