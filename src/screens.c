@@ -5,11 +5,11 @@
 #include "gfx_functions.h"
 #include "gfx/icons.h"
 #include "equates.h"
+#include "gfx/trekicon.h"
 
 
 void GUI_PowerReport(Module_t *ShipModules, char limit, char selected, char speed) {
     char counter = 1, i;
-    gfx_WipeScreen();
     PrintHeader("Power Allocation", xStart+1, yStart+1, 80, 2);
     gfx_PrintStringXY("Reserve", xStart+90, yStart+18);
     gfx_PrintStringXY("Usage", xStart+195, yStart+18);
@@ -43,7 +43,6 @@ void GUI_PowerReport(Module_t *ShipModules, char limit, char selected, char spee
 
 void GUI_StatusReport(Module_t *ShipModules, char limit, char selected, char repairing) {
     char counter = 1, i;
-    gfx_WipeScreen();
     PrintHeader("Systems Status", xStart+1, yStart+1, 80, 2);
     
     

@@ -6,6 +6,7 @@
 #include "gfx_functions.h"
 #include "gfx/icons.h"
 #include "mymath.h"
+#include "gfx/trekicon.h"
 
 void Module_NoPower(Module_t* module){
     module->powerReserve = 0;
@@ -45,7 +46,6 @@ void PROC_PowerCycle(Module_t *ShipModules, Module_t *warpcore, char repairing, 
             zx7_Decompress(uncompressed, power_alert_compressed);
             gfx_Sprite(uncompressed, 310 - power_alert_width, 203);
             free(uncompressed);
-            gfx_BlitBuffer();
         }
     }
 }
@@ -63,13 +63,4 @@ void PROC_PowerDraw(Module_t *ShipModules, char repairing){
                if(module->powerReserve <= 0) Module_NoPower(module);
         }
     }
-}
-
-
-void PROC_AnglesToVectors(Position_t *pos){
-    char xzangle = pos->angles[0], yangle = pos->angles[1];
-    pos->vectors[0] = byteCos(xzangle) * byteCos(yangle);
-    pos->vectors[1] = byteSin(xzangle) * byteCos(yangle);
-    pos->vectors[2] = byteSin(yangle);
-    //pos->vectors[2] = z vector
 }

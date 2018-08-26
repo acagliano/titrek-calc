@@ -18,3 +18,12 @@ signed char byteSin(unsigned char x){
 char r_ArcTan(short numerator, short denominator){
     
 }
+
+
+void PROC_AnglesToVectors(Position_t *pos){
+    char xzangle = pos->angles[0], yangle = pos->angles[1];
+    pos->vectors[0] = byteCos(xzangle) * byteCos(yangle);
+    pos->vectors[1] = byteSin(xzangle) * byteCos(yangle);
+    pos->vectors[2] = byteSin(yangle);
+    //pos->vectors[2] = z vector
+}

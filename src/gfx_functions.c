@@ -1,5 +1,6 @@
 
 #include <graphx.h>
+#include <tice.h>
 #include <compression.h>
 #include "equates.h"
 #include "gfx/icons.h"
@@ -7,14 +8,11 @@
 #include "datatypes/mapdata.h"
 #include "datatypes/shipmodules.h"
 #include "datatypes/playerdata.h"
+#include "gfx/trekicon.h"
 #include <math.h>
 
-const char *trek_version = "v0.60 alpha";
-typedef struct {
-    char type;
-    long distance;
-    char angleOffsets[2];
-} RenderItem_t;
+const char *trek_version = "v0.64 alpha";
+
 
 void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){
     gfx_SetColor(0);
@@ -31,7 +29,7 @@ void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){
 
 void gfx_WipeScreen(){
     gfx_SetColor(0);
-    gfx_FillRectangle(23, 21, 274, 165);
+    gfx_FillRectangle(xStart, yStart, vWidth, vHeight+1);
     gfx_SetTextXY(xStart, yStart);
 }
 
@@ -78,7 +76,6 @@ void DrawGUI(){
     gfx_Line(135, 228, 135, 238);
     gfx_Line(208, 228, 208, 238);
     gfx_Line(260, 228, 260, 238);
-    gfx_BlitBuffer();
 }
 
 
@@ -87,15 +84,16 @@ void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields, Player_t *pl
     gfx_sprite_t *uncompressed;
     char shieldhealth = shields->health * 100 / shields->maxHealth;
     char integhealth = integrity->health * 100 / integrity->maxHealth;
-    if(uncompressed = gfx_MallocSprite(shield_alert_width, shield_alert_height)){
+    if(uncompressed = gfx_MallocSprite(ship_alert_width, ship_alert_height)){
         gfx_SetColor(30);
         if(shieldhealth < 50) gfx_SetColor(247);
         if(shieldhealth < 25) gfx_SetColor(224);
         if(shieldhealth == 0 || !shields->online) gfx_SetColor(148);
-        gfx_FillRectangle(10, 193, shield_alert_width, shield_alert_height);
-        zx7_Decompress(uncompressed, shield_alert_bg_compressed);
+        gfx_FillRectangle(10, 193, ship_alert_width, ship_alert_height);
+        if(integhealth < 50) zx7_Decompress(uncompressed, hull_alert_compressed);
+        else  zx7_Decompress(uncompressed, hull_normal_compressed);
         gfx_TransparentSprite(uncompressed, 10, 193);
-        zx7_Decompress(uncompressed, shield_alert_compressed);
+        zx7_Decompress(uncompressed, ship_alert_compressed);
         gfx_TransparentSprite(uncompressed, 10, 193);
         gfx_SetColor(224);
         if(player->damagesection[nacelles-1]) {
@@ -103,8 +101,7 @@ void gfx_DrawShipStatusIcon(Module_t* integrity, Module_t* shields, Player_t *pl
             gfx_FillRectangle(45, 193+22, 18, 2);
         }
         if(player->damagesection[aft-1]) gfx_FillRectangle(36, 193+13, 10, 3);
-        if(integhealth < 50) gfx_FillCircle(23, 193+14, 3);
-        if(integhealth <= 0) gfx_FillCircle(23, 193+14, 5);
+        if(player->damagesection[saucer-1]) gfx_FillCircle(20, 193+14, 3);
         free(uncompressed);
     }
 }
@@ -114,33 +111,24 @@ void gfx_DrawInventoryStatusIcon(bool status){
     // status will be false for compromised, or true for good
     gfx_sprite_t *uncompressed;
     if(uncompressed = gfx_MallocSprite(torpedo_alert_width, torpedo_alert_height)){
-        gfx_SetColor(36);
-        if(status == false) gfx_SetColor(224);
-        gfx_FillRectangle(225 - torpedo_alert_width, 203, torpedo_alert_width, torpedo_alert_height);
         zx7_Decompress(uncompressed, torpedo_alert_compressed);
         gfx_TransparentSprite(uncompressed, 225 - torpedo_alert_width, 203);
         free(uncompressed);
     }
 }
 
-void gfx_DrawCoreBreachAlert(bool status){
+void gfx_DrawCoreBreachAlert(void){
     gfx_sprite_t *uncompressed;
     if(uncompressed = gfx_MallocSprite(breach_alert_width, breach_alert_height)){
-        gfx_SetColor(224);
-        if(!status) gfx_SetColor(148);
-        gfx_FillRectangle(285 - breach_alert_width, 203, breach_alert_width, breach_alert_height);
         zx7_Decompress(uncompressed, breach_alert_compressed);
         gfx_TransparentSprite(uncompressed, 285 - breach_alert_width, 203);
         free(uncompressed);
     }
 }
 
-void gfx_DrawLifeSupportAlert(bool status){
+void gfx_DrawLifeSupportAlert(void){
     gfx_sprite_t *uncompressed;
     if(uncompressed = gfx_MallocSprite(lifesupport_alert_width, lifesupport_alert_height)){
-        gfx_SetColor(224);
-        if(!status) gfx_SetColor(148);
-        gfx_FillRectangle(260 - lifesupport_alert_width, 203, lifesupport_alert_width, lifesupport_alert_height);
         zx7_Decompress(uncompressed, lifesupport_alert_compressed);
         gfx_TransparentSprite(uncompressed, 260 - lifesupport_alert_width, 203);
         free(uncompressed);
@@ -212,6 +200,18 @@ void gfx_DrawSpeedIndicator(char speed, char maxspeed_warp, char maxspeed_impuls
     gfx_SetTextBGColor(0);
 }
 
+void vfx_RenderSparkFlare(animation_t *animate){
+    char i, offset_x, offset_y;
+    char duration = animate->duration + 1;
+    char pixels = randInt(duration, duration + 5);
+    gfx_SetColor(31);
+    for(i = 0; i < pixels; i++) {
+        unsigned int xpos = animate->origin_x + randInt(-2*duration, 2*duration);
+        unsigned char ypos = 10 * randInt(duration - 1, duration) + animate->origin_y;
+        gfx_SetPixel(xpos, ypos);
+    }
+    if(++animate->duration == SPARK_ANIM_DURA) animate->duration = 0;
+}
 
 /*void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
     char i;

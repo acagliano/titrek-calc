@@ -40,13 +40,13 @@ enum timers {
 
 typedef struct {
     char speed;
-    int coords[3];
+    unsigned int coords[3];
     short vectors[2];
     unsigned char angles[2];
 } Position_t;
 
 typedef struct {
-    unsigned char angles[2];
+    char angles[2];
     char target;
 } target_t;
 
@@ -70,7 +70,7 @@ typedef struct {
     char iconStates[2];
     bool damagesection[3];
     char ScreenSelected;  // default, status, power, tactical, chat, sensors
-    char ScreenSecondary;
+    char viewScreenPrior;
     char moduleSelected;
     char moduleRepairing;
     char deathreason;
@@ -81,6 +81,7 @@ typedef struct {
 enum ScreenSelections {
     SCRN_START,
     SCRN_VIEW,
+    SCRN_VIEW_TARG,
     SCRN_TACTICAL,
     SCRN_STATUS,
     SCRN_POWER,
@@ -88,11 +89,7 @@ enum ScreenSelections {
     SCRN_INVENTORY,
     SCRN_SENSORS
 };
-enum ScreenSecondary {
-    DEFAULT = 0,
-    SCRN_VIEW_NAV,
-    SCRN_VIEW_TACT
-};
+
 
 #define REFRESH_RATE 20
 #define ALERT_REFRESH 80

@@ -5,25 +5,39 @@ using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-7:
+9:
  tactical : converted! (822 > 69 bytes)
  power_alert : converted! (402 > 47 bytes)
- shield_alert : converted! (1742 > 185 bytes)
- shield_alert_bg : converted! (1742 > 154 bytes)
- torpedo_alert : converted! (502 > 52 bytes)
+ ship_alert : converted! (1742 > 173 bytes)
+ hull_alert : converted! (1742 > 179 bytes)
+ hull_normal : converted! (1742 > 154 bytes)
+ torpedo_alert : converted! (402 > 50 bytes)
  lifesupport_alert : converted! (402 > 38 bytes)
  breach_alert : converted! (402 > 86 bytes)
+ splashlogo : converted! (6502 > 1310 bytes)
 
 --- vfx (C) ---
 using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-1:
- splashlogo : converted! (6502 > 1297 bytes)
+2:
+ target : converted! (902 > 117 bytes)
+ phaser : converted! (1026 > 102 bytes)
 
-exporting appvar: trekvfx.8xp
+exporting appvar: trekicon.8xp
+ tactical
+ power_alert
+ ship_alert
+ hull_alert
+ hull_normal
+ torpedo_alert
+ lifesupport_alert
+ breach_alert
  splashlogo
+exporting appvar: trekvfx.8xp
+ target
+ phaser
 
 converted in 0 s
 

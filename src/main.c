@@ -29,6 +29,7 @@
 
 /* Put your function prototypes here */
 void printText(const char *text, uint8_t x, uint8_t y);
+char gfx_MainMenu(bool gfx_initialized);
 
 #include "gfx/icons.h"
 #include "gfx_functions.h"
@@ -41,10 +42,18 @@ void printText(const char *text, uint8_t x, uint8_t y);
 #include "mymath.h"
 #include "vfx.h"
 #include "gfx/trekvfx.h"
+#include "gfx/trekicon.h"
 
 #include "screens.h"
 
 #include "equates.h"
+
+typedef struct {
+    bool impact;
+    char damage;
+    char bleedthrough;
+    char internal;
+} damage_desc_t;
 
 enum {
     k_Yequ,
@@ -74,74 +83,51 @@ const char *GameSave = "TrekSave";
 void main(void) {
     bool loopgame = true, key = false;
     char looplimit = sizeof(ShipModules) / sizeof(Module_t);
-    bool gfx_initialized, splash_first_loop = true;
+    bool gfx_initialized[2];
+    animation_t animation[2] = {0};
+    animation_t *temp;
     gfx_sprite_t* uncompressed;
     long tick_test;
     bool keys_prior[15] = {0};
     char SavePtr;
-    char i, j;
+    char i = 0, j;
     char mapslot;
     srandom(rtc_Time());
     ti_CloseAll();
     gfx_Begin();
     gfx_SetDrawBuffer();
-    gfx_initialized = trekvfx_init();
-    if(gfx_initialized){
-        if(uncompressed = gfx_MallocSprite(75,116)){
+    gfx_initialized[0] = trekicon_init();
+    gfx_initialized[1] = trekvfx_init();
+    temp = &animation[0];
+    temp->origin_x = 11;
+    temp->origin_y = 25;
+    temp->duration = 0;
+    temp = &animation[1];
+    temp->origin_x = 319;
+    temp->origin_y = 25;
+    temp->duration = 0;
+    while(i != 1){
+        i = gfx_MainMenu(gfx_initialized[0]);
+        if(i == 3) {
+            gfx_End();
+            prgm_CleanUp();
+            return;
+        }
+        if(i == 2){
             gfx_ZeroScreen();
-            zx7_Decompress(uncompressed, splashlogo_compressed);
-            gfx_Sprite(uncompressed, 20, 50);
-            free(uncompressed);
+            gfx_SetTextFGColor(231);
+            gfx_SetTextBGColor(255);
+            gfx_PrintStringXY("Star Trek Multiplayer, ", 40, 1);
+            gfx_PrintString(trek_version);
+            gfx_Line(0, 12, 320, 12);
+            gfx_PrintStringXY("ACagliano - concept, general programming", 5, 15);
+            gfx_PrintStringXY("GregsAStar - 3d trig, rendering", 5, 25);
+            gfx_PrintStringXY("Zeda - framebuffer sorting", 5, 35);
+            gfx_PrintStringXY("TurquoiseDragon - spritework", 5, 45);
+            gfx_PrintStringXY("Press any key to continue.", 5, 230);
+            gfx_BlitBuffer();
+            while(!os_GetCSC());
         }
-    }
-    gfx_SetTextScale(3,3);
-    gfx_SetTextFGColor(26);
-    gfx_SetTextBGColor(0);
-    gfx_SetTextTransparentColor(0);
-    gfx_PrintStringXY("Star Trek", 103, 53);
-    gfx_SetTextFGColor(230);
-    gfx_PrintStringXY("Star Trek", 100, 50);
-    gfx_SetTextScale(2,2);
-    gfx_PrintStringXY("Multiplayer", 115, 80);
-    gfx_SetColor(230);
-    gfx_FillRectangle(100, 100, 200, 2);
-    gfx_SetColor(231);
-    gfx_FillRectangle(140, 110, 100, 45);
-    gfx_SetTextScale(1,1);
-    gfx_PrintStringXY("Boldly going where no", 10, 220);
-    gfx_PrintStringXY("calculator has gone before!", 10, 230);
-    gfx_PrintStringXY(trek_version, 240, 230);
-    gfx_SetTextTransparentColor(255);
-    gfx_SetTextFGColor(0);
-    gfx_SetTextBGColor(255);
-    i = 0;
-    do {
-        key = os_GetCSC();
-        if(key == sk_Up) i--;
-        if(key == sk_Down) i++;
-        if(key == sk_Clear) {
-            key = sk_Enter;
-            i = 2;
-        }
-        if(i < 0) i = 2;
-        if(i > 2) i = 0;
-        if(key || splash_first_loop) {
-            gfx_SetColor(231);
-            gfx_FillRectangle(140, 110, 100, 45);
-            gfx_SetColor(229);
-            gfx_FillRectangle(140, i * 15 + 110, 100, 15);
-            gfx_PrintStringXY("Start Demo", 150, 114);
-            gfx_PrintStringXY("Controls", 150, 129);
-            gfx_PrintStringXY("Exit Game", 150, 144);
-            splash_first_loop = false;
-        }
-        gfx_BlitBuffer();
-    } while (key != sk_Enter);
-    
-    if(i == 2) {
-        gfx_End();
-        prgm_CleanUp();
-        return;
     }
     gfx_SetTextFGColor(255);
     gfx_SetTextTransparentColor(1);
@@ -244,7 +230,7 @@ void main(void) {
     MapMain = calloc(10, sizeof(MapData_t));
     boot_ClearVRAM();
     DrawGUI();
-    player->ScreenSelected = SCRN_TACTICAL;
+    player->ScreenSelected = SCRN_VIEW;
     player->moduleRepairing = -1;
     if((mapslot = map_LocateSlot(MapMain)) >= 0){
         MapData_t *slot = &MapMain[mapslot];
@@ -261,7 +247,9 @@ void main(void) {
     }
     do
     {
+        damage_desc_t shiphit = {0};
         char corestability, lifesupporthealth, speed = player->position.speed;
+        char integrityhealth;
         unsigned char warpdrivehealth = warpdrive->health * 100 / warpdrive->maxHealth;
         unsigned char impdrivehealth = impulsedrive->health * 100 / impulsedrive->maxHealth;
         char topspeed_warp = warpdrive->stats.sysstats.topSpeed;
@@ -288,25 +276,33 @@ void main(void) {
         kb_ScanGroup(1);
         key = kb_Data[1] & kb_Window;
         if(key && !keys_prior[k_Window] ){
-            if(player->ScreenSelected == SCRN_STATUS) player->ScreenSelected = SCRN_VIEW;
+            if(player->ScreenSelected == SCRN_STATUS) player->ScreenSelected = (player->viewScreenPrior) ? SCRN_VIEW_TARG : SCRN_VIEW;
             else player->ScreenSelected = SCRN_STATUS;
         }
         keys_prior[k_Window] = key;
         key = kb_Data[1] & kb_Trace;
         if( key && !keys_prior[k_Trace] ){
-            if(player->ScreenSelected == SCRN_POWER) player->ScreenSelected = SCRN_VIEW;
+            if(player->ScreenSelected == SCRN_POWER) player->ScreenSelected = (player->viewScreenPrior) ? SCRN_VIEW_TARG : SCRN_VIEW;
             else player->ScreenSelected = SCRN_POWER;
         }
         keys_prior[k_Trace] = key;
         key = kb_Data[1] & kb_Yequ;
         if( key && !keys_prior[k_Yequ] ){
-            if(player->ScreenSelected == SCRN_TACTICAL) player->ScreenSelected = SCRN_VIEW;
+            if(player->ScreenSelected == SCRN_TACTICAL) player->ScreenSelected = (player->viewScreenPrior) ? SCRN_VIEW_TARG : SCRN_VIEW;
             else player->ScreenSelected = SCRN_TACTICAL;
         }
         keys_prior[k_Yequ] = key;
         
         key = kb_Data[1] & kb_Mode;
         if( key && !keys_prior[k_Mode] ){
+            if(player->ScreenSelected == SCRN_VIEW) {
+                player->ScreenSelected = SCRN_VIEW_TARG;
+                player->viewScreenPrior = SCRN_VIEW_TARG;
+            }
+            else if(player->ScreenSelected == SCRN_VIEW_TARG) {
+                player->ScreenSelected = SCRN_VIEW;
+                player->viewScreenPrior = 0;
+            }
             if(player->ScreenSelected == SCRN_POWER){
                 Module_t* module = &ShipModules[player->moduleSelected];
                 char health = module->health * 100 / module->maxHealth;
@@ -390,12 +386,15 @@ void main(void) {
             char damage = randInt(4,6);
             char drv = shields->stats.shieldstats.resistance * shields->powerDraw * shields->health / shields->powerDefault / shields->maxHealth;
             char int_drv = integrity->health * integrity->powerDraw * 100 / integrity->maxHealth / integrity->powerDefault;
+            shiphit.impact = true;
+            shiphit.damage = damage;
             if(shields->online){
                 shields->health -= damage;
                 if(shields->health < 0) shields->health = 0;
                 damage -= drv;
                 if(damage < 0) damage = 0;
             }
+            shiphit.bleedthrough = damage;
             drv = 0;
             if(integrity->online){
                 drv = integrity->stats.sysstats.resistance;
@@ -406,6 +405,7 @@ void main(void) {
                 damage -= drv;
                 if(damage < 0) damage = 0;
             }
+            shiphit.internal = damage;
             for(i = 0; i < 2; i++){
                 Module_t* module = &ShipModules[randInt(tt_lifesupport-1,tt_warpcore-1)];
                 module->health -= damage;
@@ -441,6 +441,9 @@ void main(void) {
                     player->position.angles[1]++;
                     PROC_AnglesToVectors(&player->position);
                     break;
+                case SCRN_VIEW_TARG:
+                    if(player->target.angles[1] < 40) player->target.angles[1]++;
+                    break;
                 case SCRN_POWER:
                 case SCRN_STATUS:
                     if(key && !keys_prior[k_Down]){
@@ -458,6 +461,9 @@ void main(void) {
                 case SCRN_VIEW:
                     player->position.angles[1]--;
                     PROC_AnglesToVectors(&player->position);
+                    break;
+                case SCRN_VIEW_TARG:
+                    if(player->target.angles[1] > -40) player->target.angles[1]--;
                     break;
                 case SCRN_POWER:
                 case SCRN_STATUS:
@@ -477,6 +483,9 @@ void main(void) {
                     player->position.angles[0]++;
                     PROC_AnglesToVectors(&player->position);
                     break;
+                case SCRN_VIEW_TARG:
+                    if(player->target.angles[0] < 40) player->target.angles[0]++;
+                    break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Right]){
                         module = &ShipModules[player->moduleSelected];
@@ -491,13 +500,16 @@ void main(void) {
         keys_prior[k_Right] = key;
         key = kb_Data[7] & kb_Left;
         if( key){
-        Module_t* module;
-        switch(player->ScreenSelected){
-            case SCRN_VIEW:
-                player->position.angles[0]--;
-                PROC_AnglesToVectors(&player->position);
-                break;
-            case SCRN_POWER:
+            Module_t* module;
+            switch(player->ScreenSelected){
+                case SCRN_VIEW:
+                    player->position.angles[0]--;
+                    PROC_AnglesToVectors(&player->position);
+                    break;
+                case SCRN_VIEW_TARG:
+                    if(player->target.angles[0] > -40) player->target.angles[0]--;
+                    break;
+                case SCRN_POWER:
                     if(key && !keys_prior[k_Left]){
                         module = &ShipModules[player->moduleSelected];
                         if(module->techtype != tt_warpcore && module->techtype != tt_lifesupport){
@@ -555,14 +567,91 @@ void main(void) {
         
         if(warpcore && player->tick % CORE_RECHARGE_TIMER == 0)
             if(warpcore->powerReserve < 256) warpcore->powerReserve++;
+        gfx_WipeScreen();
         
-        
+        gfx_SetClipRegion(xStart, yStart, xStart + vWidth, yStart + vHeight);
         switch(player->ScreenSelected){
+            case SCRN_VIEW_TARG:
             case SCRN_VIEW:
-                gfx_WipeScreen();
-                gfx_SetClipRegion(23, 22, 297, 186);
-                if(speed >= 10) GUI_RenderWarp(speed);
-                gfx_SetClipRegion(0, 0, 320, 240);
+                if(shiphit.impact) {
+                    int j, damage = shiphit.damage;
+                    if(shields->online && shields->health * 100 / shields->maxHealth) gfx_SetColor(223);
+                    else gfx_SetColor(255);
+                    gfx_FillRectangle(xStart, yStart, vWidth, vHeight);
+                    if(shiphit.bleedthrough){
+                        for(j = 34; j < vHeight + 21; j++)
+                            if(randInt(shiphit.bleedthrough, damage + 5) == damage){
+                                gfx_SetColor(randInt(0,255));
+                                gfx_HorizLine(xStart+1, j, vWidth - 1);
+                            }
+                    }
+                } else {
+                    if(speed >= 10) GUI_RenderWarp(speed);
+                }
+                // render frame buffer
+                if(player->ScreenSelected == SCRN_VIEW || player->ScreenSelected == SCRN_VIEW_TARG){
+                    // vector display
+                    unsigned char anglexz = player->position.angles[0];
+                    unsigned char angley = player->position.angles[1];
+                    int coords;
+                    int dialx = xStart+17;
+                    unsigned char dialy = yStart+vHeight-25;
+                    char vectorx = 10 * byteSin(anglexz) / 127;
+                    char vectory = -10 * byteCos(anglexz) / 127;
+                    gfx_SetColor(255);
+                    gfx_SetTextXY(xStart + 4, dialy - 18);
+                    gfx_PrintUInt(anglexz,3);
+                    gfx_Circle(dialx, dialy + 1, 10);
+                    gfx_Line(xStart + 17, dialy+1, xStart + 17 + vectorx, dialy + 1 + vectory);
+                    gfx_PrintStringXY("Rot", xStart+4, dialy + 15);
+                    dialx += 25;
+                    vectorx = 10 * byteCos(angley) / 127;
+                    vectory = 10 * byteSin(angley) / 127;
+                    gfx_SetTextXY(dialx - 9, dialy - 18);
+                    gfx_PrintUInt(angley,3);
+                    gfx_Circle(dialx, dialy+1, 10);
+                    gfx_Line(dialx, dialy+1, dialx + vectorx, dialy+1 + vectory);
+                    gfx_PrintStringXY("Pit", dialx - 9, dialy + 15);
+                    gfx_Rectangle(xStart + vWidth - 85, yStart+vHeight-23, 85, 23);
+                    gfx_PrintStringXY("Sector:", xStart+vWidth-82, yStart+vHeight-20);
+                    gfx_SetTextXY(xStart+vWidth-82, yStart+vHeight-10);
+                    gfx_PrintUInt(player->position.coords[0]>>16, 3);
+                    gfx_PrintString(":");
+                    gfx_PrintUInt(player->position.coords[1]>>16, 3);
+                    gfx_PrintString(":");
+                    gfx_PrintUInt(player->position.coords[2]>>16, 3);
+                }
+                if(player->ScreenSelected == SCRN_VIEW_TARG){
+                    gfx_sprite_t *uncompressed;
+                    int view_center_x = vWidth / 2;
+                    int view_center_y = vHeight / 2;
+                    char anglexz = player->target.angles[0];
+                    char angley = player->target.angles[1];
+                    gfx_SetTextFGColor(224);
+                    gfx_SetTextXY(xStart + vWidth - 84, yStart + vHeight - 40);
+                    if(activeweapon->techtype == tt_phaser) gfx_PrintString("[ Phasers ]");
+                    if(activeweapon->techtype == tt_torpedo) gfx_PrintString("[ Torpedo ]");
+                    gfx_SetTextFGColor(255);
+                    if(abs(anglexz) < 45 && abs(angley) < 45){
+                        char charge = activeweapon->stats.weapstats.charge;
+                        char maxCharge = activeweapon->stats.weapstats.maxCharge;
+                        int targ_gui_x = view_center_x * anglexz / 45 + view_center_x;
+                        int targ_gui_y = view_center_y * angley / 45 + view_center_y;
+                        gfx_SetColor(224);
+                        if(uncompressed = gfx_MallocSprite(target_width, target_height)){
+                            zx7_Decompress(uncompressed, target_compressed);
+                            gfx_TransparentSprite(uncompressed,
+                                                  xStart + targ_gui_x - (target_width>>1),
+                                                  yStart + targ_gui_y - (target_height>>1));
+                            free(uncompressed);
+                        }
+                       /* gfx_Circle(xStart + targ_gui_x, yStart + targ_gui_y, 15);
+                        gfx_Circle(xStart + targ_gui_x, yStart + targ_gui_y, 8); */
+                        gfx_HorizLine(xStart + targ_gui_x - 15, yStart + targ_gui_y, 30);
+                        gfx_VertLine(xStart + targ_gui_x, yStart + targ_gui_y - 15, 30);
+                        gfx_FillCircle(xStart + targ_gui_x, yStart + targ_gui_y, charge * 8 / maxCharge);
+                    }
+                }
                 break;
             case SCRN_TACTICAL:
                 GUI_TacticalReport(&ShipModules, shields, activeweapon);
@@ -574,8 +663,9 @@ void main(void) {
                 GUI_PowerReport(&ShipModules, looplimit, player->moduleSelected, player->position.speed);
                 break;
         }
+        gfx_SetClipRegion(0, 0, 320, 240);
         
-       
+        
         if(warpcore){
             corestability = warpcore->health * 100 / warpcore->maxHealth;
             lifesupporthealth = lifesupport->health * 100 / lifesupport->maxHealth;
@@ -591,17 +681,24 @@ void main(void) {
         }
         if((lifesupporthealth == 0 || !lifesupport->online) & !player->timers[timer_lifesupport])
             player->timers[timer_lifesupport]++;
-        else if(lifesupporthealth > 50 && lifesupport->online) player->timers[timer_lifesupport] = 0;
+        else if(lifesupporthealth > 25 && lifesupport->online) player->timers[timer_lifesupport] = 0;
         if(player->timers[timer_lifesupport]) player->timers[timer_lifesupport]++;
         if(player->timers[timer_lifesupport] == LIFE_SUPPORT_TIMER){
             player->deathreason = 2;
             break;
         }
-        gfx_DrawLifeSupportAlert(player->timers[timer_lifesupport] != 0);
-        gfx_DrawCoreBreachAlert(player->timers[timer_corebreach] != 0);
+        gfx_SetColor(148); gfx_FillRectangle(225, 203, 20 * 3, 20);
+        if(player->timers[timer_lifesupport]) gfx_DrawLifeSupportAlert();
+        if(player->timers[timer_corebreach]) gfx_DrawCoreBreachAlert();
         gfx_DrawShipStatusIcon(integrity, shields, &player);
         gfx_DrawSpeedIndicator(player->position.speed, topspeed_warp, topspeed_impulse);
+        integrityhealth = integrity->health * 100 / integrity->maxHealth;
+        if(integrityhealth < 50){
+          
+            
+        }
         gfx_BlitBuffer();
+        
         player->tick++;
     }
     while(loopgame);
@@ -642,4 +739,61 @@ void printText(char *text, uint8_t xpos, uint8_t ypos) {
     os_PutStrFull(text);
 }
 
+char gfx_MainMenu(bool gfx_initialized){
+    bool splash_first_loop = true;
+    gfx_sprite_t *uncompressed;
+    char key = 0, i;
+    gfx_ZeroScreen();
+    if(gfx_initialized){
+        if(uncompressed = gfx_MallocSprite(75,116)){
+            zx7_Decompress(uncompressed, splashlogo_compressed);
+            gfx_Sprite(uncompressed, 20, 50);
+            free(uncompressed);
+        }
+    }
+    gfx_SetTextScale(3,3);
+    gfx_SetTextFGColor(26);
+    gfx_SetTextBGColor(0);
+    gfx_SetTextTransparentColor(0);
+    gfx_PrintStringXY("Star Trek", 103, 53);
+    gfx_SetTextFGColor(230);
+    gfx_PrintStringXY("Star Trek", 100, 50);
+    gfx_SetTextScale(2,2);
+    gfx_PrintStringXY("Multiplayer", 120, 80);
+    gfx_SetColor(230);
+    gfx_FillRectangle(100, 100, 200, 2);
+    gfx_SetColor(231);
+    gfx_FillRectangle(140, 110, 100, 45);
+    gfx_SetTextScale(1,1);
+    gfx_PrintStringXY("Boldly going where no", 10, 220);
+    gfx_PrintStringXY("calculator has gone before!", 10, 230);
+    gfx_PrintStringXY(trek_version, 240, 230);
+    gfx_SetTextTransparentColor(255);
+    gfx_SetTextFGColor(0);
+    gfx_SetTextBGColor(255);
+    i = 0;
+    do {
+        key = os_GetCSC();
+        if(key == sk_Up) i--;
+        if(key == sk_Down) i++;
+        if(key == sk_Clear) {
+            key = sk_Enter;
+            i = 2;
+        }
+        if(i < 0) i = 2;
+        if(i > 2) i = 0;
+        if(key || splash_first_loop) {
+            gfx_SetColor(231);
+            gfx_FillRectangle(140, 110, 100, 45);
+            gfx_SetColor(229);
+            gfx_FillRectangle(140, i * 15 + 110, 100, 15);
+            gfx_PrintStringXY("Start Demo", 150, 114);
+            gfx_PrintStringXY("Credits", 150, 129);
+            gfx_PrintStringXY("Exit Game", 150, 144);
+            splash_first_loop = false;
+        }
+        gfx_BlitBuffer();
+    } while (key != sk_Enter);
+    return i + 1;
+}
 
