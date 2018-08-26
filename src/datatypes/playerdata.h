@@ -33,15 +33,15 @@ enum timers {
 #define COORD_X 0
 #define COORD_Y 1
 #define COORD_Z 2
-#define angle_xy 0
-#define angle_z 1
+#define rotation 0
+#define pitch 1
 #define MODE_PHASER 0
 #define MODE_PHOTON 1
 
 typedef struct {
     char speed;
     unsigned int coords[3];
-    short vectors[2];
+    short vectors[3];
     unsigned char angles[2];
 } Position_t;
 

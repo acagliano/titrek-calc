@@ -43,6 +43,8 @@ char gfx_MainMenu(bool gfx_initialized);
 #include "vfx.h"
 #include "gfx/trekvfx.h"
 #include "gfx/trekicon.h"
+#define icons_enabled 0
+#define vfx_enabled 0
 
 #include "screens.h"
 
@@ -96,8 +98,8 @@ void main(void) {
     ti_CloseAll();
     gfx_Begin();
     gfx_SetDrawBuffer();
-    gfx_initialized[0] = trekicon_init();
-    gfx_initialized[1] = trekvfx_init();
+    gfx_initialized[icons_enabled] = trekicon_init();
+    gfx_initialized[vfx_enabled] = trekvfx_init();
     temp = &animation[0];
     temp->origin_x = 11;
     temp->origin_y = 25;
@@ -439,10 +441,10 @@ void main(void) {
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
                     player->position.angles[1]++;
-                    PROC_AnglesToVectors(&player->position);
+                    AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles[1] < 40) player->target.angles[1]++;
+                    if(player->target.angles[1] < 45) player->target.angles[1]++;
                     break;
                 case SCRN_POWER:
                 case SCRN_STATUS:
@@ -460,10 +462,10 @@ void main(void) {
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
                     player->position.angles[1]--;
-                    PROC_AnglesToVectors(&player->position);
+                    AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles[1] > -40) player->target.angles[1]--;
+                    if(player->target.angles[1] > -45) player->target.angles[1]--;
                     break;
                 case SCRN_POWER:
                 case SCRN_STATUS:
@@ -481,10 +483,10 @@ void main(void) {
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
                     player->position.angles[0]++;
-                    PROC_AnglesToVectors(&player->position);
+                    AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles[0] < 40) player->target.angles[0]++;
+                    if(player->target.angles[0] < 45) player->target.angles[0]++;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Right]){
@@ -504,10 +506,10 @@ void main(void) {
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
                     player->position.angles[0]--;
-                    PROC_AnglesToVectors(&player->position);
+                    AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles[0] > -40) player->target.angles[0]--;
+                    if(player->target.angles[0] > -45) player->target.angles[0]--;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Left]){
@@ -641,8 +643,8 @@ void main(void) {
                         if(uncompressed = gfx_MallocSprite(target_width, target_height)){
                             zx7_Decompress(uncompressed, target_compressed);
                             gfx_TransparentSprite(uncompressed,
-                                                  xStart + targ_gui_x - (target_width>>1),
-                                                  yStart + targ_gui_y - (target_height>>1));
+                                                  xStart + targ_gui_x - 15,
+                                                  yStart + targ_gui_y - 15);
                             free(uncompressed);
                         }
                        /* gfx_Circle(xStart + targ_gui_x, yStart + targ_gui_y, 15);
@@ -688,17 +690,14 @@ void main(void) {
             break;
         }
         gfx_SetColor(148); gfx_FillRectangle(225, 203, 20 * 3, 20);
-        if(player->timers[timer_lifesupport]) gfx_DrawLifeSupportAlert();
-        if(player->timers[timer_corebreach]) gfx_DrawCoreBreachAlert();
-        gfx_DrawShipStatusIcon(integrity, shields, &player);
+        if(gfx_initialized[icons_enabled]){
+            if(player->timers[timer_lifesupport]) gfx_DrawLifeSupportAlert();
+            if(player->timers[timer_corebreach]) gfx_DrawCoreBreachAlert();
+            gfx_DrawShipStatusIcon(integrity, shields, &player);
+        }
         gfx_DrawSpeedIndicator(player->position.speed, topspeed_warp, topspeed_impulse);
         integrityhealth = integrity->health * 100 / integrity->maxHealth;
-        if(integrityhealth < 50){
-          
-            
-        }
         gfx_BlitBuffer();
-        
         player->tick++;
     }
     while(loopgame);

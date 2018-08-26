@@ -21,9 +21,11 @@ using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-2:
+4:
  target : converted! (902 > 117 bytes)
  phaser : converted! (1026 > 102 bytes)
+ torp_photon : converted! (1026 > 117 bytes)
+ torp_quantum : converted! (1026 > 136 bytes)
 
 exporting appvar: trekicon.8xp
  tactical
@@ -38,6 +40,8 @@ exporting appvar: trekicon.8xp
 exporting appvar: trekvfx.8xp
  target
  phaser
+ torp_photon
+ torp_quantum
 
 converted in 0 s
 

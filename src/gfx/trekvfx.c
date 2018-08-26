@@ -3,9 +3,11 @@
 #include "trekvfx.h"
 
 #include <fileioc.h>
-uint8_t *trekvfx[2] = {
+uint8_t *trekvfx[4] = {
  (uint8_t*)0,
  (uint8_t*)117,
+ (uint8_t*)219,
+ (uint8_t*)336,
 };
 
 bool trekvfx_init(void) {
