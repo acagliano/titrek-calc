@@ -239,7 +239,7 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     double val = 180/M_PI;
     gfx_sprite_t *uncompressed;
     unsigned int coord_temp;
-    int sens_range = sensors->stats.sysstats.sensor_range;
+    unsigned int sens_range = sensors->stats.sysstats.sensor_range;
     int sens_health = sensors->health * 100 / sensors->maxHealth;
     int sens_power = sensors->powerDraw * 100 / sensors->powerDefault;
     unsigned int sens_scrn_x_start = xStart + 100;
@@ -254,7 +254,6 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     gfx_RenderOrientation(player_angle_xz, player_angle_y, xStart + 17, yStart + vHeight - 25);
     sens_range = sens_range * sens_power / 100;
     if(sens_health < 50) sens_range = sens_range * sens_health / 50;
-    sens_range *= sens_range;
     gfx_SetColor(181);
     gfx_Rectangle(sens_scrn_x_start, sens_scrn_y_start, sens_scrn_origin_x * 2, sens_scrn_origin_y * 2);
     gfx_PrintStringXY("Coordinates:", xStart + 3, yStart + 16);
@@ -300,9 +299,9 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                 anglexz -= player_angle_xz;
                 angley -= player_angle_y;
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
-                render_x = conv_dist * byteSin(anglexz) / 255;
+                render_x = conv_dist * byteSin(anglexz) / 128;
                 conv_dist = distance * sens_scrn_origin_y / sens_range;
-                render_y = -conv_dist * byteCos(anglexz) / 255;
+                render_y = conv_dist * byteCos(anglexz) / 128;
                 gfx_SetColor(242);
                 gfx_FillCircle(xmid + render_x, ymid + render_y, 3);
             }

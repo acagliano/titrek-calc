@@ -201,7 +201,7 @@ void main(void) {
                 break;
             case tt_sensor:
                 module->location = saucer;
-                module->stats.sysstats.sensor_range = 200;
+                module->stats.sysstats.sensor_range = 200*200;
                 module->pdConstant = false;
                 strcpy(module->techname, "Sensors");
                 break;
@@ -265,9 +265,9 @@ void main(void) {
         slot->entitystats.e_ship.maxHealth = 50;
         slot->entitystats.e_ship.shield = 50;
         slot->entitystats.e_ship.shieldMax = 50;
-        slot->position.coords.x = randInt(0,255)<<8;
-        slot->position.coords.y = randInt(0,255)<<8;
-        slot->position.coords.z = randInt(0,255)<<8;
+        slot->position.coords.x = randInt(100,150)<<8;
+        slot->position.coords.y = randInt(100,150)<<8;
+        slot->position.coords.z = randInt(100,150)<<8;
     }
     do
     {
