@@ -201,8 +201,8 @@ void main(void) {
                 break;
             case tt_sensor:
                 module->location = saucer;
-                module->stats.sysstats.sensor_range = 200*200;
-                module->pdConstant = false;
+                module->stats.sysstats.sensor_range = 300*300;
+                module->pdConstant = true;
                 strcpy(module->techname, "Sensors");
                 break;
             case tt_phaser:

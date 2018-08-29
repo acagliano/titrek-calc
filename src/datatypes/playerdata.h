@@ -102,6 +102,7 @@ typedef struct {
     char deathreason;
     char weaponMode;
     char refreshRate;
+    unsigned char sensor_gui_angle;
 } Player_t;
 
 enum ScreenSelections {

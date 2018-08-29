@@ -39,7 +39,8 @@ void PROC_PowerCycle(Module_t *ShipModules, Module_t *warpcore, Module_t *auxpow
            // gfx_DrawPowerStatusIcon(false);
         if(!powerout) break;
         if(module->techtype && (module->techtype <= tt_transporter) && module->powerReserve < 256 && i != repairing){
-            if(drawreduction == 100 && (module->powerDraw == module->powerDefault)) drawreduction = (module->powerReserve < 256) ? 120 : 100;
+            if(drawreduction == 100 && (module->powerDraw == module->powerDefault))
+                drawreduction = (module->powerReserve < 256) ? 120 : 100;
             powerout -= (module->powerDefault * drawreduction / 100);
             module->powerReserve += (module->powerDefault * drawreduction / 100);
             if(module->powerReserve < 64) status = false;
@@ -68,14 +69,15 @@ void PROC_PowerDraw(Module_t *ShipModules, char repairing){
     unsigned char i;
     for(i = 0; i < 15; i++){
         Module_t* module = &ShipModules[i];
-        if((module->online == true &&
-           (module->pdConstant))){
+        if(module->techtype){
+            if(module->online == true && module->pdConstant){
                module->powerReserve -= module->powerDraw;
                if(module->powerReserve <= 0) Module_NoPower(module);
-        }
-        else if(i == repairing && module->health < module->maxHealth){
-            module->powerReserve -= module->powerDraw;
-            if(module->powerReserve <= 0) Module_NoPower(module);
+            }
+            else if(i == repairing && module->health < module->maxHealth){
+                module->powerReserve -= module->powerDraw;
+                if(module->powerReserve <= 0) Module_NoPower(module);
+            }
         }
     }
 }
@@ -83,9 +85,9 @@ void PROC_PowerDraw(Module_t *ShipModules, char repairing){
 void proc_MoveShip(Position_t *pos){
     int coord_x = pos->coords.x, coord_y = pos->coords.y, coord_z = pos->coords.z;
     int vector_x = pos->vectors.x, vector_y = pos->vectors.y, vector_z = pos->vectors.z;
-    coord_x += vector_x;
-    coord_y += vector_y;
-    coord_z += vector_z;
+    coord_x -= vector_x;
+    coord_y -= vector_y;
+    coord_z -= vector_z;
     pos->coords.x = coord_x;
     pos->coords.y = coord_y;
     pos->coords.z = coord_z;

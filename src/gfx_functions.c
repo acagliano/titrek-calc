@@ -13,7 +13,7 @@
 #include "gfx/trekicon.h"
 #include <math.h>
 
-const char *trek_version = "v0.69 alpha";
+const char *trek_version = "v0.70 alpha";
 
 
 void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){

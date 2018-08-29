@@ -66,8 +66,8 @@ extern uint8_t *trekicon[20];
 #define battery_icon_width 10
 #define battery_icon_height 10
 #define battery_icon_compressed ((gfx_sprite_t*)trekicon[18])
-#define ship_icon_width 13
-#define ship_icon_height 17
+#define ship_icon_width 16
+#define ship_icon_height 16
 #define ship_icon_compressed ((gfx_sprite_t*)trekicon[19])
 bool trekicon_init(void);
 

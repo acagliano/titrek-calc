@@ -242,16 +242,20 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     unsigned int sens_range = sensors->stats.sysstats.sensor_range;
     int sens_health = sensors->health * 100 / sensors->maxHealth;
     int sens_power = sensors->powerDraw * 100 / sensors->powerDefault;
-    unsigned int sens_scrn_x_start = xStart + 100;
+    unsigned int sens_scrn_x_start = xStart + 144;
     unsigned int sens_scrn_y_start = yStart + 14;
-    unsigned int sens_scrn_origin_x = (vWidth - 100) / 2;
+    unsigned int sens_scrn_origin_x = (vWidth - 144) / 2;
     unsigned int sens_scrn_origin_y = (vHeight - 14) / 2;
     int xmid = sens_scrn_x_start + sens_scrn_origin_x;
     int ymid = sens_scrn_y_start + sens_scrn_origin_y;
     unsigned char player_angle_xz = player->position.angles.xz;
     unsigned char player_angle_y = player->position.angles.y;
+    char line_x2 = 78 * byteCos(player->sensor_gui_angle) / 127;
+    char line_y2 = 78 * byteSin(player->sensor_gui_angle) / 127;
     PrintHeader("Sensor Readout", yStart+3);
     gfx_RenderOrientation(player_angle_xz, player_angle_y, xStart + 17, yStart + vHeight - 25);
+    gfx_SetColor(191);
+    gfx_Line(xmid, ymid, line_x2 + xmid, line_y2 + ymid);
     sens_range = sens_range * sens_power / 100;
     if(sens_health < 50) sens_range = sens_range * sens_health / 50;
     gfx_SetColor(181);
@@ -278,8 +282,14 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     gfx_PrintString("  |  ");
     gfx_PrintUInt(coord_temp&0xff, 3);
     if(uncompressed = gfx_MallocSprite(ship_icon_width, ship_icon_height)){
+        gfx_sprite_t *rotated;
         zx7_Decompress(uncompressed, ship_icon_compressed);
-        gfx_TransparentSprite(uncompressed, xmid - (ship_icon_width>>1), ymid - (ship_icon_height>>1));
+        if(rotated = gfx_MallocSprite(ship_icon_width, ship_icon_height)){
+            gfx_RotateSprite(uncompressed, rotated, player_angle_xz);
+            gfx_TransparentSprite(rotated, xmid - (ship_icon_width>>1), ymid - (ship_icon_height>>1));
+            free(rotated);
+        } else
+            gfx_TransparentSprite(uncompressed, xmid - (ship_icon_width>>1), ymid - (ship_icon_height>>1));
         free(uncompressed);
     }
     for(i = 0; i < map_size; i++){
@@ -296,15 +306,14 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                 unsigned char anglexz = (tempangle < 0) ? 255 - tempangle : tempangle, angley;
                 tempangle = 255 * atan2(dy, dx) * val / 360;
                 angley = (tempangle < 0) ? 255 - tempangle : tempangle;
-                anglexz -= player_angle_xz;
-                angley -= player_angle_y;
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
-                render_x = conv_dist * byteSin(anglexz) / 128;
+                render_x = conv_dist * byteSin(anglexz) / 127;
                 conv_dist = distance * sens_scrn_origin_y / sens_range;
-                render_y = conv_dist * byteCos(anglexz) / 128;
+                render_y = conv_dist * byteCos(anglexz) / 127;
                 gfx_SetColor(242);
                 gfx_FillCircle(xmid + render_x, ymid + render_y, 3);
             }
         }
     }
+    player->sensor_gui_angle++;
 }

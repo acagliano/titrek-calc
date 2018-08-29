@@ -25,7 +25,7 @@ transparent color : 0x0000
  impulsespeed_icon : converted! (338 > 74 bytes)
  warpspeed_icon : converted! (370 > 137 bytes)
  battery_icon : converted! (102 > 26 bytes)
- ship_icon : converted! (223 > 42 bytes)
+ ship_icon : converted! (258 > 56 bytes)
 
 --- vfx (C) ---
 using built-in xlibc palette ...
