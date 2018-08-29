@@ -7,6 +7,7 @@
 #define POWER_DEFAULT 5
 
 enum techtype {
+    tt_null = 0,
     tt_shield = 1,
     tt_integrity,
     tt_lifesupport,
@@ -16,8 +17,8 @@ enum techtype {
     tt_torpedo,
     tt_sensor,
     tt_transporter = 9,
-    tt_warpcore,
-    tt_auxiliary,
+    tt_warpcore = 14,
+    tt_auxiliary = 15,
     tt_ejectedcore
 };
 
@@ -42,9 +43,11 @@ typedef struct {
 typedef struct {
     char resistance;
     char powerOut;
-    char navSensRange;
-    char targSensRange;
+    char powerOutActual;
+    int sensor_range;
+    int targSensRange;
     char topSpeed;
+    int auxiliarymax;
 } sysstats_t;
 
 typedef struct {

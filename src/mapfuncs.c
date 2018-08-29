@@ -4,7 +4,7 @@
 
 char map_LocateSlot(MapData_t* map){
     char i;
-    for(i = 0; i < 100; i++){
+    for(i = 0; i < 19; i++){
         MapData_t *slot = &map[i];
         if(!slot->entitytype) return i;
     }

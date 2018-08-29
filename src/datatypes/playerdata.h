@@ -39,14 +39,39 @@ enum timers {
 #define MODE_PHOTON 1
 
 typedef struct {
-    char speed;
-    unsigned int coords[3];
-    short vectors[3];
-    unsigned char angles[2];
+    unsigned char impulse;
+    unsigned char warp;
+} speed_t;
+
+typedef struct {
+    unsigned char xz;
+    unsigned char y;
+} u_angles_t;
+
+typedef struct {
+    char xz;
+    char y;
+} angles_t;
+
+typedef struct {
+    bool warpactive;
+    speed_t speed;
+    speed_t topspeed;
+    struct {
+        unsigned int x;
+        unsigned int y;
+        unsigned int z;
+    } coords;
+    struct {
+        char x;
+        char y;
+        char z;
+    } vectors;
+    u_angles_t angles;
 } Position_t;
 
 typedef struct {
-    char angles[2];
+    angles_t angles;
     char target;
 } target_t;
 
@@ -73,6 +98,7 @@ typedef struct {
     char viewScreenPrior;
     char moduleSelected;
     char moduleRepairing;
+    bool powersource;
     char deathreason;
     char weaponMode;
     char refreshRate;
@@ -92,6 +118,7 @@ enum ScreenSelections {
 
 
 #define REFRESH_RATE 20
+#define MOVE_RATE 64
 #define ALERT_REFRESH 80
 
 

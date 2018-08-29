@@ -1,5 +1,6 @@
 
 #include <graphx.h>
+#include <string.h>
 #include <tice.h>
 #include <compression.h>
 #include "equates.h"
@@ -8,10 +9,11 @@
 #include "datatypes/mapdata.h"
 #include "datatypes/shipmodules.h"
 #include "datatypes/playerdata.h"
+#include "mymath.h"
 #include "gfx/trekicon.h"
 #include <math.h>
 
-const char *trek_version = "v0.64 alpha";
+const char *trek_version = "v0.69 alpha";
 
 
 void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){
@@ -21,7 +23,7 @@ void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){
     gfx_FillRectangle(x+5, y, percent/scale, 7);
     if(text){
         gfx_SetTextXY(x+55+(50*(scale==1))+7-(2*(scale>1)), y);
-        gfx_PrintUInt(percent,1+(percent>9)+(percent>99));
+        gfx_PrintUInt(percent,lcars_GetIntLength(percent));
         gfx_PrintString("% ");
     }
 }
@@ -29,18 +31,15 @@ void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){
 
 void gfx_WipeScreen(){
     gfx_SetColor(0);
-    gfx_FillRectangle(xStart, yStart, vWidth, vHeight+1);
+    gfx_FillRectangle(xStart, yStart, vWidth, vHeight);
     gfx_SetTextXY(xStart, yStart);
 }
 
-void PrintHeader(char *text, char x, char y, char xtextOff, char ytextOff){
-    gfx_SetColor(247);
-    gfx_FillRectangle(x, y, vWidth, 12);
-    gfx_SetTextFGColor(0);
-    gfx_SetTextBGColor(247);
-    gfx_PrintStringXY(text, x+xtextOff, y+ytextOff);
-    gfx_SetTextFGColor(255);
-    gfx_SetTextBGColor(0);
+void PrintHeader(char *text, char y){
+    unsigned int pixellen = text_GetCenterX(text, vWidth);
+    gfx_PrintStringXY(text, pixellen, y);
+    gfx_SetColor(255);
+    gfx_HorizLine(xStart + 1, y + 11, vWidth - 2);
 }
 
 
@@ -48,12 +47,11 @@ void DrawGUI(){
     char yPos = 230;
     gfx_FillScreen(148);
     gfx_SetColor(74);
-    gfx_FillRectangle(20, 19, 280, 170);
+    gfx_FillRectangle(xStart-3, yStart-3, vWidth+6, vHeight + 6);
     gfx_SetColor(0);
-    gfx_FillRectangle(23, 22, 274, 164);
+    gfx_FillRectangle(xStart, yStart, vWidth, vHeight);
     gfx_SetTextScale(1,1);
     gfx_SetColor(74);
-    gfx_SetTextBGColor(74);
     gfx_FillRectangle(10, 227, 300, 13);
     gfx_PrintStringXY("Tactical", 14, yPos);
     gfx_PrintStringXY("Status", 83, yPos);
@@ -61,16 +59,7 @@ void DrawGUI(){
     gfx_PrintStringXY("Power", 216, yPos);
     gfx_PrintStringXY("Chat", 270, yPos);
     gfx_SetTextScale(1,1);
-    gfx_SetColor(197);
-    gfx_FillRectangle(0, 0, 320, 18);
-    gfx_SetColor(16);
-    gfx_FillRectangle(2, 2, 316, 14);
-    gfx_SetTextFGColor(197);
-    gfx_SetTextBGColor(16);
-    gfx_PrintStringXY("Star Trek Multiplayer ", 32, 5);
-    gfx_PrintString(trek_version);
     gfx_SetTextFGColor(255);
-    gfx_SetTextBGColor(0);
     gfx_SetColor(255);
     gfx_Line(75, 228, 75, 238);
     gfx_Line(135, 228, 135, 238);
@@ -135,18 +124,18 @@ void gfx_DrawLifeSupportAlert(void){
     }
 }
 
-void gfx_DrawSpeedIndicator(char speed, char maxspeed_warp, char maxspeed_impulse){
+void gfx_DrawSpeedIndicator(char speed, char maxspeed_warp, char maxspeed_impulse, bool icons_enabled){
+    gfx_sprite_t *uncompressed;
     char i, tierspeed, difference;
     char warpspeeds[11] = {10, 12, 15, 19, 24, 30, 37, 45, 54, 64, 65};
     bool warpspeed = (speed > 9);
-    unsigned char yPos = 191, xPos = xStart + 56, limitbarlen = 0;
+    unsigned char yPos = 191, xPos = xStart + 80, limitbarlen = 0;
     gfx_SetTextFGColor(0);
-    gfx_SetTextBGColor(247);
     // impulse speed bar
     gfx_SetColor(148);
     gfx_FillRectangle(xPos-5, yPos-2, 220, 10);
-    gfx_SetColor(247);
-    gfx_FillRectangle(xPos+1, yPos+9, 88, 12);
+    gfx_SetColor(107);      // change color?
+    gfx_FillRectangle(xPos+1, yPos+9, 50, 15);
     gfx_SetColor(224);
     gfx_FillRectangle(xPos, yPos, 60, 7);
     gfx_SetColor(23);
@@ -165,28 +154,33 @@ void gfx_DrawSpeedIndicator(char speed, char maxspeed_warp, char maxspeed_impuls
     //  gfx_FillRectangle(xPos, yPos, barlen, 7);
     //gfx_FillRectangle(barlen + xPos - 2, yPos-1, 5, 9);
     gfx_Rectangle(xPos, yPos+7, 200, 2);
-    gfx_Rectangle(xPos, yPos+8, 90, 14);
+    gfx_Rectangle(xPos, yPos+8, 52, 17);
     gfx_SetColor(239);
     gfx_SetTextXY(xPos+3, yPos+12);
     if(!warpspeed){
-        if(!speed) gfx_PrintString("Full Stop");
-        else {
-            if(maxspeed_impulse % speed == 0 && maxspeed_impulse / speed == 1) gfx_PrintString("Full");
-            else if(maxspeed_impulse % speed == 0 && maxspeed_impulse / speed == 2) gfx_PrintString("Half");
-            else {
-                gfx_PrintUInt(speed, 1);
-                gfx_PrintString("/");
-                gfx_PrintUInt(maxspeed_impulse, 1);
+        if(icons_enabled)
+            if(uncompressed = gfx_MallocSprite(impulsespeed_icon_width, impulsespeed_icon_height)){
+                zx7_Decompress(uncompressed, impulsespeed_icon_compressed);
+                gfx_TransparentSprite(uncompressed, xPos+1, yPos+8);
+                free(uncompressed);
             }
-            gfx_PrintString(" Impulse");
-            gfx_FillRectangle(xPos, yPos, speed * 60 / maxspeed_impulse , 7);
-            gfx_FillRectangle(speed * 60 / maxspeed_impulse + xPos - 2, yPos-1, 5, 9);
-        }
+        gfx_SetTextXY(xPos+27, yPos + 13);
+        gfx_PrintUInt(speed, 1);
+        gfx_PrintString("/");
+        gfx_PrintUInt(maxspeed_impulse, 1);
+        gfx_FillRectangle(xPos, yPos, speed * 60 / maxspeed_impulse , 7);
+        gfx_FillRectangle(speed * 60 / maxspeed_impulse + xPos - 2, yPos-1, 5, 9);
     } else {
         unsigned char barlen;
+        if(icons_enabled)
+            if(uncompressed = gfx_MallocSprite(warpspeed_icon_width, warpspeed_icon_height)){
+                zx7_Decompress(uncompressed, warpspeed_icon_compressed);
+                gfx_TransparentSprite(uncompressed, xPos+1, yPos+8);
+                free(uncompressed);
+            }
         for(i = 0; i < 9; i++)
             if(warpspeeds[i] > speed) break;
-        gfx_PrintString("Warp ");
+        gfx_SetTextXY(xPos+27, yPos + 13);
         gfx_PrintUInt(i, 1);
         gfx_PrintString(".");
         tierspeed = warpspeeds[i-1];
@@ -197,7 +191,6 @@ void gfx_DrawSpeedIndicator(char speed, char maxspeed_warp, char maxspeed_impuls
         gfx_FillRectangle(barlen + xPos - 2, yPos-1, 5, 9);
     }
     gfx_SetTextFGColor(255);
-    gfx_SetTextBGColor(0);
 }
 
 void vfx_RenderSparkFlare(animation_t *animate){
@@ -212,6 +205,26 @@ void vfx_RenderSparkFlare(animation_t *animate){
     }
     if(++animate->duration == SPARK_ANIM_DURA) animate->duration = 0;
 }
+
+void gfx_RenderOrientation(unsigned char anglexz, unsigned char angley, int dialx, unsigned char dialy){
+    char vectorx = 10 * byteSin(anglexz) / 127;
+    char vectory = -10 * byteCos(anglexz) / 127;
+    gfx_SetColor(255);
+    gfx_SetTextXY(dialx - 9, dialy - 18);
+    gfx_PrintUInt(anglexz,3);
+    gfx_Circle(dialx, dialy + 1, 10);
+    gfx_Line(dialx, dialy+1, dialx + vectorx, dialy + 1 + vectory);
+    gfx_PrintStringXY("Rot", dialx - 9, dialy + 15);
+    dialx += 30;
+    vectorx = 10 * byteCos(angley) / 127;
+    vectory = 10 * byteSin(angley) / 127;
+    gfx_SetTextXY(dialx - 9, dialy - 18);
+    gfx_PrintUInt(angley,3);
+    gfx_Circle(dialx, dialy+1, 10);
+    gfx_Line(dialx, dialy+1, dialx + vectorx, dialy+1 + vectory);
+    gfx_PrintStringXY("Pit", dialx - 9, dialy + 15);
+}
+
 
 /*void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
     char i;
