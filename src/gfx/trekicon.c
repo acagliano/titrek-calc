@@ -3,7 +3,7 @@
 #include "trekicon.h"
 
 #include <fileioc.h>
-uint8_t *trekicon[20] = {
+uint8_t *trekicon[21] = {
  (uint8_t*)0,
  (uint8_t*)69,
  (uint8_t*)116,
@@ -24,6 +24,7 @@ uint8_t *trekicon[20] = {
  (uint8_t*)2425,
  (uint8_t*)2562,
  (uint8_t*)2588,
+ (uint8_t*)2644,
 };
 
 bool trekicon_init(void) {

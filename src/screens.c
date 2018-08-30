@@ -234,7 +234,7 @@ void GUI_TacticalReport(Module_t *ShipModules, char loops, Module_t *shields, Mo
     }
 }
 
-void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, Module_t *sensors){
+void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, Module_t *sensors, bool icons){
     int i;
     double val = 180/M_PI;
     gfx_sprite_t *uncompressed;
@@ -242,46 +242,67 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     unsigned int sens_range = sensors->stats.sysstats.sensor_range;
     int sens_health = sensors->health * 100 / sensors->maxHealth;
     int sens_power = sensors->powerDraw * 100 / sensors->powerDefault;
-    unsigned int sens_scrn_x_start = xStart + 144;
-    unsigned int sens_scrn_y_start = yStart + 14;
-    unsigned int sens_scrn_origin_x = (vWidth - 144) / 2;
-    unsigned int sens_scrn_origin_y = (vHeight - 14) / 2;
+    unsigned int sens_scrn_x_start = xStart + 148;
+    unsigned int sens_scrn_y_start = yStart + 16;
+    unsigned int sens_scrn_origin_x = (vWidth + xStart - sens_scrn_x_start) / 2;
     int xmid = sens_scrn_x_start + sens_scrn_origin_x;
-    int ymid = sens_scrn_y_start + sens_scrn_origin_y;
+    int ymid = sens_scrn_y_start + sens_scrn_origin_x;
     unsigned char player_angle_xz = player->position.angles.xz;
     unsigned char player_angle_y = player->position.angles.y;
-    char line_x2 = 78 * byteCos(player->sensor_gui_angle) / 127;
-    char line_y2 = 78 * byteSin(player->sensor_gui_angle) / 127;
+    char line_x2 = 74 * byteSin(player->sensor_gui_angle) / 127;
+    char line_y2 = 74 * byteCos(player->sensor_gui_angle) / 127;
     PrintHeader("Sensor Readout", yStart+3);
+    gfx_SetColor(107);
+    gfx_FillRectangle(sens_scrn_x_start, sens_scrn_y_start, sens_scrn_origin_x<<1, sens_scrn_origin_x<<1);
+    gfx_SetColor(0);
+    gfx_FillCircle(xmid, ymid, sens_scrn_origin_x);
     gfx_RenderOrientation(player_angle_xz, player_angle_y, xStart + 17, yStart + vHeight - 25);
-    gfx_SetColor(191);
-    gfx_Line(xmid, ymid, line_x2 + xmid, line_y2 + ymid);
     sens_range = sens_range * sens_power / 100;
     if(sens_health < 50) sens_range = sens_range * sens_health / 50;
-    gfx_SetColor(181);
-    gfx_Rectangle(sens_scrn_x_start, sens_scrn_y_start, sens_scrn_origin_x * 2, sens_scrn_origin_y * 2);
+    gfx_SetColor(255);
+    gfx_VertLine(xmid, sens_scrn_y_start, vHeight - 18);
+    gfx_HorizLine(xmid - sens_scrn_origin_x, ymid, sens_scrn_origin_x * 2);
+    gfx_PrintStringXY("+x", xmid - 15, yStart + 20);
+    gfx_PrintStringXY("-z", xmid + sens_scrn_origin_x - 20, ymid - 10);
+    gfx_PrintStringXY("-x", xmid - 15, yStart + vHeight - 15);
+    gfx_PrintStringXY("+z", xmid - sens_scrn_origin_x + 5, ymid - 10);
     gfx_PrintStringXY("Coordinates:", xStart + 3, yStart + 16);
     gfx_PrintStringXY("sect", xStart + 9, yStart + 26);
     gfx_PrintStringXY("coord", xStart + 51, yStart + 26);
     gfx_SetTextXY(xStart + 2, yStart + 36);
     gfx_PrintString("X: ");
     coord_temp = player->position.coords.x>>8;
-    gfx_PrintUInt(coord_temp>>8, 3);
+    gfx_PrintUInt(coord_temp>>16, 3);
     gfx_PrintString("  |  ");
-    gfx_PrintUInt(coord_temp&0xff, 3);
+    gfx_PrintUInt(coord_temp&0xffff, 5);
     gfx_SetTextXY(xStart + 2, yStart + 46);
     gfx_PrintString("Y: ");
     coord_temp = player->position.coords.y>>8;
-    gfx_PrintUInt(coord_temp>>8, 3);
+    gfx_PrintUInt(coord_temp>>16, 3);
     gfx_PrintString("  |  ");
-    gfx_PrintUInt(coord_temp&0xff, 3);
+    gfx_PrintUInt(coord_temp&0xffff, 5);
     gfx_SetTextXY(xStart + 2, yStart + 56);
     gfx_PrintString("Z: ");
     coord_temp = player->position.coords.z>>8;
-    gfx_PrintUInt(coord_temp>>8, 3);
+    gfx_PrintUInt(coord_temp>>16, 3);
     gfx_PrintString("  |  ");
-    gfx_PrintUInt(coord_temp&0xff, 3);
-    if(uncompressed = gfx_MallocSprite(ship_icon_width, ship_icon_height)){
+    gfx_PrintUInt(coord_temp&0xffff, 5);
+    if(icons && (uncompressed = gfx_MallocSprite(range_icon_width, range_icon_height))){
+        zx7_Decompress(uncompressed, range_icon_compressed);
+        gfx_TransparentSprite(uncompressed, xStart + 2, yStart + 66);
+        free(uncompressed);
+    }
+    if(sensors->online){
+        gfx_SetTextXY(xStart + 20, yStart + 68);
+        gfx_PrintUInt(sens_range, lcars_GetIntLength(sens_range));
+        gfx_PrintString(" / ");
+        gfx_PrintUInt(sensors->stats.sysstats.sensor_range, lcars_GetIntLength(sensors->stats.sysstats.sensor_range));
+    }
+    else gfx_PrintStringXY("offline", xStart + 20, yStart + 68);
+    if(!sensors->online) return;
+    gfx_SetColor(191);
+    gfx_Line(xmid, ymid, line_x2 + xmid, line_y2 + ymid);
+    if(icons && (uncompressed = gfx_MallocSprite(ship_icon_width, ship_icon_height))){
         gfx_sprite_t *rotated;
         zx7_Decompress(uncompressed, ship_icon_compressed);
         if(rotated = gfx_MallocSprite(ship_icon_width, ship_icon_height)){
@@ -292,6 +313,7 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
             gfx_TransparentSprite(uncompressed, xmid - (ship_icon_width>>1), ymid - (ship_icon_height>>1));
         free(uncompressed);
     }
+    sens_range *= sens_range;
     for(i = 0; i < map_size; i++){
         MapData_t *entity = &map[i];
         if(entity->entitytype){
@@ -303,17 +325,17 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
             if(distance <= sens_range){
                 int render_x, render_y, conv_dist;
                 signed int tempangle = 255 * atan2(dz, dx) * val / 360;
-                unsigned char anglexz = (tempangle < 0) ? 255 - tempangle : tempangle, angley;
+                unsigned char anglexz = (tempangle < 0) ? 255 + tempangle : tempangle, angley;
                 tempangle = 255 * atan2(dy, dx) * val / 360;
-                angley = (tempangle < 0) ? 255 - tempangle : tempangle;
+                angley = (tempangle < 0) ? 255 + tempangle : tempangle;
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
-                render_x = conv_dist * byteSin(anglexz) / 127;
-                conv_dist = distance * sens_scrn_origin_y / sens_range;
-                render_y = conv_dist * byteCos(anglexz) / 127;
+                render_x = conv_dist * byteCos(anglexz - 64) / 127;
+                conv_dist = distance * sens_scrn_origin_x / sens_range;
+                render_y = conv_dist * byteSin(anglexz - 64) / 127;
                 gfx_SetColor(242);
                 gfx_FillCircle(xmid + render_x, ymid + render_y, 3);
             }
         }
     }
-    player->sensor_gui_angle++;
+    player->sensor_gui_angle += 2;
 }

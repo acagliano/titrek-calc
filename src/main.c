@@ -201,7 +201,7 @@ void main(void) {
                 break;
             case tt_sensor:
                 module->location = saucer;
-                module->stats.sysstats.sensor_range = 300*300;
+                module->stats.sysstats.sensor_range = 300;
                 module->pdConstant = true;
                 strcpy(module->techname, "Sensors");
                 break;
@@ -702,11 +702,11 @@ void main(void) {
                     gfx_Rectangle(xStart + vWidth - 85, yStart+vHeight-23, 85, 23);
                     gfx_PrintStringXY("Sector:", xStart+vWidth-82, yStart+vHeight-20);
                     gfx_SetTextXY(xStart+vWidth-82, yStart+vHeight-10);
-                    gfx_PrintUInt(player->position.coords.x>>16, 3);
+                    gfx_PrintUInt(player->position.coords.x>>24, 3);
                     gfx_PrintString(":");
-                    gfx_PrintUInt(player->position.coords.y>>16, 3);
+                    gfx_PrintUInt(player->position.coords.y>>24, 3);
                     gfx_PrintString(":");
-                    gfx_PrintUInt(player->position.coords.z>>16, 3);
+                    gfx_PrintUInt(player->position.coords.z>>24, 3);
                 }
                 if(player->ScreenSelected == SCRN_VIEW_TARG){
                     gfx_sprite_t *uncompressed;
@@ -768,7 +768,7 @@ void main(void) {
                  GUI_StatusReport(&ShipModules, looplimit, moduleselected, modulerepairing);
                 break;
             case SCRN_SENSORS:
-                GUI_SensorReadout(MapMain, sizeof(MapMain)/sizeof(MapData_t), &player, sensors);
+                GUI_SensorReadout(MapMain, sizeof(MapMain)/sizeof(MapData_t), &player, sensors, gfx_initialized[icons_enabled]);
                 break;
             case SCRN_POWER:
                 GUI_PowerReport(&ShipModules, looplimit, moduleselected, gfx_initialized[icons_enabled], !player->powersource);
@@ -806,7 +806,11 @@ void main(void) {
         }
         gfx_DrawSpeedIndicator(speed, topspeed_warp, topspeed_impulse, gfx_initialized[icons_enabled]);
         integrityhealth = integrity->health * 100 / integrity->maxHealth;
-        if(speed && player->tick % (MOVE_RATE / speed) == 0) proc_MoveShip(&player->position);
+        if(speed){
+            bool remainder = player->tick % 2;
+            if(!remainder) proc_MoveShip(&player->position, speed>>1);
+            else proc_MoveShip(&player->position, speed % 2);
+        }
         gfx_BlitBuffer();
         player->tick++;
         player->moduleSelected = moduleselected;

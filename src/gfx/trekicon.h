@@ -6,9 +6,9 @@
 
 #include <stdbool.h>
 
-#define trekicon_num 20
+#define trekicon_num 21
 
-extern uint8_t *trekicon[20];
+extern uint8_t *trekicon[21];
 #define tactical_width 20
 #define tactical_height 41
 #define tactical_compressed ((gfx_sprite_t*)trekicon[0])
@@ -69,6 +69,9 @@ extern uint8_t *trekicon[20];
 #define ship_icon_width 16
 #define ship_icon_height 16
 #define ship_icon_compressed ((gfx_sprite_t*)trekicon[19])
+#define range_icon_width 12
+#define range_icon_height 12
+#define range_icon_compressed ((gfx_sprite_t*)trekicon[20])
 bool trekicon_init(void);
 
 #endif

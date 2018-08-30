@@ -23,9 +23,9 @@ char r_ArcTan(short numerator, short denominator){
 
 void AnglesToVectors(Position_t *pos){
     unsigned char xzangle = pos->angles.xz, yangle = pos->angles.y;
-    pos->vectors.x = (byteCos(xzangle) * byteCos(yangle))&0xff;
-    pos->vectors.z = (byteSin(xzangle) * byteCos(yangle))&0xff;
-    pos->vectors.y = byteSin(yangle)&0xff;
+    pos->vectors.x = byteCos(xzangle) * byteCos(yangle);
+    pos->vectors.z = byteSin(xzangle) * byteCos(yangle);
+    pos->vectors.y = byteSin(yangle);
     //pos->vectors[2] = z vector
 }
 
