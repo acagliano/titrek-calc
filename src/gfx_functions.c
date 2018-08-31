@@ -207,8 +207,8 @@ void vfx_RenderSparkFlare(animation_t *animate){
 }
 
 void gfx_RenderOrientation(unsigned char anglexz, unsigned char angley, int dialx, unsigned char dialy){
-    char vectorx = 10 * byteSin(anglexz) / 127;
-    char vectory = -10 * byteCos(anglexz) / 127;
+    char vectorx = 10 * byteCos(anglexz - 64) / 127;
+    char vectory = 10 * byteSin(anglexz - 64) / 127;
     gfx_SetColor(255);
     gfx_SetTextXY(dialx - 9, dialy - 18);
     gfx_PrintUInt(anglexz,3);

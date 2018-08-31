@@ -104,7 +104,7 @@ void main(void) {
     long tick_test;
     bool keys_prior[18] = {0};
     char SavePtr;
-    char i = 0, j;
+    unsigned char i = 0, j;
     char mapslot;
     srandom(rtc_Time());
     ti_CloseAll();

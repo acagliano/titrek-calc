@@ -85,9 +85,9 @@ void PROC_PowerDraw(Module_t *ShipModules, char repairing){
 void proc_MoveShip(Position_t *pos, char speed){
     int coord_x = pos->coords.x, coord_y = pos->coords.y, coord_z = pos->coords.z;
     int vector_x = pos->vectors.x, vector_y = pos->vectors.y, vector_z = pos->vectors.z;
-    coord_x -= (speed * vector_x);
-    coord_y -= (speed * vector_y);
-    coord_z -= (speed * vector_z);
+    coord_x += (speed * vector_x);
+    coord_y += (speed * vector_y);
+    coord_z += (speed * vector_z);
     pos->coords.x = coord_x;
     pos->coords.y = coord_y;
     pos->coords.z = coord_z;

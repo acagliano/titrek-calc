@@ -262,10 +262,10 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     gfx_SetColor(255);
     gfx_VertLine(xmid, sens_scrn_y_start, vHeight - 18);
     gfx_HorizLine(xmid - sens_scrn_origin_x, ymid, sens_scrn_origin_x * 2);
-    gfx_PrintStringXY("+x", xmid - 15, yStart + 20);
-    gfx_PrintStringXY("-z", xmid + sens_scrn_origin_x - 20, ymid - 10);
-    gfx_PrintStringXY("-x", xmid - 15, yStart + vHeight - 15);
-    gfx_PrintStringXY("+z", xmid - sens_scrn_origin_x + 5, ymid - 10);
+    gfx_PrintStringXY("+z", xmid - 15, yStart + 20);
+    gfx_PrintStringXY("-x", xmid + sens_scrn_origin_x - 20, ymid - 10);
+    gfx_PrintStringXY("-z", xmid - 15, yStart + vHeight - 15);
+    gfx_PrintStringXY("+x", xmid - sens_scrn_origin_x + 5, ymid - 10); //changed
     gfx_PrintStringXY("Coordinates:", xStart + 3, yStart + 16);
     gfx_PrintStringXY("sect", xStart + 9, yStart + 26);
     gfx_PrintStringXY("coord", xStart + 51, yStart + 26);
