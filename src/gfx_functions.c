@@ -13,7 +13,7 @@
 #include "gfx/trekvfx.h"
 #include <math.h>
 
-const char *trek_version = "v0.71 alpha";
+const char *trek_version = "v0.72 alpha";
 
 
 void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){
@@ -242,7 +242,8 @@ void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
         distance_x = item_x - player_x;
         distance_y = item_y - player_y;
         distance_z = item_z - player_z;
-        if((distance = r_GetDistance(distance_x, distance_y, distance_z)) <= RENDER_DISTANCE){
+        distance = r_GetDistance(distance_x, distance_y, distance_z);
+        if(distance < RENDER_DISTANCE){
             unsigned char objectvect_xz = (char)(atan2(distance_z, distance_x) * val);
             unsigned char objectvect_y = (char)(atan2(distance_y, distance_x) * val);
             char vectordiff_xz, vectordiff_y;
@@ -271,10 +272,10 @@ void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
                 gfx_sprite_t* scaled;
                 char scale;
                 zx7_Decompress(uncompressed, sprite);
-                scale = 4 * render->distance * uncompressed->width / RENDER_DISTANCE;
-                scaled = gfx_MallocSprite(uncompressed->width * scale, uncompressed->height * scale);
-                scaled->width = scale * uncompressed->width;
-                scaled->height = scale * uncompressed->width;
+                scale = render->distance * uncompressed->width / RENDER_DISTANCE;
+                scaled = gfx_MallocSprite(scale, scale);
+                scaled->width = scale;
+                scaled->height = scale;
                 gfx_ScaleSprite(uncompressed, scaled);
                 gfx_TransparentSprite(scaled, render->x, render->y);
                 free(scaled);

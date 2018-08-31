@@ -312,7 +312,6 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
             gfx_TransparentSprite(uncompressed, xmid - (ship_icon_width>>1), ymid - (ship_icon_height>>1));
         free(uncompressed);
     }
-    sens_range *= sens_range;
     for(i = 0; i < map_size; i++){
         MapData_t *entity = &map[i];
         if(entity->entitytype){

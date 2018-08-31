@@ -376,24 +376,22 @@ void main(void) {
         
         key = kb_Data[1] & kb_2nd;
         if( key && activeweapon){
-            activeweapon->stats.weapstats.weaponready = true;
-            if(activeweapon->stats.weapstats.weaponready ^ !keys_prior[k_2nd]){
-                if(activeweapon->online){
-                    int power = activeweapon->powerReserve;
-                    char charge = activeweapon->stats.weapstats.charge;
-                    char maxCharge = activeweapon->stats.weapstats.maxCharge;
-                    if((power >= ((charge + 1) * activeweapon->powerDraw)) && (charge < maxCharge)){
-                        activeweapon->stats.weapstats.charge++;
-                    }
+            if(activeweapon->online){
+                int power = activeweapon->powerReserve;
+                char charge = activeweapon->stats.weapstats.charge;
+                char maxCharge = activeweapon->stats.weapstats.maxCharge;
+                if((power >= ((charge + 1) * activeweapon->powerDraw)) && (charge < maxCharge)){
+                    activeweapon->stats.weapstats.charge++;
                 }
             }
         }
+
         if(!key && keys_prior[k_2nd]){
             if(activeweapon){ //fire phaser
                 if(activeweapon->techtype == tt_phaser){
                     char index;
                     activeweapon->powerReserve -= (activeweapon->stats.weapstats.charge * activeweapon->powerDraw);
-                    activeweapon->stats.weapstats.weaponready = false;
+                    activeweapon->stats.weapstats.charge = 0;
                     if((index = map_LocateSlot(&MapMain)) != -1){
                         MapData_t *slot = &MapMain[index];
                         // copy and offset position
@@ -401,19 +399,20 @@ void main(void) {
                         Position_t *entitypos = &slot->position;
                         memcpy(entitypos, playerpos, sizeof(Position_t));
                         slot->speed = activeweapon->stats.weapstats.speed;
-                        slot->position.coords.x += (2 * slot->position.vectors.x);
-                        slot->position.coords.y += (2* slot->position.vectors.y);
-                        slot->position.coords.z += (2* slot->position.vectors.z);
+                        slot->position.angles.xz = player->position.angles.xz + player->target.angles.xz;
+                        slot->position.angles.y = player->position.angles.y + player->target.angles.y;
+                        AnglesToVectors(&slot->position);
+                        slot->position.coords.x += (2 * slot->position.vectors.x)<<8;
+                        slot->position.coords.y += (2 * slot->position.vectors.y)<<8;
+                        slot->position.coords.z += (2 * slot->position.vectors.z)<<8;
+                        
                         slot->entitytype = et_phaser;
                         slot->mobile = true;
                     }
                 }
             }
         }
-        if(activeweapon->stats.weapstats.charge > 0 && !key){
-            activeweapon->stats.weapstats.charge--;
-            if(activeweapon->stats.weapstats.charge == 0) activeweapon->stats.weapstats.weaponready = true;
-        }
+        
         keys_prior[k_2nd] = key;
     
         kb_ScanGroup(2);
