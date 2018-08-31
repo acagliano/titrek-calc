@@ -1,11 +1,11 @@
 opened convpng.ini
 
---- icons (C) ---
+--- trekgui (C) ---
 using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-21:
+22:
  tactical : converted! (822 > 69 bytes)
  power_alert : converted! (402 > 47 bytes)
  ship_alert : converted! (1742 > 173 bytes)
@@ -27,19 +27,19 @@ transparent color : 0x0000
  battery_icon : converted! (102 > 26 bytes)
  ship_icon : converted! (258 > 56 bytes)
  range_icon : converted! (146 > 31 bytes)
+ target : converted! (902 > 117 bytes)
 
---- vfx (C) ---
+--- trekvfx (C) ---
 using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-4:
- target : converted! (902 > 117 bytes)
+3:
  phaser : converted! (1026 > 102 bytes)
  torp_photon : converted! (1026 > 117 bytes)
  torp_quantum : converted! (1026 > 136 bytes)
 
-exporting appvar: trekicon.8xp
+exporting appvar: trekgui.8xp
  tactical
  power_alert
  ship_alert
@@ -61,8 +61,8 @@ exporting appvar: trekicon.8xp
  battery_icon
  ship_icon
  range_icon
-exporting appvar: trekvfx.8xp
  target
+exporting appvar: trekvfx.8xp
  phaser
  torp_photon
  torp_quantum

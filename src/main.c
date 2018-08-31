@@ -31,7 +31,6 @@
 void printText(const char *text, uint8_t x, uint8_t y);
 char gfx_MainMenu(bool gfx_initialized);
 
-#include "gfx/icons.h"
 #include "gfx_functions.h"
 #include "datatypes/mapdata.h"
 #include "datatypes/shipmodules.h"
@@ -41,9 +40,9 @@ char gfx_MainMenu(bool gfx_initialized);
 #include "mapfuncs.h"
 #include "mymath.h"
 #include "vfx.h"
+#include "gfx/trekgui.h"
 #include "gfx/trekvfx.h"
-#include "gfx/trekicon.h"
-#define icons_enabled 0
+#define gui_enabled 0
 #define vfx_enabled 1
 
 #include "screens.h"
@@ -79,7 +78,7 @@ enum {
 };
 Player_t player[1] = {0};
 Module_t ShipModules[15] = {0};
-MapData_t MapMain[20];
+MapData_t MapMain[20] = {0};
 Module_t *activeweapon = NULL;
 const char *GameSave = "TrekSave";
 #define shields ((Module_t*)&ShipModules[tt_shield-1])
@@ -112,8 +111,9 @@ void main(void) {
     gfx_SetDrawBuffer();
     gfx_SetTextBGColor(32);
     gfx_SetTextTransparentColor(32);
-    gfx_initialized[icons_enabled] = trekicon_init();
-    if(gfx_initialized[vfx_enabled] = trekvfx_init() == false){
+    gfx_initialized[gui_enabled] = trekgui_init();
+    gfx_initialized[vfx_enabled] = trekvfx_init();
+    if(!gfx_initialized[gui_enabled] || !gfx_initialized[vfx_enabled]){
         player->deathreason = 4;
         loopgame = false;
     }
@@ -261,10 +261,10 @@ void main(void) {
         // assign ship data to slot
         slot->entitytype = et_ship;
         slot->mobile = false;
-        slot->entitystats.e_ship.health = 50;
-        slot->entitystats.e_ship.maxHealth = 50;
-        slot->entitystats.e_ship.shield = 50;
-        slot->entitystats.e_ship.shieldMax = 50;
+        slot->entitystats.ship.health = 50;
+        slot->entitystats.ship.maxHealth = 50;
+        slot->entitystats.ship.shield = 50;
+        slot->entitystats.ship.shieldMax = 50;
         slot->position.coords.x = randInt(100,150)<<8;
         slot->position.coords.y = randInt(100,150)<<8;
         slot->position.coords.z = randInt(100,150)<<8;
@@ -375,21 +375,44 @@ void main(void) {
         keys_prior[k_Del] = key;
         
         key = kb_Data[1] & kb_2nd;
-        if( key && (!keys_prior[k_2nd] || player->tick % 2 == 0) ){
-            if(activeweapon && activeweapon->online){
-                int power = activeweapon->powerReserve;
-                char charge = activeweapon->stats.weapstats.charge;
-                char maxCharge = activeweapon->stats.weapstats.maxCharge;
-                if((power >= ((charge + 1) * activeweapon->powerDraw)) && (charge < maxCharge)){
-                    activeweapon->stats.weapstats.charge++;
+        if( key && activeweapon){
+            activeweapon->stats.weapstats.weaponready = true;
+            if(activeweapon->stats.weapstats.weaponready ^ !keys_prior[k_2nd]){
+                if(activeweapon->online){
+                    int power = activeweapon->powerReserve;
+                    char charge = activeweapon->stats.weapstats.charge;
+                    char maxCharge = activeweapon->stats.weapstats.maxCharge;
+                    if((power >= ((charge + 1) * activeweapon->powerDraw)) && (charge < maxCharge)){
+                        activeweapon->stats.weapstats.charge++;
+                    }
                 }
             }
         }
         if(!key && keys_prior[k_2nd]){
             if(activeweapon){ //fire phaser
-                activeweapon->powerReserve -= (activeweapon->stats.weapstats.charge * activeweapon->powerDraw);
-                activeweapon->stats.weapstats.charge = 0;
+                if(activeweapon->techtype == tt_phaser){
+                    char index;
+                    activeweapon->powerReserve -= (activeweapon->stats.weapstats.charge * activeweapon->powerDraw);
+                    activeweapon->stats.weapstats.weaponready = false;
+                    if((index = map_LocateSlot(&MapMain)) != -1){
+                        MapData_t *slot = &MapMain[index];
+                        // copy and offset position
+                        Position_t *playerpos = &player->position;
+                        Position_t *entitypos = &slot->position;
+                        memcpy(entitypos, playerpos, sizeof(Position_t));
+                        slot->speed = activeweapon->stats.weapstats.speed;
+                        slot->position.coords.x += (2 * slot->position.vectors.x);
+                        slot->position.coords.y += (2* slot->position.vectors.y);
+                        slot->position.coords.z += (2* slot->position.vectors.z);
+                        slot->entitytype = et_phaser;
+                        slot->mobile = true;
+                    }
+                }
             }
+        }
+        if(activeweapon->stats.weapstats.charge > 0 && !key){
+            activeweapon->stats.weapstats.charge--;
+            if(activeweapon->stats.weapstats.charge == 0) activeweapon->stats.weapstats.weaponready = true;
         }
         keys_prior[k_2nd] = key;
     
@@ -670,6 +693,7 @@ void main(void) {
         switch(player->ScreenSelected){
             case SCRN_VIEW_TARG:
             case SCRN_VIEW:
+                GUI_ViewScreen(&MapMain, &player->position);
                 if(shiphit.impact) {
                     int j, damage = shiphit.damage;
                     if(shields->online && shields->health * 100 / shields->maxHealth) gfx_SetColor(223);
@@ -762,16 +786,16 @@ void main(void) {
                 }
                 break;
             case SCRN_TACTICAL:
-                GUI_TacticalReport(&ShipModules, looplimit, shields, activeweapon, gfx_initialized[icons_enabled]);
+                GUI_TacticalReport(&ShipModules, looplimit, shields, activeweapon, gfx_initialized[gui_enabled]);
                 break;
             case SCRN_STATUS:
                  GUI_StatusReport(&ShipModules, looplimit, moduleselected, modulerepairing);
                 break;
             case SCRN_SENSORS:
-                GUI_SensorReadout(MapMain, sizeof(MapMain)/sizeof(MapData_t), &player, sensors, gfx_initialized[icons_enabled]);
+                GUI_SensorReadout(MapMain, sizeof(MapMain)/sizeof(MapData_t), &player, sensors, gfx_initialized[gui_enabled]);
                 break;
             case SCRN_POWER:
-                GUI_PowerReport(&ShipModules, looplimit, moduleselected, gfx_initialized[icons_enabled], !player->powersource);
+                GUI_PowerReport(&ShipModules, looplimit, moduleselected, gfx_initialized[gui_enabled], !player->powersource);
                 break;
         }
         gfx_SetClipRegion(0, 0, 320, 240);
@@ -799,12 +823,12 @@ void main(void) {
             break;
         }
         gfx_SetColor(148); gfx_FillRectangle(225, 203, 20 * 3, 20);
-        if(gfx_initialized[icons_enabled]){
+        if(gfx_initialized[gui_enabled]){
             if(player->timers[timer_lifesupport]) gfx_DrawLifeSupportAlert();
             if(player->timers[timer_corebreach]) gfx_DrawCoreBreachAlert();
             gfx_DrawShipStatusIcon(integrity, shields, &player);
         }
-        gfx_DrawSpeedIndicator(speed, topspeed_warp, topspeed_impulse, gfx_initialized[icons_enabled]);
+        gfx_DrawSpeedIndicator(speed, topspeed_warp, topspeed_impulse, gfx_initialized[gui_enabled]);
         integrityhealth = integrity->health * 100 / integrity->maxHealth;
         if(speed){
             bool remainder = player->tick % 2;

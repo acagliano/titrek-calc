@@ -9,14 +9,15 @@
 enum EntityTypes {
     // 0 = NULL
     et_ship = 1,
+    et_phaser,
+    et_photon_projectile,
+    et_quantum_projectile,
     et_star,
     et_planet,
     et_asteroid,
     et_blackhole,
     et_supernova,
     et_ejectedcore,
-    et_phaser_projectile,
-    et_torpedo_projectile
 };
 
 typedef struct {
@@ -36,15 +37,22 @@ typedef struct {
     char weaponid;      // to identify weapon in database
 } entity_misc_t;        // structure type for ejected core and projectile
 
+typedef struct {
+    char shield_damage;
+    char hull_damage;
+    int ticks_to_die;
+} entity_weap_t;
+
 
 typedef struct {
     char entitytype;
     bool mobile;
     Position_t position;
+    char speed;
     union entitystats {
-        entity_ship_t e_ship;
-        entity_default_t e_default;
-        entity_misc_t e_misc;
+        entity_ship_t ship;
+        entity_default_t terrain;
+        entity_misc_t weapon;
     } entitystats;
 } MapData_t;
 

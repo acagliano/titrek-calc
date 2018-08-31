@@ -4,9 +4,8 @@
 #include <graphx.h>
 #include "datatypes/shipmodules.h"
 #include "gfx_functions.h"
-#include "gfx/icons.h"
 #include "mymath.h"
-#include "gfx/trekicon.h"
+#include "gfx/trekgui.h"
 
 void Module_NoPower(Module_t* module){
     module->powerReserve = 0;

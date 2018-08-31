@@ -11,6 +11,3 @@ char map_LocateSlot(MapData_t* map){
     return -1;
 }
 
-void map_PopulateSlot(MapData_t* slot, char type){
-    MapData_t *object = slot;
-}

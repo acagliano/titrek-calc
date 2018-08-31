@@ -4,10 +4,9 @@
 #include "datatypes/playerdata.h"
 #include "datatypes/mapdata.h"
 #include "gfx_functions.h"
-#include "gfx/icons.h"
 #include "equates.h"
 #include "mymath.h"
-#include "gfx/trekicon.h"
+#include "gfx/trekgui.h"
 #include <math.h>
 #include <debug.h>
 #include <stdio.h>

@@ -32,6 +32,7 @@ enum locations {
 
 typedef struct {
     char weapname[11];
+    bool weaponready;
     char equipped; // torpedoes only
     char cooldown;
     char charge, maxCharge;  // phasers only

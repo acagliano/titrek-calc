@@ -7,7 +7,7 @@ const char cosLUT[64] = {127, 126, 126, 126, 126, 125, 125, 124, 123, 123, 122, 
 
 long r_GetDistance(int xdiff, int ydiff, int zdiff){
     long distance = xdiff * xdiff + ydiff * ydiff + zdiff * zdiff;
-    return distance;
+    return (long)sqrt(distance);
 }
 
 signed char byteCos(unsigned char x){
@@ -77,8 +77,9 @@ void popheap(renderitem_t* arr,int size){
 }
 void heapify(renderitem_t* arr,int size){
     int n=(size-1)>>1;
-    int m=n*2+1
-    int i,j,k;
+    int m=n*2+1;
+    int i,k;
+    renderitem_t j;
     if(size<2){return;}
    
     //Optimizing first iteration, since that's the only one that needs to verify bounds

@@ -4,13 +4,13 @@
 #include <tice.h>
 #include <compression.h>
 #include "equates.h"
-#include "gfx/icons.h"
 #include "gfx_functions.h"
 #include "datatypes/mapdata.h"
 #include "datatypes/shipmodules.h"
 #include "datatypes/playerdata.h"
 #include "mymath.h"
-#include "gfx/trekicon.h"
+#include "gfx/trekgui.h"
+#include "gfx/trekvfx.h"
 #include <math.h>
 
 const char *trek_version = "v0.71 alpha";
@@ -230,15 +230,15 @@ void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
     char i, count = 0;
     renderitem_t renderbuffer[20], *sortbuffer = NULL;
     double val = 180/M_PI;
-    int player_x = playerpos->coords.x, player_y = playerpos->coords.y, player_z = playerpos->coords.y;
+    int player_x = playerpos->coords.x>>8, player_y = playerpos->coords.y>>8, player_z = playerpos->coords.y>>8;
     int item_x, item_y, item_z;
     int distance_x, distance_y, distance_z;
     long distance;
-    for(i=0; i<(sizeof(map)/sizeof(MapData_t)); i++){
+    for(i=0; i<20; i++){
         MapData_t *item = &map[i];
-        item_x = item->position.coords.x;
-        item_y = item->position.coords.y;
-        item_z = item->position.coords.z;
+        item_x = item->position.coords.x>>8;
+        item_y = item->position.coords.y>>8;
+        item_z = item->position.coords.z>>8;
         distance_x = item_x - player_x;
         distance_y = item_y - player_y;
         distance_z = item_z - player_z;
@@ -253,7 +253,7 @@ void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
             if(abs(vectordiff_xz) <= 45 && abs(vectordiff_y) <= 45){
                 renderitem_t *render = &renderbuffer[count++];
                 renderbuffer->spriteid = item->entitytype;
-                renderbuffer->distance = distance;
+                renderbuffer->distance = RENDER_DISTANCE - distance;
                 vectordiff_xz += 46;
                 renderbuffer->x = vWidth * vectordiff_xz / 91;
                 vectordiff_y += 46;
@@ -261,14 +261,26 @@ void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
             }
         }
     }
-    heapsort(&renderbuffer, sizeof(renderbuffer)/sizeof(renderitem_t));
-    for(i = 0; i < (sizeof(renderbuffer) / sizeof(renderitem_t)); i++){
-        renderitem_t *render = &renderbuffer[i];
-        gfx_sprite_t* sprite;
-        gfx_sprite_t* scaled;
-        char scale_x = (RENDER_DISTANCE - render->distance) * sprite->width / RENDER_DISTANCE;
-        char scale_y = (RENDER_DISTANCE - render->distance) * sprite->height / RENDER_DISTANCE;
-        gfx_ScaleSprite(sprite, scaled);
-        //render->type; // use this to locate sprite
+    if(count){
+        heapsort(&renderbuffer, count);
+        for(i = 0; i < count; i++){
+            renderitem_t *render = &renderbuffer[i];
+            if(render->spriteid>1){
+                gfx_sprite_t* sprite = (gfx_sprite_t*)trekvfx[render->spriteid-1];
+                gfx_sprite_t* uncompressed = gfx_MallocSprite(32, 32);
+                gfx_sprite_t* scaled;
+                char scale;
+                zx7_Decompress(uncompressed, sprite);
+                scale = 4 * render->distance * uncompressed->width / RENDER_DISTANCE;
+                scaled = gfx_MallocSprite(uncompressed->width * scale, uncompressed->height * scale);
+                scaled->width = scale * uncompressed->width;
+                scaled->height = scale * uncompressed->width;
+                gfx_ScaleSprite(uncompressed, scaled);
+                gfx_TransparentSprite(scaled, render->x, render->y);
+                free(scaled);
+                free(uncompressed);
+                //render->type; // use this to locate sprite
+            }
+        }
     }
 }
