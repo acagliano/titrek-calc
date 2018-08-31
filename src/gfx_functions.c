@@ -226,51 +226,49 @@ void gfx_RenderOrientation(unsigned char anglexz, unsigned char angley, int dial
 }
 
 
-/*void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
-    char i;
-    RenderItem_t* renderbuffer = NULL, renderbuff_start;
-    double val = 180/PI;
-    int player_x = playerpos->coords[0], player_y = playerpos->coords[1], player_z = playerpos->coords[2];
+void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
+    char i, count = 0;
+    renderitem_t renderbuffer[20], *sortbuffer = NULL;
+    double val = 180/M_PI;
+    int player_x = playerpos->coords.x, player_y = playerpos->coords.y, player_z = playerpos->coords.y;
     int item_x, item_y, item_z;
     int distance_x, distance_y, distance_z;
     long distance;
-    for(i=0; i<(sizeof(map)/sizeof(MapData_t)), i++){
+    for(i=0; i<(sizeof(map)/sizeof(MapData_t)); i++){
         MapData_t *item = &map[i];
-        item_x = item->position.coords[0];
-        item_y = item->position.coords[1];
-        item_z = item->position.coords[2];
+        item_x = item->position.coords.x;
+        item_y = item->position.coords.y;
+        item_z = item->position.coords.z;
         distance_x = item_x - player_x;
         distance_y = item_y - player_y;
         distance_z = item_z - player_z;
         if((distance = r_GetDistance(distance_x, distance_y, distance_z)) <= RENDER_DISTANCE){
-            unsigned char objectvect_xz = (char)(atan2(distance_z / distance_x) * val);
-            unsigned char objectvect_y = (char)(atan2(distance_y / distance_x) * val);
-            char vectordiff_xz = playerpos->angles[0] - objectvect_xz;
-            char vectordiff_y = playerpos->angles[1] - objectvect_y;
+            unsigned char objectvect_xz = (char)(atan2(distance_z, distance_x) * val);
+            unsigned char objectvect_y = (char)(atan2(distance_y, distance_x) * val);
+            char vectordiff_xz, vectordiff_y;
+            objectvect_xz = 255* objectvect_xz / 360;
+            objectvect_y = 255* objectvect_y / 360;
+            vectordiff_xz = playerpos->angles.xz - objectvect_xz;
+            vectordiff_y = playerpos->angles.y - objectvect_y;
             if(abs(vectordiff_xz) <= 45 && abs(vectordiff_y) <= 45){
-                if(renderbuffer == NULL) {
-                    renderbuffer = malloc(sizeof(RenderItem_t));
-                    renderbuff_start = renderbuffer;
-                }
-                else renderbuffer = realloc(renderbuffer, sizeof(renderbuffer) + sizeof(RenderItem_t));
-                renderbuffer->type = item->entitytype;
+                renderitem_t *render = &renderbuffer[count++];
+                renderbuffer->spriteid = item->entitytype;
                 renderbuffer->distance = distance;
-                renderbuffer->angleOffsets[0] = vectordiff_xz;
-                renderbuffer->angleOffsets[1] = vectordiff_y;
-                renderbuffer++;
+                vectordiff_xz += 46;
+                renderbuffer->x = vWidth * vectordiff_xz / 91;
+                vectordiff_y += 46;
+                renderbuffer->y = vHeight * vectordiff_y / 91;
             }
         }
     }
-    // heapsort renderbuffer
-    for(i = 0; i < (sizeof(renderbuffer) / sizeof(RenderItem_t)); i++){
-        RenderItem_t *render = renderbuff_start[i];
+    heapsort(&renderbuffer, sizeof(renderbuffer)/sizeof(renderitem_t));
+    for(i = 0; i < (sizeof(renderbuffer) / sizeof(renderitem_t)); i++){
+        renderitem_t *render = &renderbuffer[i];
         gfx_sprite_t* sprite;
         gfx_sprite_t* scaled;
         char scale_x = (RENDER_DISTANCE - render->distance) * sprite->width / RENDER_DISTANCE;
         char scale_y = (RENDER_DISTANCE - render->distance) * sprite->height / RENDER_DISTANCE;
         gfx_ScaleSprite(sprite, scaled);
-        render->type // use this to locate sprite
+        //render->type; // use this to locate sprite
     }
-    free(renderbuffer);
-    free(renderbuff_start);
-} */
+}

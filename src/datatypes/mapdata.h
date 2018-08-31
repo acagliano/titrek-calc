@@ -48,5 +48,10 @@ typedef struct {
     } entitystats;
 } MapData_t;
 
+typedef struct {
+    unsigned char spriteid;
+    unsigned int x,y;
+    unsigned int distance;
+} renderitem_t;
 
 #endif
