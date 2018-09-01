@@ -13,6 +13,7 @@
 #include "gfx/trekvfx.h"
 #include <math.h>
 
+
 const char *trek_version = "v0.72 alpha";
 
 
@@ -226,14 +227,14 @@ void gfx_RenderOrientation(unsigned char anglexz, unsigned char angley, int dial
 }
 
 
-void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
+void GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *playerpos, framedata_t* frame){
     char i, count = 0;
-    renderitem_t renderbuffer[20], *sortbuffer = NULL;
     double val = 180/M_PI;
     int player_x = playerpos->coords.x>>8, player_y = playerpos->coords.y>>8, player_z = playerpos->coords.y>>8;
     int item_x, item_y, item_z;
     int distance_x, distance_y, distance_z;
     long distance;
+    memset(renderbuffer, 0, sizeof(renderitem_t) * 20);
     for(i=0; i<20; i++){
         MapData_t *item = &map[i];
         item_x = item->position.coords.x>>8;
@@ -253,21 +254,27 @@ void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
             vectordiff_y = playerpos->angles.y - objectvect_y;
             if(abs(vectordiff_xz) <= 45 && abs(vectordiff_y) <= 45){
                 renderitem_t *render = &renderbuffer[count++];
-                renderbuffer->spriteid = item->entitytype;
-                renderbuffer->distance = RENDER_DISTANCE - distance;
+                render->spriteid = item->entitytype;
+                render->distance = RENDER_DISTANCE - distance;
                 vectordiff_xz += 46;
-                renderbuffer->x = vWidth * vectordiff_xz / 91;
+                render->x = vWidth * vectordiff_xz / 91;
                 vectordiff_y += 46;
-                renderbuffer->y = vHeight * vectordiff_y / 91;
+                render->y = (vHeight * vectordiff_y / 91);
             }
         }
     }
+    frame->count = count;
+}
+
+void GUI_RenderFrame(framedata_t *frame, renderitem_t *renderbuffer){
+    char count = frame->count;
+    char i;
     if(count){
-        heapsort(&renderbuffer, count);
+        heapsort(renderbuffer, count);
         for(i = 0; i < count; i++){
             renderitem_t *render = &renderbuffer[i];
             if(render->spriteid>1){
-                gfx_sprite_t* sprite = (gfx_sprite_t*)trekvfx[render->spriteid-1];
+                gfx_sprite_t* sprite = (gfx_sprite_t*)trekvfx[render->spriteid-2];
                 gfx_sprite_t* uncompressed = gfx_MallocSprite(32, 32);
                 gfx_sprite_t* scaled;
                 char scale;
@@ -277,9 +284,9 @@ void GUI_ViewScreen(MapData_t *map, Position_t *playerpos){
                 scaled->width = scale;
                 scaled->height = scale;
                 gfx_ScaleSprite(uncompressed, scaled);
-                gfx_TransparentSprite(scaled, render->x, render->y);
-                free(scaled);
                 free(uncompressed);
+                gfx_TransparentSprite(scaled, render->x - (scaled->width>>1), render->y - (scaled->height>>1));
+                free(scaled);
                 //render->type; // use this to locate sprite
             }
         }

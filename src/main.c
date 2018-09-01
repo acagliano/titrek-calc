@@ -79,6 +79,7 @@ enum {
 Player_t player[1] = {0};
 Module_t ShipModules[15] = {0};
 MapData_t MapMain[20] = {0};
+renderitem_t renderbuffer[20] = {0};
 Module_t *activeweapon = NULL;
 const char *GameSave = "TrekSave";
 #define shields ((Module_t*)&ShipModules[tt_shield-1])
@@ -272,6 +273,7 @@ void main(void) {
     do
     {
         damage_desc_t shiphit = {0};
+        framedata_t frame;
         char corestability, lifesupporthealth, speed;
         char integrityhealth;
         char moduleselected = player->moduleSelected;
@@ -692,7 +694,8 @@ void main(void) {
         switch(player->ScreenSelected){
             case SCRN_VIEW_TARG:
             case SCRN_VIEW:
-                GUI_ViewScreen(&MapMain, &player->position);
+                if(!(player->tick % 2)) GUI_PrepareFrame(&MapMain, &renderbuffer, &player->position, &frame);
+                if(player->tick % 2) GUI_RenderFrame(&frame, &renderbuffer);
                 if(shiphit.impact) {
                     int j, damage = shiphit.damage;
                     if(shields->online && shields->health * 100 / shields->maxHealth) gfx_SetColor(223);

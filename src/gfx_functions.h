@@ -6,6 +6,11 @@
 #include "datatypes/shipmodules.h"
 #include "datatypes/playerdata.h"
 
+typedef struct {
+    char count;
+    int pointer;
+} framedata_t;
+
 #define SPARK_ANIM_DURA 15
 typedef struct {
     unsigned int origin_x;
@@ -31,7 +36,8 @@ void gfx_DrawLifeSupportAlert(void);
 void gfx_DrawSpeedIndicator(char speed, char maxspeed_warp, char maxspeed_impulse, bool icons_enabled);
 void vfx_RenderSparkFlare(animation_t *animate);
 void gfx_RenderOrientation(unsigned char anglexz, unsigned char angley, int dialx, unsigned char dialy);
-void GUI_ViewScreen(MapData_t *map, Position_t *playerpos);
+void GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *playerpos, framedata_t* frame);
+void GUI_RenderFrame(framedata_t *frame, renderitem_t *renderbuffer);
 //void GUI_ViewScreen(MapData_t *map, Position_t *playerpos);
 extern const char *trek_version;
 
