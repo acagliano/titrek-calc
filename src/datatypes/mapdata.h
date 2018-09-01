@@ -3,7 +3,7 @@
 #include "playerdata.h"
 #include <stdbool.h>
 
-#define RENDER_DISTANCE 2500
+#define RENDER_DISTANCE 50
 #define FOV 45
 
 enum EntityTypes {
@@ -34,13 +34,13 @@ typedef struct {
 
 typedef struct {
     char timer_remain; // for ejected core
-    char weaponid;      // to identify weapon in database
 } entity_misc_t;        // structure type for ejected core and projectile
 
 typedef struct {
+    char weaponid;      // to identify weapon in database
     char shield_damage;
     char hull_damage;
-    int ticks_to_die;
+    int range;
 } entity_weap_t;
 
 
@@ -52,7 +52,7 @@ typedef struct {
     union entitystats {
         entity_ship_t ship;
         entity_default_t terrain;
-        entity_misc_t weapon;
+        entity_weap_t weapon;
     } entitystats;
 } MapData_t;
 

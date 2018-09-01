@@ -305,7 +305,7 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
         gfx_sprite_t *rotated;
         zx7_Decompress(uncompressed, ship_icon_compressed);
         if(rotated = gfx_MallocSprite(ship_icon_width, ship_icon_height)){
-            gfx_RotateSprite(uncompressed, rotated, player_angle_xz);
+            gfx_RotateSprite(uncompressed, rotated, player_angle_xz + 64);
             gfx_TransparentSprite(rotated, xmid - (ship_icon_width>>1), ymid - (ship_icon_height>>1));
             free(rotated);
         } else
@@ -316,6 +316,7 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
         MapData_t *entity = &map[i];
         if(entity->entitytype){
             unsigned long distance;
+            unsigned char color, size;
             int dx = (entity->position.coords.x - player->position.coords.x)>>8;
             int dy = (entity->position.coords.y - player->position.coords.y)>>8;
             int dz = (entity->position.coords.z - player->position.coords.z)>>8;
@@ -327,11 +328,24 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                 tempangle = 255 * atan2(dy, dx) * val / 360;
                 angley = (tempangle < 0) ? 255 + tempangle : tempangle;
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
-                render_x = conv_dist * byteCos(anglexz - 64) / 127;
+                render_x = conv_dist * byteCos(anglexz) / 127;
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
-                render_y = conv_dist * byteSin(anglexz - 64) / 127;
+                render_y = conv_dist * byteSin(anglexz) / 127;
                 gfx_SetColor(242);
-                gfx_FillCircle(xmid + render_x, ymid + render_y, 3);
+                switch(entity->entitytype){
+                    case et_ship:
+                        size = 4;
+                        color = 239;
+                        break;
+                    case et_phaser:
+                    case et_photon_projectile:
+                    case et_quantum_projectile:
+                        size = 1;
+                        color = 224;
+                        break;
+                }
+                gfx_SetColor(color);
+                gfx_FillCircle(xmid + render_x, ymid + render_y, size);
             }
         }
     }

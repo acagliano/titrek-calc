@@ -35,7 +35,7 @@ warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
 3:
- phaser : converted! (1026 > 102 bytes)
+ phaser : converted! (1026 > 213 bytes)
  torp_photon : converted! (1026 > 117 bytes)
  torp_quantum : converted! (1026 > 136 bytes)
 
@@ -67,7 +67,7 @@ exporting appvar: trekvfx.8xp
  torp_photon
  torp_quantum
 
-converted in 0 s
+converted in 1 s
 
 [warning] image quality might be too low.
 please try grouping similar images, reducing image colors, 

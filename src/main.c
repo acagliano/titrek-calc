@@ -40,6 +40,7 @@ char gfx_MainMenu(bool gfx_initialized);
 #include "mapfuncs.h"
 #include "mymath.h"
 #include "vfx.h"
+#include "render.h"
 #include "gfx/trekgui.h"
 #include "gfx/trekvfx.h"
 #define gui_enabled 0
@@ -404,12 +405,12 @@ void main(void) {
                         slot->position.angles.xz = player->position.angles.xz + player->target.angles.xz;
                         slot->position.angles.y = player->position.angles.y + player->target.angles.y;
                         AnglesToVectors(&slot->position);
-                        slot->position.coords.x += (2 * slot->position.vectors.x)<<8;
-                        slot->position.coords.y += (2 * slot->position.vectors.y)<<8;
-                        slot->position.coords.z += (2 * slot->position.vectors.z)<<8;
-                        
+                        slot->position.coords.x += (slot->position.vectors.x<<1);
+                        slot->position.coords.y += (slot->position.vectors.y<<1);
+                        slot->position.coords.z += (slot->position.vectors.z<<1);
                         slot->entitytype = et_phaser;
                         slot->mobile = true;
+                        slot->entitystats.weapon.range = activeweapon->stats.weapstats.range;
                     }
                 }
             }
@@ -834,9 +835,10 @@ void main(void) {
         integrityhealth = integrity->health * 100 / integrity->maxHealth;
         if(speed){
             bool remainder = player->tick % 2;
-            if(!remainder) proc_MoveShip(&player->position, speed>>1);
-            else proc_MoveShip(&player->position, speed % 2);
+            if(!remainder) proc_MoveEntity(&player->position, speed>>1);
+            else proc_MoveEntity(&player->position, speed % 2);
         }
+        map_MoveObjects(&MapMain);
         gfx_BlitBuffer();
         player->tick++;
         player->moduleSelected = moduleselected;
