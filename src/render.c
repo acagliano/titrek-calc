@@ -31,13 +31,9 @@ void GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *pl
         distance_z = item_z - player_z;
         distance = r_GetDistance(distance_x, distance_y, distance_z);
         if(distance < RENDER_DISTANCE){
-            unsigned int objectvect_xz = (unsigned char)(atan2(distance_z, distance_x) * val / 5);
-            unsigned int objectvect_y = (unsigned char)(atan2(distance_y, distance_x) * val / 5);
+            char objectvect_xz = byteATan(distance_z, distance_x);
+            char objectvect_y = byteATan(distance_y, distance_x);
             char vectordiff_xz, vectordiff_y;
-            objectvect_xz = (objectvect_xz >= 0) ? objectvect_xz : 36 - objectvect_xz;
-            if(objectvect_xz > 71) objectvect_xz = 0;
-            objectvect_y = (objectvect_y >= 0) ? objectvect_y : 36 - objectvect_y;
-            if(objectvect_y > 71) objectvect_y = 0;
             vectordiff_xz = AngleOpsBounded(objectvect_xz, playerpos->angles.xz);
             vectordiff_y = AngleOpsBounded(objectvect_y, playerpos->angles.y);
             if(abs(vectordiff_xz) <= 9 && abs(vectordiff_y) <= 9){

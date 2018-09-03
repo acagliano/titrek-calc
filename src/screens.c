@@ -323,8 +323,8 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
             distance = (unsigned int)sqrt(r_GetDistance(dx, dy, dz));
             if(distance <= sens_range){
                 int render_x, render_y, conv_dist;
-                signed int anglexz = atan2(dz, dx) * val / 5;
-                signed int angley = atan2(dy, dx) * val / 5;
+                char anglexz = byteATan(dz, dx);
+                char angley = byteATan(dy, dx);
                 anglexz = AngleOpsBounded(anglexz, -18);
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
                 render_x = conv_dist * byteCos(anglexz) / 127;
