@@ -3,7 +3,7 @@
 #include "playerdata.h"
 #include <stdbool.h>
 
-#define RENDER_DISTANCE 2500
+#define RENDER_DISTANCE 100
 #define FOV 45
 
 enum EntityTypes {

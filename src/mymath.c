@@ -33,15 +33,21 @@ char byteATan(long non_x, long x){
         if(non_x > 0) return 18;    // 90 degrees
         if(non_x < 0) return 54;    // 270 degrees
     }
-    value = abs(non_x / x);
+    if(non_x == 0){
+        if(x > 0) return 0;
+        if(x < 0) return 36;
+    }
     if(non_x > 0 && x > 0) quadrant = 0;
-    else if(non_x < 0 && x > 0) quadrant = 1;
+    else if(non_x > 0 && x < 0) quadrant = 1;
     else if(non_x < 0 && x < 0) quadrant = 2;
     else quadrant = 3;
+    if(!(quadrant & 1))  value = abs(127 * non_x / x);
+    else value = abs(127 * x / non_x);
     while(index >= 0){
-        if(value >= arctanLUT[index]) return 18 * quadrant + index;
+        if(value >= arctanLUT[index]) break;
         index--;
     }
+   return 18 * quadrant + index;
 }
 
 void AnglesToVectors(Position_t *pos){

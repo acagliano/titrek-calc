@@ -203,7 +203,7 @@ void main(void) {
                 break;
             case tt_sensor:
                 module->location = saucer;
-                module->stats.sysstats.sensor_range = 300*300;
+                module->stats.sysstats.sensor_range = 300;
                 module->pdConstant = true;
                 strcpy(module->techname, "Sensors");
                 break;
@@ -217,7 +217,7 @@ void main(void) {
                 module->stats.weapstats.damage_shield = 2;
                 module->stats.weapstats.damage_hull = 1;
                 module->stats.weapstats.range = 100;
-                module->stats.weapstats.speed = 10;
+                module->stats.weapstats.speed = 20;
                 strcpy(module->techname, "Phasers");
                 strcpy(module->stats.weapstats.weapname, "Pulse");
                 break;
@@ -406,8 +406,8 @@ void main(void) {
                         entitypos->angles.y = AngleOpsBounded(entitypos->angles.y, player->target.angles.y);
                         AnglesToVectors(entitypos);
                         entitypos->coords.x += (entitypos->vectors.x<<4);
-                        entitypos->coords.y += (entitypos->vectors.y<<1);
-                        entitypos->coords.z += (entitypos->vectors.z<<1);
+                        entitypos->coords.y += (entitypos->vectors.y<<4);
+                        entitypos->coords.z += (entitypos->vectors.z<<4);
                         slot->entitytype = et_phaser;
                         slot->mobile = true;
                         slot->entitystats.weapon.range = activeweapon->stats.weapstats.range;

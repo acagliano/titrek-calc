@@ -29,22 +29,25 @@ void GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *pl
         distance_x = item_x - player_x;
         distance_y = item_y - player_y;
         distance_z = item_z - player_z;
-        distance = r_GetDistance(distance_x, distance_y, distance_z);
+        distance = (long)sqrt(r_GetDistance(distance_x, distance_y, distance_z));
         if(distance < RENDER_DISTANCE){
             char objectvect_xz = byteATan(distance_z, distance_x);
             char objectvect_y = byteATan(distance_y, distance_x);
-            char vectordiff_xz, vectordiff_y;
-            vectordiff_xz = AngleOpsBounded(objectvect_xz, playerpos->angles.xz);
-            vectordiff_y = AngleOpsBounded(objectvect_y, playerpos->angles.y);
-            if(abs(vectordiff_xz) <= 9 && abs(vectordiff_y) <= 9){
+            char diff_xz = objectvect_xz - playerpos->angles.xz;
+            char diff_y = objectvect_y - playerpos->angles.y;
+            //objectvect_xz = AngleOpsBounded(objectvect_xz, -1 * playerpos->angles.xz);
+            //objectvect_y = AngleOpsBounded(objectvect_y, -1 * playerpos->angles.y);
+            //vectordiff_xz = AngleOpsBounded(objectvect_xz, playerpos->angles.xz);
+           // vectordiff_y = AngleOpsBounded(objectvect_y, playerpos->angles.y);
+            if((abs(diff_xz) <= 9) && (abs(diff_y) <= 9)){
                 int vcenter = vHeight>>1 + yStart;
                 renderitem_t *render = &renderbuffer[count++];
-                render->spriteid = item->entitytype;
-                render->distance = calcSpriteScale(distance, RENDER_DISTANCE);
-                vectordiff_xz += 10;
-                render->x = vWidth * vectordiff_xz / 19;
-                vectordiff_y += 10;
-                render->y = (vHeight * vectordiff_y / 19);
+                render->spriteid = item->entitytype-1;
+                render->distance = (RENDER_DISTANCE - distance) * 100 / RENDER_DISTANCE;
+                diff_xz += 10;
+                render->x = vWidth * diff_xz / 19;
+                diff_y += 10;
+                render->y = (vHeight * diff_y / 19);
             }
         }
     }
@@ -54,12 +57,13 @@ void GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *pl
         for(i = 0; i < count; i++){
             renderitem_t *render = &renderbuffer[i];
             if(render->spriteid){
-                gfx_sprite_t* sprite = (gfx_sprite_t*)trekvfx[render->spriteid-1];
+                gfx_sprite_t* sprite = (gfx_sprite_t*)trekvfx[render->spriteid];
                 gfx_sprite_t* uncompressed;
                 gfx_sprite_t* scaled;
                 char scale = render->distance;
+                int width, height;
                 switch(render->spriteid){
-                    case et_ship:
+                    case et_ship-1:
                         uncompressed = gfx_MallocSprite(64, 32);
                         break;
                     default:
@@ -67,9 +71,11 @@ void GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *pl
                 }
                 zx7_Decompress(uncompressed, sprite);
                 //if(scale != -1){
-                scaled = gfx_MallocSprite(scale, scale);
-                scaled->width = scale;
-                scaled->height = scale;
+                width = uncompressed->width * scale / 100;
+                height = uncompressed->height * scale / 100;
+                scaled = gfx_MallocSprite(width, height);
+                scaled->width = width;
+                scaled->height = height;
                 gfx_ScaleSprite(uncompressed, scaled);
                 gfx_TransparentSprite(scaled, render->x - (scaled->width>>1), render->y - (scaled->height>>1));
                 free(scaled);

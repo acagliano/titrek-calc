@@ -238,7 +238,7 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     double val = 180/M_PI;
     gfx_sprite_t *uncompressed;
     unsigned int coord_temp;
-    unsigned int sens_range = sqrt(sensors->stats.sysstats.sensor_range);
+    unsigned int sens_range = sensors->stats.sysstats.sensor_range;
     int sens_health = sensors->health * 100 / sensors->maxHealth;
     int sens_power = sensors->powerDraw * 100 / sensors->powerDefault;
     unsigned int sens_scrn_x_start = xStart + 148;
@@ -255,6 +255,8 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     gfx_FillRectangle(sens_scrn_x_start, sens_scrn_y_start, sens_scrn_origin_x<<1, sens_scrn_origin_x<<1);
     gfx_SetColor(0);
     gfx_FillCircle(xmid, ymid, sens_scrn_origin_x);
+    gfx_SetColor(247);
+    gfx_Circle(xmid, ymid, RENDER_DISTANCE * sens_scrn_origin_x / sens_range);
     gfx_RenderOrientation(player_angle_xz, player_angle_y, xStart + 17, yStart + vHeight - 25);
     sens_range = sens_range * sens_power / 100;
     if(sens_health < 50) sens_range = sens_range * sens_health / 50;
@@ -295,7 +297,7 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
         gfx_SetTextXY(xStart + 20, yStart + 68);
         gfx_PrintUInt(sens_range, lcars_GetIntLength(sens_range));
         gfx_PrintString(" / ");
-        gfx_PrintUInt((int)sqrt(sensors->stats.sysstats.sensor_range), lcars_GetIntLength(sensors->stats.sysstats.sensor_range));
+        gfx_PrintUInt(sensors->stats.sysstats.sensor_range, lcars_GetIntLength(sensors->stats.sysstats.sensor_range));
     }
     else gfx_PrintStringXY("offline", xStart + 20, yStart + 68);
     if(!sensors->online) return;
@@ -325,6 +327,14 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                 int render_x, render_y, conv_dist;
                 char anglexz = byteATan(dz, dx);
                 char angley = byteATan(dy, dx);
+                gfx_SetTextXY(xStart + 20, yStart + 78);
+                gfx_PrintUInt(anglexz, 2);
+                gfx_SetTextXY(xStart + 60, yStart + 78);
+                gfx_PrintUInt(angley, 2);
+                gfx_SetTextXY(xStart + 20, yStart + 88);
+                gfx_PrintUInt(distance, 6);
+                gfx_SetTextXY(xStart + 20, yStart + 98);
+                gfx_PrintUInt(RENDER_DISTANCE, 6);
                 anglexz = AngleOpsBounded(anglexz, -18);
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
                 render_x = conv_dist * byteCos(anglexz) / 127;
