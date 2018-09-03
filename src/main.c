@@ -203,7 +203,7 @@ void main(void) {
                 break;
             case tt_sensor:
                 module->location = saucer;
-                module->stats.sysstats.sensor_range = 300;
+                module->stats.sysstats.sensor_range = 300*300;
                 module->pdConstant = true;
                 strcpy(module->techname, "Sensors");
                 break;
@@ -298,7 +298,7 @@ void main(void) {
             topspeed_impulse = topspeed_impulse * impdrivehealth / 50;
             player->position.topspeed.impulse = topspeed_impulse;
         }
-        if(speed < 10 && (impdrivehealth == 0 || !impulsedrive->online)) topspeed = 0;
+        if(speed < 10 && (impdrivehealth == 0 || !impulsedrive->online)) topspeed_impulse = 0;
         if(topspeed_warp < 10 || warpdrivehealth == 0 || !warpdrive->online)
             player->position.warpactive = false;
         if(player->position.warpactive) {
@@ -402,12 +402,12 @@ void main(void) {
                         Position_t *entitypos = &slot->position;
                         memcpy(entitypos, playerpos, sizeof(Position_t));
                         slot->speed = activeweapon->stats.weapstats.speed;
-                        slot->position.angles.xz = player->position.angles.xz + player->target.angles.xz;
-                        slot->position.angles.y = player->position.angles.y + player->target.angles.y;
-                        AnglesToVectors(&slot->position);
-                        slot->position.coords.x += (slot->position.vectors.x<<1);
-                        slot->position.coords.y += (slot->position.vectors.y<<1);
-                        slot->position.coords.z += (slot->position.vectors.z<<1);
+                        entitypos->angles.xz = AngleOpsBounded(entitypos->angles.xz, player->target.angles.xz);
+                        entitypos->angles.y = AngleOpsBounded(entitypos->angles.y, player->target.angles.y);
+                        AnglesToVectors(entitypos);
+                        entitypos->coords.x += (entitypos->vectors.x<<4);
+                        entitypos->coords.y += (entitypos->vectors.y<<1);
+                        entitypos->coords.z += (entitypos->vectors.z<<1);
                         slot->entitytype = et_phaser;
                         slot->mobile = true;
                         slot->entitystats.weapon.range = activeweapon->stats.weapstats.range;
@@ -545,11 +545,11 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.y++;
+                    player->position.angles.y = AngleOpsBounded(player->position.angles.y, 1);
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.y < 45) player->target.angles.y++;
+                    if(player->target.angles.y < 9) player->target.angles.y++;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Down]){
@@ -574,11 +574,11 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.y--;
+                    player->position.angles.y = AngleOpsBounded(player->position.angles.y, -1);
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.y > -45) player->target.angles.y--;
+                    if(player->target.angles.y > -9) player->target.angles.y--;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Up]){
@@ -602,11 +602,11 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.xz++;
+                    player->position.angles.xz = AngleOpsBounded(player->position.angles.xz, 1);
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.xz < 45) player->target.angles.xz++;
+                    if(player->target.angles.xz < 9) player->target.angles.xz++;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Right]){
@@ -625,11 +625,11 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.xz--;
+                    player->position.angles.xz = AngleOpsBounded(player->position.angles.xz, -1);
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.xz > -45) player->target.angles.xz--;
+                    if(player->target.angles.xz > -9) player->target.angles.xz--;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Left]){
@@ -695,8 +695,8 @@ void main(void) {
         switch(player->ScreenSelected){
             case SCRN_VIEW_TARG:
             case SCRN_VIEW:
-                if(!(player->tick % 2)) GUI_PrepareFrame(&MapMain, &renderbuffer, &player->position, &frame);
-                if(player->tick % 2) GUI_RenderFrame(&frame, &renderbuffer);
+                /*if(!(player->tick % 2)) */GUI_PrepareFrame(&MapMain, &renderbuffer, &player->position, &frame);
+               // if(player->tick % 2) GUI_RenderFrame(&frame, &renderbuffer);
                 if(shiphit.impact) {
                     int j, damage = shiphit.damage;
                     if(shields->online && shields->health * 100 / shields->maxHealth) gfx_SetColor(223);
@@ -716,8 +716,8 @@ void main(void) {
                 
                 if(player->ScreenSelected == SCRN_VIEW || player->ScreenSelected == SCRN_VIEW_TARG){
                     // vector display
-                    unsigned char anglexz = player->position.angles.xz;
-                    unsigned char angley = player->position.angles.y;
+                    char anglexz = player->position.angles.xz;
+                    char angley = player->position.angles.y;
                     int coords;
                     if(player->ScreenSelected == SCRN_VIEW){
                         char text[] = "[Nav Sensors]";
@@ -767,11 +767,11 @@ void main(void) {
                     } else gfx_PrintString("offline");
                     
                     gfx_SetTextFGColor(255);
-                    if(sensorhealth > 25 && (abs(anglexz) < 45 && abs(angley) < 45)){
+                    if(sensorhealth > 25 && (abs(anglexz) < 32 && abs(angley) < 32)){
                         char charge = activeweapon->stats.weapstats.charge;
                         char maxCharge = activeweapon->stats.weapstats.maxCharge;
-                        int targ_gui_x = view_center_x * anglexz / 45 + view_center_x;
-                        int targ_gui_y = view_center_y * angley / 45 + view_center_y;
+                        int targ_gui_x = view_center_x * anglexz / 9 + view_center_x;
+                        int targ_gui_y = view_center_y * angley / 9 + view_center_y;
                         gfx_SetColor(224);
                         if(uncompressed = gfx_MallocSprite(target_width, target_height)){
                             zx7_Decompress(uncompressed, target_compressed);
@@ -838,7 +838,7 @@ void main(void) {
             if(!remainder) proc_MoveEntity(&player->position, speed>>1);
             else proc_MoveEntity(&player->position, speed % 2);
         }
-        map_MoveObjects(&MapMain);
+        map_MoveObjects(&MapMain, player->tick % 2);
         gfx_BlitBuffer();
         player->tick++;
         player->moduleSelected = moduleselected;

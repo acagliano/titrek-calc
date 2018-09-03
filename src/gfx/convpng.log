@@ -34,10 +34,13 @@ using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-3:
+6:
+ narada : converted! (2050 > 211 bytes)
  phaser : converted! (1026 > 213 bytes)
  torp_photon : converted! (1026 > 117 bytes)
  torp_quantum : converted! (1026 > 136 bytes)
+ shield_flare : converted! (1026 > 178 bytes)
+ explosion : converted! (1026 > 524 bytes)
 
 exporting appvar: trekgui.8xp
  tactical
@@ -63,11 +66,14 @@ exporting appvar: trekgui.8xp
  range_icon
  target
 exporting appvar: trekvfx.8xp
+ narada
  phaser
  torp_photon
  torp_quantum
+ shield_flare
+ explosion
 
-converted in 1 s
+converted in 0 s
 
 [warning] image quality might be too low.
 please try grouping similar images, reducing image colors, 

@@ -14,7 +14,7 @@
 #include <math.h>
 
 
-const char *trek_version = "v0.72 alpha";
+const char *trek_version = "v0.73 alpha";
 
 
 void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){
@@ -208,8 +208,8 @@ void vfx_RenderSparkFlare(animation_t *animate){
 }
 
 void gfx_RenderOrientation(unsigned char anglexz, unsigned char angley, int dialx, unsigned char dialy){
-    char vectorx = 10 * byteCos(anglexz - 64) / 127;
-    char vectory = 10 * byteSin(anglexz - 64) / 127;
+    char vectorx = 10 * byteCos(AngleOpsBounded(anglexz, -18)) / 127;
+    char vectory = 10 * byteSin(AngleOpsBounded(anglexz, -18)) / 127;
     gfx_SetColor(255);
     gfx_SetTextXY(dialx - 9, dialy - 18);
     gfx_PrintUInt(anglexz,3);

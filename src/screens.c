@@ -233,12 +233,12 @@ void GUI_TacticalReport(Module_t *ShipModules, char loops, Module_t *shields, Mo
     }
 }
 
-void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, Module_t *sensors, bool icons){
+void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, Module_t *sensors,  bool icons){
     int i;
     double val = 180/M_PI;
     gfx_sprite_t *uncompressed;
     unsigned int coord_temp;
-    unsigned int sens_range = sensors->stats.sysstats.sensor_range;
+    unsigned int sens_range = sqrt(sensors->stats.sysstats.sensor_range);
     int sens_health = sensors->health * 100 / sensors->maxHealth;
     int sens_power = sensors->powerDraw * 100 / sensors->powerDefault;
     unsigned int sens_scrn_x_start = xStart + 148;
@@ -246,10 +246,10 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     unsigned int sens_scrn_origin_x = (vWidth + xStart - sens_scrn_x_start) / 2;
     int xmid = sens_scrn_x_start + sens_scrn_origin_x;
     int ymid = sens_scrn_y_start + sens_scrn_origin_x;
-    unsigned char player_angle_xz = player->position.angles.xz;
-    unsigned char player_angle_y = player->position.angles.y;
-    char line_x2 = 74 * byteSin(player->sensor_gui_angle) / 127;
-    char line_y2 = 74 * byteCos(player->sensor_gui_angle) / 127;
+    char player_angle_xz = player->position.angles.xz;
+    char player_angle_y = player->position.angles.y;
+    char line_x2 = 74 * byteCos(player->sensor_gui_angle) / 127;
+    char line_y2 = 74 * byteSin(player->sensor_gui_angle) / 127;
     PrintHeader("Sensor Readout", yStart+3);
     gfx_SetColor(107);
     gfx_FillRectangle(sens_scrn_x_start, sens_scrn_y_start, sens_scrn_origin_x<<1, sens_scrn_origin_x<<1);
@@ -295,7 +295,7 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
         gfx_SetTextXY(xStart + 20, yStart + 68);
         gfx_PrintUInt(sens_range, lcars_GetIntLength(sens_range));
         gfx_PrintString(" / ");
-        gfx_PrintUInt(sensors->stats.sysstats.sensor_range, lcars_GetIntLength(sensors->stats.sysstats.sensor_range));
+        gfx_PrintUInt((int)sqrt(sensors->stats.sysstats.sensor_range), lcars_GetIntLength(sensors->stats.sysstats.sensor_range));
     }
     else gfx_PrintStringXY("offline", xStart + 20, yStart + 68);
     if(!sensors->online) return;
@@ -305,7 +305,7 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
         gfx_sprite_t *rotated;
         zx7_Decompress(uncompressed, ship_icon_compressed);
         if(rotated = gfx_MallocSprite(ship_icon_width, ship_icon_height)){
-            gfx_RotateSprite(uncompressed, rotated, player_angle_xz + 64);
+            gfx_RotateSprite(uncompressed, rotated, player_angle_xz * 255 / 72);
             gfx_TransparentSprite(rotated, xmid - (ship_icon_width>>1), ymid - (ship_icon_height>>1));
             free(rotated);
         } else
@@ -317,25 +317,23 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
         if(entity->entitytype){
             unsigned long distance;
             unsigned char color, size;
-            int dx = (entity->position.coords.x - player->position.coords.x)>>8;
-            int dy = (entity->position.coords.y - player->position.coords.y)>>8;
-            int dz = (entity->position.coords.z - player->position.coords.z)>>8;
-            distance = r_GetDistance(dx, dy, dz);
+            int dx = entity->position.coords.x - player->position.coords.x;
+            int dy = entity->position.coords.y - player->position.coords.y;
+            int dz = entity->position.coords.z - player->position.coords.z;
+            distance = (unsigned int)sqrt(r_GetDistance(dx, dy, dz));
             if(distance <= sens_range){
                 int render_x, render_y, conv_dist;
-                signed int tempangle = 255 * atan2(dz, dx) * val / 360;
-                unsigned char anglexz = (tempangle < 0) ? 255 + tempangle : tempangle, angley;
-                tempangle = 255 * atan2(dy, dx) * val / 360;
-                angley = (tempangle < 0) ? 255 + tempangle : tempangle;
+                signed int anglexz = atan2(dz, dx) * val / 5;
+                signed int angley = atan2(dy, dx) * val / 5;
+                anglexz = AngleOpsBounded(anglexz, -18);
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
                 render_x = conv_dist * byteCos(anglexz) / 127;
-                conv_dist = distance * sens_scrn_origin_x / sens_range;
                 render_y = conv_dist * byteSin(anglexz) / 127;
                 gfx_SetColor(242);
                 switch(entity->entitytype){
                     case et_ship:
                         size = 4;
-                        color = 239;
+                        color = 224;
                         break;
                     case et_phaser:
                     case et_photon_projectile:
@@ -343,11 +341,13 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                         size = 1;
                         color = 224;
                         break;
+                    default:
+                        size = 0;
                 }
                 gfx_SetColor(color);
                 gfx_FillCircle(xmid + render_x, ymid + render_y, size);
             }
         }
     }
-    player->sensor_gui_angle += 2;
+    player->sensor_gui_angle = AngleOpsBounded( player->sensor_gui_angle, 1);
 }

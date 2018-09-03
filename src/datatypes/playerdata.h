@@ -44,11 +44,6 @@ typedef struct {
 } speed_t;
 
 typedef struct {
-    unsigned char xz;
-    unsigned char y;
-} u_angles_t;
-
-typedef struct {
     char xz;
     char y;
 } angles_t;
@@ -67,7 +62,7 @@ typedef struct {
         signed char y;
         signed char z;
     } vectors;
-    u_angles_t angles;
+    angles_t angles;
 } Position_t;
 
 typedef struct {

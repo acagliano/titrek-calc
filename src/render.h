@@ -6,7 +6,7 @@
 typedef struct { char count; int pointer; } framedata_t;
 
 void GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *playerpos, framedata_t* frame);
-void GUI_RenderFrame(framedata_t *frame, renderitem_t *renderbuffer);
+//void GUI_RenderFrame(framedata_t *frame, renderitem_t *renderbuffer);
 
 
 #endif

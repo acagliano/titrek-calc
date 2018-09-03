@@ -1,7 +1,8 @@
 
 #ifndef processes_h
 #define processes_h
-
+#include "datatypes/shipmodules.h"
+#include "datatypes/playerdata.h"
 
 void PROC_PowerDraw(Module_t *ShipModules, char repairing);
 void PROC_PowerCycle(Module_t *ShipModules, Module_t *warpcore, Module_t *auxpower, char repairing, Player_t *player, bool powerwarp);

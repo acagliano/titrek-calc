@@ -2,39 +2,49 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
-const char cosLUT[64] = {127, 126, 126, 126, 126, 125, 125, 124, 123, 123, 122, 121, 120, 119, 118, 117, 116, 114, 113, 111, 110, 108, 107, 105, 103, 101, 99, 97, 95, 93, 91, 89, 87, 84, 82, 80, 77, 75, 72, 70, 67, 64, 62, 59, 56, 53, 50, 48, 45, 42, 39, 36, 33, 30, 27, 24, 21, 17, 14, 11, 8, 5, 2, 0};
+const char cosLUT[72] = {127, 126, 125, 122, 119, 115, 109, 104, 97, 89, 81, 72, 63, 53, 43, 32, 22, 11, 0, -11, -22, -32, -43, -53, -63, -72, -81, -89, -97, -104, -109, -115, -119, -122, -125, -126, -127, -126, -125, -122, -119, -115, -109, -104, -97, -89, -81, -72, -63, -53, -43, -32, -22, -11, 0, 11, 22, 32, 43, 53, 63, 72, 81, 89, 97, 104, 109, 115, 119, 122, 125, 126};
+const char sinLUT[72] = {0, 11, 22, 32, 43, 53, 63, 72, 81, 89, 97, 104, 109, 115, 119, 122, 125, 126, 127, 126, 125, 122, 119, 115, 109, 104, 97, 89, 81, 72, 63, 53, 43, 32, 22, 11, 0, -11, -22, -32, -43, -53, -63, -72, -81, -89, -97, -104, -109, -115, -119, -122, -125, -126, -127, -126, -125, -122, -119, -115, -109, -104, -97, -89, -81, -72, -63, -53, -43, -32, -22, -11};
 
 
-long r_GetDistance(int xdiff, int ydiff, int zdiff){
-    long distance = xdiff * xdiff + ydiff * ydiff + zdiff * zdiff;
-    return (long)sqrt(distance);
+unsigned long r_GetDistance(int xdiff, int ydiff, int zdiff){
+    unsigned long distance;
+    xdiff = xdiff>>8; ydiff = ydiff>>8; zdiff = zdiff>8;
+    distance = xdiff * xdiff + ydiff * ydiff + zdiff * zdiff;
+    return distance;
 }
 
 signed char byteCos(unsigned char x){
-    if(x < 64) return cosLUT[x];
+    /*if(x < 64) return cosLUT[x];
     else if(x < 128) return -cosLUT[127 - x];
     else if(x < 192) return -cosLUT[x - 128];
-    else if(x < 256) return cosLUT[255 - x];
+    else if(x < 256) return cosLUT[255 - x];*/
+    return cosLUT[x];
 }
 
 signed char byteSin(unsigned char x){
-    return byteCos(x-64);
+    return sinLUT[x];
 }
 
 char r_ArcTan(short numerator, short denominator){
     
 }
 
-
-
-
 void AnglesToVectors(Position_t *pos){
     unsigned char xzangle = pos->angles.xz, yangle = pos->angles.y;
-    pos->vectors.x = byteCos(xzangle) * byteCos(yangle);
-    pos->vectors.z = byteSin(xzangle) * byteCos(yangle);
+    pos->vectors.x = byteCos(xzangle) * byteCos(yangle) / 127;
+    pos->vectors.z = byteSin(xzangle) * byteCos(yangle) / 127;
     pos->vectors.y = byteSin(yangle);
     //pos->vectors[2] = z vector
 }
+
+char AngleOpsBounded(char angle, char operand){
+    bool operation = true;
+    if(operand < 0) operation = false;
+    if(operation) angle = ((angle + operand) <= 71) ? angle+operand : 72 - (angle+operand);
+    if(!operation) { operand = -operand; angle = ((angle - operand) >= 0) ? angle-operand : 72 + (angle-operand);}
+    return angle;
+}
+
 
 char lcars_GetIntLength(char value){
     return 1 + (value > 9) + (value > 99);
@@ -46,6 +56,15 @@ unsigned int text_GetCenterX(char* text, int viewer_width){
     return (viewer_width>>1) - pixellen;
 }
 
+char calcSpriteScale(unsigned long d, unsigned int render_distance){
+    unsigned int s, g;
+    if(d >= render_distance) return -1;
+    if(d >= 1024) { s = 49 * 32 + 25; g = 99; }
+    if(d >= 256) { s = 31 * 32 + 25; g = 63; }
+    else { s = 15 * 32 + 25; g = 31; }
+    while( d >= g ) { s -= 32; d -= g; g -= 2; }
+    return 32 - (s/50);
+}
 
 /*
  This is an example function using an array of ints.

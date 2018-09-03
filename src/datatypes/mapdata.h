@@ -3,7 +3,7 @@
 #include "playerdata.h"
 #include <stdbool.h>
 
-#define RENDER_DISTANCE 50
+#define RENDER_DISTANCE 2500
 #define FOV 45
 
 enum EntityTypes {
@@ -12,12 +12,14 @@ enum EntityTypes {
     et_phaser,
     et_photon_projectile,
     et_quantum_projectile,
-    et_star,
+    /*et_star,
     et_planet,
     et_asteroid,
     et_blackhole,
     et_supernova,
-    et_ejectedcore,
+    et_ejectedcore,*/
+    shield_flare,
+    explosion
 };
 
 typedef struct {
