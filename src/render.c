@@ -10,9 +10,8 @@
 #include "gfx/trekvfx.h"
 #include <compression.h>
 
-
-void GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *playerpos, framedata_t* frame){
-    char i, count = 0, scale;
+char GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *playerpos){
+    char i, count = 0;
     double val = 180/M_PI;
     unsigned long player_x = playerpos->coords.x;
     unsigned long player_y = playerpos->coords.y;
@@ -31,87 +30,83 @@ void GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *pl
         distance_z = item_z - player_z;
         distance = (long)sqrt(r_GetDistance(distance_x, distance_y, distance_z));
         if(distance < RENDER_DISTANCE){
-            char objectvect_xz = byteATan(distance_z, distance_x);
-            char objectvect_y = byteATan(distance_y, distance_x);
+            unsigned char objectvect_xz = byteATan(distance_z, distance_x);
+            unsigned char objectvect_y = byteATan(distance_y, distance_x);
             char diff_xz = objectvect_xz - playerpos->angles.xz;
             char diff_y = objectvect_y - playerpos->angles.y;
-            //objectvect_xz = AngleOpsBounded(objectvect_xz, -1 * playerpos->angles.xz);
-            //objectvect_y = AngleOpsBounded(objectvect_y, -1 * playerpos->angles.y);
-            //vectordiff_xz = AngleOpsBounded(objectvect_xz, playerpos->angles.xz);
-           // vectordiff_y = AngleOpsBounded(objectvect_y, playerpos->angles.y);
-            if((abs(diff_xz) <= 9) && (abs(diff_y) <= 9)){
+            diff_xz = (diff_xz <= 127) ? diff_xz : -(256 - diff_xz);
+            diff_y = (diff_y <= 127) ? diff_y : -(256 - diff_y);
+            if((abs(diff_xz) <= 32) && (abs(diff_y) <= 32)){
                 int vcenter = vHeight>>1 + yStart;
                 renderitem_t *render = &renderbuffer[count++];
                 render->spriteid = item->entitytype-1;
-                render->distance = (RENDER_DISTANCE - distance) * 100 / RENDER_DISTANCE;
-                diff_xz += 10;
-                render->x = vWidth * diff_xz / 19;
-                diff_y += 10;
-                render->y = (vHeight * diff_y / 19);
+                render->distance = (RENDER_DISTANCE - distance) * 200 / RENDER_DISTANCE;
+                render->angle = diff_xz>>4;
+                diff_xz += 33;
+                render->x = vWidth * diff_xz / 65;
+                diff_y += 33;
+                render->y = (vHeight * diff_y / 65) + (2 * (RENDER_DISTANCE - distance));
+                render->length = item->entitystats.weapon.charge + 1;
             }
         }
     }
-    frame->count = count;
-    if(count){
-        heapsort(renderbuffer, count);
-        for(i = 0; i < count; i++){
-            renderitem_t *render = &renderbuffer[i];
-            if(render->spriteid){
-                gfx_sprite_t* sprite = (gfx_sprite_t*)trekvfx[render->spriteid];
-                gfx_sprite_t* uncompressed;
-                gfx_sprite_t* scaled;
-                char scale = render->distance;
-                int width, height;
-                switch(render->spriteid){
-                    case et_ship-1:
-                        uncompressed = gfx_MallocSprite(64, 32);
-                        break;
-                    default:
-                        uncompressed = gfx_MallocSprite(32, 32);
-                }
-                zx7_Decompress(uncompressed, sprite);
-                //if(scale != -1){
-                width = uncompressed->width * scale / 100;
-                height = uncompressed->height * scale / 100;
-                scaled = gfx_MallocSprite(width, height);
-                scaled->width = width;
-                scaled->height = height;
-                gfx_ScaleSprite(uncompressed, scaled);
-                gfx_TransparentSprite(scaled, render->x - (scaled->width>>1), render->y - (scaled->height>>1));
-                free(scaled);
-                // }
-                free(uncompressed);
-                //render->type; // use this to locate sprite
-            }
+    return count;
+}
+
+
+void GUI_RenderFrame(gfx_sprite_t **sprites, buffers_t *buffers, renderitem_t *renderbuffer, char count){
+    char i;
+    //if(count>1)qsort(&renderbuffer, count, sizeof(renderitem_t), &compare_objects);
+    for(i = 0; i < count; i++){
+        renderitem_t *render = &renderbuffer[i];
+        gfx_sprite_t* sprite = (gfx_sprite_t*)sprites[render->spriteid];
+        gfx_sprite_t* uncompressed = buffers->uncompressed;
+        gfx_sprite_t* rotated = buffers->rotated;
+        gfx_sprite_t* scaled = buffers->scaled;
+        int scale = render->distance;
+        char length = render->length;
+        int width, height;
+            //if(scale != -1){
+        if(render->spriteid > 0){
+            gfx_RotateSprite(sprite, rotated, render->angle);
+            memcpy(uncompressed, rotated, rotated->width * rotated->height + 2);
         }
+        width = uncompressed->width * scale / 100;
+        height = uncompressed->height * scale / 100;
+        scaled->width = width;
+        scaled->height = height;
+        gfx_ScaleSprite(uncompressed, scaled);
+        gfx_TransparentSprite(scaled, render->x - (scaled->width>>1), render->y);
     }
 }
 
-/*
-void GUI_RenderFrame(framedata_t *frame, renderitem_t *renderbuffer){
-    char count = frame->count;
+int compare_objects(const void *p, const void *q) {
+    renderitem_t x = *(renderitem_t*)p;
+    renderitem_t y = *(renderitem_t*)q;
+    long dx = x.distance;
+    long dy = y.distance;
+    /* Avoid return x - y, which can cause undefined behaviour
+     because of signed integer overflow. */
+    if (dx < dy)
+        return 1;  // Return -1 if you want ascending, 1 if you want descending order.
+    else if (dx > dy)
+        return -1;   // Return 1 if you want ascending, -1 if you want descending order.
+    return 0;
+}
+
+void gfxinit_DecompressAll(gfx_sprite_t **array){
     char i;
-    if(count){
-        heapsort(renderbuffer, count);
-        for(i = 0; i < count; i++){
-            renderitem_t *render = &renderbuffer[i];
-            if(render->spriteid>1){
-                gfx_sprite_t* sprite = (gfx_sprite_t*)trekvfx[render->spriteid-2];
-                gfx_sprite_t* uncompressed = gfx_MallocSprite(32, 32);
-                gfx_sprite_t* scaled;
-                char scale = render->distance;
-                zx7_Decompress(uncompressed, sprite);
-                //if(scale != -1){
-                    scaled = gfx_MallocSprite(scale, scale);
-                    scaled->width = scale;
-                    scaled->height = scale;
-                    gfx_ScaleSprite(uncompressed, scaled);
-                    gfx_TransparentSprite(scaled, render->x - (scaled->width>>1), render->y - (scaled->height>>1));
-                    free(scaled);
-               // }
-                free(uncompressed);
-                //render->type; // use this to locate sprite
-            }
-        }
+    for(i = 0; i < trekvfx_num; i++){
+        gfx_sprite_t* sprite = (gfx_sprite_t*)trekvfx[i];
+        gfx_sprite_t *uncompressed = gfx_MallocSprite(64, 64);
+        zx7_Decompress(uncompressed, sprite);
+        array[i] = uncompressed;
     }
-}*/
+}
+
+void gfxinit_FreeAll(gfx_sprite_t **array){
+    char i;
+    for(i = 0; i < trekvfx_num; i++){
+        free(array[i]);
+    }
+}

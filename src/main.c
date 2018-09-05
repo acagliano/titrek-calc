@@ -82,6 +82,7 @@ Module_t ShipModules[15] = {0};
 MapData_t MapMain[20] = {0};
 renderitem_t renderbuffer[20] = {0};
 Module_t *activeweapon = NULL;
+gfx_sprite_t *sprites[trekvfx_num];
 const char *GameSave = "TrekSave";
 #define shields ((Module_t*)&ShipModules[tt_shield-1])
 #define integrity ((Module_t*)&ShipModules[tt_integrity-1])
@@ -102,11 +103,15 @@ void main(void) {
     animation_t animation[2] = {0};
     animation_t *temp;
     gfx_sprite_t* uncompressed;
+    buffers_t buffers;
     long tick_test;
     bool keys_prior[18] = {0};
     char SavePtr;
     unsigned char i = 0, j;
     char mapslot;
+    buffers.uncompressed = gfx_MallocSprite(64, 64);
+    buffers.rotated = gfx_MallocSprite(64, 64);
+    buffers.scaled = gfx_MallocSprite(128, 128);
     srandom(rtc_Time());
     ti_CloseAll();
     gfx_Begin();
@@ -115,6 +120,7 @@ void main(void) {
     gfx_SetTextTransparentColor(32);
     gfx_initialized[gui_enabled] = trekgui_init();
     gfx_initialized[vfx_enabled] = trekvfx_init();
+    gfxinit_DecompressAll(&sprites);
     if(!gfx_initialized[gui_enabled] || !gfx_initialized[vfx_enabled]){
         player->deathreason = 4;
         loopgame = false;
@@ -216,7 +222,7 @@ void main(void) {
                 module->stats.weapstats.maxCharge = 5;
                 module->stats.weapstats.damage_shield = 2;
                 module->stats.weapstats.damage_hull = 1;
-                module->stats.weapstats.range = 100;
+                module->stats.weapstats.range = 25;
                 module->stats.weapstats.speed = 20;
                 strcpy(module->techname, "Phasers");
                 strcpy(module->stats.weapstats.weapname, "Pulse");
@@ -226,8 +232,8 @@ void main(void) {
                 module->pdConstant = false;
                 module->stats.weapstats.damage_shield = 1;
                 module->stats.weapstats.damage_hull = 3;
-                module->stats.weapstats.range = 100;
-                module->stats.weapstats.speed = 5;
+                module->stats.weapstats.range = 50;
+                module->stats.weapstats.speed = 10;
                 strcpy(module->techname, "Torpedo");
                 strcpy(module->stats.weapstats.weapname, "Photon");
                 break;
@@ -274,8 +280,8 @@ void main(void) {
     do
     {
         damage_desc_t shiphit = {0};
-        framedata_t frame;
         char corestability, lifesupporthealth, speed;
+        char map_count = GUI_PrepareFrame(&MapMain, &renderbuffer, &player->position);
         char integrityhealth;
         char moduleselected = player->moduleSelected;
         char modulerepairing = player->moduleRepairing;
@@ -391,10 +397,9 @@ void main(void) {
 
         if(!key && keys_prior[k_2nd]){
             if(activeweapon){ //fire phaser
-                if(activeweapon->techtype == tt_phaser){
+                if(activeweapon){
                     char index;
                     activeweapon->powerReserve -= (activeweapon->stats.weapstats.charge * activeweapon->powerDraw);
-                    activeweapon->stats.weapstats.charge = 0;
                     if((index = map_LocateSlot(&MapMain)) != -1){
                         MapData_t *slot = &MapMain[index];
                         // copy and offset position
@@ -402,16 +407,20 @@ void main(void) {
                         Position_t *entitypos = &slot->position;
                         memcpy(entitypos, playerpos, sizeof(Position_t));
                         slot->speed = activeweapon->stats.weapstats.speed;
-                        entitypos->angles.xz = AngleOpsBounded(entitypos->angles.xz, player->target.angles.xz);
-                        entitypos->angles.y = AngleOpsBounded(entitypos->angles.y, player->target.angles.y);
+                        entitypos->angles.xz += player->target.angles.xz;
+                        entitypos->angles.y += player->target.angles.y;
                         AnglesToVectors(entitypos);
                         entitypos->coords.x += (entitypos->vectors.x<<4);
                         entitypos->coords.y += (entitypos->vectors.y<<4);
                         entitypos->coords.z += (entitypos->vectors.z<<4);
-                        slot->entitytype = et_phaser;
+                        if(activeweapon->techtype == tt_phaser)
+                            slot->entitytype = et_phaser;
+                        else slot->entitytype = et_photon_projectile;
                         slot->mobile = true;
+                        slot->entitystats.weapon.charge = activeweapon->stats.weapstats.charge;
                         slot->entitystats.weapon.range = activeweapon->stats.weapstats.range;
                     }
+                    activeweapon->stats.weapstats.charge = 0;
                 }
             }
         }
@@ -545,11 +554,11 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.y = AngleOpsBounded(player->position.angles.y, 1);
+                    player->position.angles.y+=4;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.y < 9) player->target.angles.y++;
+                    if(player->target.angles.y < 32) player->target.angles.y+=4;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Down]){
@@ -574,11 +583,11 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.y = AngleOpsBounded(player->position.angles.y, -1);
+                    player->position.angles.y-=4;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.y > -9) player->target.angles.y--;
+                    if(player->target.angles.y > -32) player->target.angles.y-=4;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Up]){
@@ -602,11 +611,11 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.xz = AngleOpsBounded(player->position.angles.xz, 1);
+                    player->position.angles.xz+=4;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.xz < 9) player->target.angles.xz++;
+                    if(player->target.angles.xz < 32) player->target.angles.xz+=4;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Right]){
@@ -625,11 +634,11 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.xz = AngleOpsBounded(player->position.angles.xz, -1);
+                    player->position.angles.xz-=4;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.xz > -9) player->target.angles.xz--;
+                    if(player->target.angles.xz > -32) player->target.angles.xz-=4;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Left]){
@@ -695,8 +704,7 @@ void main(void) {
         switch(player->ScreenSelected){
             case SCRN_VIEW_TARG:
             case SCRN_VIEW:
-                /*if(!(player->tick % 2)) */GUI_PrepareFrame(&MapMain, &renderbuffer, &player->position, &frame);
-               // if(player->tick % 2) GUI_RenderFrame(&frame, &renderbuffer);
+                if(map_count) GUI_RenderFrame(&sprites, &buffers, &renderbuffer, map_count);
                 if(shiphit.impact) {
                     int j, damage = shiphit.damage;
                     if(shields->online && shields->health * 100 / shields->maxHealth) gfx_SetColor(223);
@@ -770,8 +778,8 @@ void main(void) {
                     if(sensorhealth > 25 && (abs(anglexz) < 32 && abs(angley) < 32)){
                         char charge = activeweapon->stats.weapstats.charge;
                         char maxCharge = activeweapon->stats.weapstats.maxCharge;
-                        int targ_gui_x = view_center_x * anglexz / 9 + view_center_x;
-                        int targ_gui_y = view_center_y * angley / 9 + view_center_y;
+                        int targ_gui_x = view_center_x * anglexz / 65 + view_center_x;
+                        int targ_gui_y = view_center_y * angley / 65 + view_center_y;
                         gfx_SetColor(224);
                         if(uncompressed = gfx_MallocSprite(target_width, target_height)){
                             zx7_Decompress(uncompressed, target_compressed);
@@ -847,8 +855,10 @@ void main(void) {
     while(loopgame);
     gfx_SetDrawScreen();
     boot_ClearVRAM();
-    
-    
+    free(buffers.uncompressed);
+    free(buffers.rotated);
+    free(buffers.scaled);
+    gfxinit_FreeAll(&sprites);
     // Cleanup
     ti_CloseAll();
     gfx_SetTextFGColor(0);

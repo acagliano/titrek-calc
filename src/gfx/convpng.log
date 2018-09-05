@@ -36,7 +36,7 @@ transparent color index : 0
 transparent color : 0x0000
 6:
  narada : converted! (2050 > 211 bytes)
- phaser : converted! (1026 > 213 bytes)
+ phaser : converted! (1026 > 133 bytes)
  torp_photon : converted! (1026 > 117 bytes)
  torp_quantum : converted! (1026 > 136 bytes)
  shield_flare : converted! (1026 > 178 bytes)

@@ -2,9 +2,9 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
-const char cosLUT[72] = {127, 126, 125, 122, 119, 115, 109, 104, 97, 89, 81, 72, 63, 53, 43, 32, 22, 11, 0, -11, -22, -32, -43, -53, -63, -72, -81, -89, -97, -104, -109, -115, -119, -122, -125, -126, -127, -126, -125, -122, -119, -115, -109, -104, -97, -89, -81, -72, -63, -53, -43, -32, -22, -11, 0, 11, 22, 32, 43, 53, 63, 72, 81, 89, 97, 104, 109, 115, 119, 122, 125, 126};
-const char sinLUT[72] = {0, 11, 22, 32, 43, 53, 63, 72, 81, 89, 97, 104, 109, 115, 119, 122, 125, 126, 127, 126, 125, 122, 119, 115, 109, 104, 97, 89, 81, 72, 63, 53, 43, 32, 22, 11, 0, -11, -22, -32, -43, -53, -63, -72, -81, -89, -97, -104, -109, -115, -119, -122, -125, -126, -127, -126, -125, -122, -119, -115, -109, -104, -97, -89, -81, -72, -63, -53, -43, -32, -22, -11};
-const int arctanLUT[18] = {0, 11, 22, 34, 46, 59, 73, 88, 106, 126, 151, 181, 219, 272, 348, 473, 720, 1451};
+const char cosLUT[64] = {127, 126, 124, 121, 117, 111, 105, 97, 89, 80, 70, 59, 48, 36, 24, 11, 0, -11, -24, -36, -48, -59, -70, -80, -89, -97, -105, -111, -117, -121, -124, -126, -127, -126, -124, -121, -117, -111, -105, -97, -89, -80, -70, -59, -48, -36, -24, -11, 0, 11, 24, 36, 48, 59, 70, 80, 89, 97, 105, 111, 117, 121, 126, 127};
+const char sinLUT[64] = {0, 11, 24, 36, 48, 59, 70, 80, 89, 97, 105, 111, 117, 121, 124, 126, 127, 126, 124, 121, 117, 111, 105, 97, 89, 80, 70, 59, 48, 36, 24, 11, 0, -11, -24, -36, -48, -59, -70, -80, -89, -97, -105, -111, -117, -121, -124, -126, -127, -126, -124, -121, -117, -111, -105, -97, -89, -80, -70, -59, -48, -36, -24, -11};
+const int arctanLUT[16] = {0, 12, 25, 38, 52, 67, 84, 104, 126, 154, 190, 237, 306, 418, 638, 1289};
 
 
 unsigned long r_GetDistance(int xdiff, int ydiff, int zdiff){
@@ -19,23 +19,23 @@ signed char byteCos(unsigned char x){
     else if(x < 128) return -cosLUT[127 - x];
     else if(x < 192) return -cosLUT[x - 128];
     else if(x < 256) return cosLUT[255 - x];*/
-    return cosLUT[x];
+    return cosLUT[x/4];
 }
 
 signed char byteSin(unsigned char x){
-    return sinLUT[x];
+    return sinLUT[x/4];
 }
 
-char byteATan(long non_x, long x){
-    char index = 17, quadrant;
+unsigned char byteATan(long non_x, long x){
+    char index = 15, quadrant;
     int value;
     if(x == 0){     // handle infinity
-        if(non_x > 0) return 18;    // 90 degrees
-        if(non_x < 0) return 54;    // 270 degrees
+        if(non_x > 0) return 63;    // 90 degrees
+        if(non_x < 0) return 191;    // 270 degrees
     }
     if(non_x == 0){
         if(x > 0) return 0;
-        if(x < 0) return 36;
+        if(x < 0) return 127;
     }
     if(non_x > 0 && x > 0) quadrant = 0;
     else if(non_x > 0 && x < 0) quadrant = 1;
@@ -47,7 +47,7 @@ char byteATan(long non_x, long x){
         if(value >= arctanLUT[index]) break;
         index--;
     }
-   return 18 * quadrant + index;
+   return 64 * quadrant + (4 * index);
 }
 
 void AnglesToVectors(Position_t *pos){

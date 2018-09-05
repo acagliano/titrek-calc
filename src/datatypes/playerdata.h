@@ -49,6 +49,11 @@ typedef struct {
 } angles_t;
 
 typedef struct {
+    unsigned char xz;
+    unsigned char y;
+} u_angles_t;
+
+typedef struct {
     bool warpactive;
     speed_t speed;
     speed_t topspeed;
@@ -62,7 +67,7 @@ typedef struct {
         signed char y;
         signed char z;
     } vectors;
-    angles_t angles;
+    u_angles_t angles;
 } Position_t;
 
 typedef struct {

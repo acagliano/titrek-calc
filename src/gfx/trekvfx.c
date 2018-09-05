@@ -6,10 +6,10 @@
 uint8_t *trekvfx[6] = {
  (uint8_t*)0,
  (uint8_t*)211,
- (uint8_t*)424,
- (uint8_t*)541,
- (uint8_t*)677,
- (uint8_t*)855,
+ (uint8_t*)344,
+ (uint8_t*)461,
+ (uint8_t*)597,
+ (uint8_t*)775,
 };
 
 bool trekvfx_init(void) {

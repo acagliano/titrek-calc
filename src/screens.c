@@ -307,7 +307,7 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
         gfx_sprite_t *rotated;
         zx7_Decompress(uncompressed, ship_icon_compressed);
         if(rotated = gfx_MallocSprite(ship_icon_width, ship_icon_height)){
-            gfx_RotateSprite(uncompressed, rotated, player_angle_xz * 255 / 72);
+            gfx_RotateSprite(uncompressed, rotated, player_angle_xz);
             gfx_TransparentSprite(rotated, xmid - (ship_icon_width>>1), ymid - (ship_icon_height>>1));
             free(rotated);
         } else
@@ -337,8 +337,8 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                 gfx_PrintUInt(RENDER_DISTANCE, 6);
                 anglexz = AngleOpsBounded(anglexz, -18);
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
-                render_x = conv_dist * byteCos(anglexz) / 127;
-                render_y = conv_dist * byteSin(anglexz) / 127;
+                render_x = conv_dist * byteCos(anglexz - 64) / 127;
+                render_y = conv_dist * byteSin(anglexz - 64) / 127;
                 gfx_SetColor(242);
                 switch(entity->entitytype){
                     case et_ship:
@@ -359,5 +359,5 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
             }
         }
     }
-    player->sensor_gui_angle = AngleOpsBounded( player->sensor_gui_angle, 1);
+    player->sensor_gui_angle+=4;
 }

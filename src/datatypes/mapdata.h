@@ -3,7 +3,7 @@
 #include "playerdata.h"
 #include <stdbool.h>
 
-#define RENDER_DISTANCE 100
+#define RENDER_DISTANCE 50
 #define FOV 45
 
 enum EntityTypes {
@@ -43,6 +43,7 @@ typedef struct {
     char shield_damage;
     char hull_damage;
     int range;
+    char charge; // phasers
 } entity_weap_t;
 
 
@@ -51,7 +52,7 @@ typedef struct {
     bool mobile;
     Position_t position;
     char speed;
-    union entitystats {
+    union {
         entity_ship_t ship;
         entity_default_t terrain;
         entity_weap_t weapon;
@@ -62,6 +63,8 @@ typedef struct {
     unsigned char spriteid;
     unsigned int x,y;
     unsigned int distance;
+    unsigned char angle;
+    char length; // some objects only
 } renderitem_t;
 
 #endif
