@@ -26,10 +26,10 @@
 #include <keypadc.h>
 
 
-
+#include "render.h"
 /* Put your function prototypes here */
 void printText(const char *text, uint8_t x, uint8_t y);
-char gfx_MainMenu(bool gfx_initialized);
+char gfx_MainMenu(bool gfx_initialized, buffers_t* buffers);
 
 #include "gfx_functions.h"
 #include "datatypes/mapdata.h"
@@ -40,7 +40,6 @@ char gfx_MainMenu(bool gfx_initialized);
 #include "mapfuncs.h"
 #include "mymath.h"
 #include "vfx.h"
-#include "render.h"
 #include "gfx/trekgui.h"
 #include "gfx/trekvfx.h"
 #define gui_enabled 0
@@ -134,7 +133,7 @@ void main(void) {
     temp->origin_y = 25;
     temp->duration = 0;
     while(i != 1){
-        i = gfx_MainMenu(gfx_initialized[0]);
+        i = gfx_MainMenu(gfx_initialized[0], &buffers);
         if(i == 3) {
             gfx_End();
             prgm_CleanUp();
@@ -775,19 +774,17 @@ void main(void) {
                     } else gfx_PrintString("offline");
                     
                     gfx_SetTextFGColor(255);
-                    if(sensorhealth > 25 && (abs(anglexz) < 32 && abs(angley) < 32)){
+                    if(sensorhealth > 25 && (abs(anglexz) <= 32 && abs(angley) <= 32)){
                         char charge = activeweapon->stats.weapstats.charge;
                         char maxCharge = activeweapon->stats.weapstats.maxCharge;
-                        int targ_gui_x = view_center_x * anglexz / 65 + view_center_x;
-                        int targ_gui_y = view_center_y * angley / 65 + view_center_y;
+                        int targ_gui_x = view_center_x * anglexz / 33 + view_center_x;
+                        int targ_gui_y = view_center_y * angley / 33 + view_center_y;
+                        gfx_sprite_t *uncompressed = buffers.uncompressed;
                         gfx_SetColor(224);
-                        if(uncompressed = gfx_MallocSprite(target_width, target_height)){
-                            zx7_Decompress(uncompressed, target_compressed);
-                            gfx_TransparentSprite(uncompressed,
-                                                  xStart + targ_gui_x - 15,
-                                                  yStart + targ_gui_y - 15);
-                            free(uncompressed);
-                        }
+                        zx7_Decompress(uncompressed, target_compressed);
+                        gfx_TransparentSprite(uncompressed,
+                                                xStart + targ_gui_x - 15,
+                                                yStart + targ_gui_y - 15);
                        /* gfx_Circle(xStart + targ_gui_x, yStart + targ_gui_y, 15);
                         gfx_Circle(xStart + targ_gui_x, yStart + targ_gui_y, 8); */
                         gfx_HorizLine(xStart + targ_gui_x - 15, yStart + targ_gui_y, 30);
@@ -835,9 +832,9 @@ void main(void) {
         }
         gfx_SetColor(148); gfx_FillRectangle(225, 203, 20 * 3, 20);
         if(gfx_initialized[gui_enabled]){
-            if(player->timers[timer_lifesupport]) gfx_DrawLifeSupportAlert();
-            if(player->timers[timer_corebreach]) gfx_DrawCoreBreachAlert();
-            gfx_DrawShipStatusIcon(integrity, shields, &player);
+            if(player->timers[timer_lifesupport]) gfx_DrawLifeSupportAlert(&buffers);
+            if(player->timers[timer_corebreach]) gfx_DrawCoreBreachAlert(&buffers);
+            if(!(player->tick % 5))gfx_DrawShipStatusIcon(&buffers, integrity, shields, &player);
         }
         gfx_DrawSpeedIndicator(speed, topspeed_warp, topspeed_impulse, gfx_initialized[gui_enabled]);
         integrityhealth = integrity->health * 100 / integrity->maxHealth;
@@ -891,17 +888,14 @@ void printText(char *text, uint8_t xpos, uint8_t ypos) {
     os_PutStrFull(text);
 }
 
-char gfx_MainMenu(bool gfx_initialized){
+char gfx_MainMenu(bool gfx_initialized, buffers_t* buffers){
     bool splash_first_loop = true;
-    gfx_sprite_t *uncompressed;
+    gfx_sprite_t *uncompressed = buffers->uncompressed;
     char key = 0, i;
     gfx_ZeroScreen();
     if(gfx_initialized){
-        if(uncompressed = gfx_MallocSprite(75,116)){
-            zx7_Decompress(uncompressed, splashlogo_compressed);
-            gfx_Sprite(uncompressed, 20, 50);
-            free(uncompressed);
-        }
+        zx7_Decompress(uncompressed, splashlogo_compressed);
+        gfx_Sprite(uncompressed, 20, 50);
     } else {
         gfx_SetTextFGColor(224);
         gfx_PrintStringXY("[ Warning ]", 5, 120);

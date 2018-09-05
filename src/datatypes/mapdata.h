@@ -64,7 +64,6 @@ typedef struct {
     unsigned int x,y;
     unsigned int distance;
     unsigned char angle;
-    char length; // some objects only
 } renderitem_t;
 
 #endif

@@ -40,42 +40,37 @@ char GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *pl
                 int vcenter = vHeight>>1 + yStart;
                 renderitem_t *render = &renderbuffer[count++];
                 render->spriteid = item->entitytype-1;
-                render->distance = (RENDER_DISTANCE - distance) * 200 / RENDER_DISTANCE;
+                render->distance = (RENDER_DISTANCE - distance) * 100 / RENDER_DISTANCE;
                 render->angle = diff_xz>>4;
                 diff_xz += 33;
                 render->x = vWidth * diff_xz / 65;
                 diff_y += 33;
                 render->y = (vHeight * diff_y / 65) + (2 * (RENDER_DISTANCE - distance));
-                render->length = item->entitystats.weapon.charge + 1;
             }
         }
     }
+   // if(count>1) heapsort(renderbuffer, count);
+    if(count>1) qsort(&renderbuffer, count, sizeof(renderitem_t), &compare_objects);
     return count;
 }
 
 
 void GUI_RenderFrame(gfx_sprite_t **sprites, buffers_t *buffers, renderitem_t *renderbuffer, char count){
     char i;
-    //if(count>1)qsort(&renderbuffer, count, sizeof(renderitem_t), &compare_objects);
     for(i = 0; i < count; i++){
         renderitem_t *render = &renderbuffer[i];
         gfx_sprite_t* sprite = (gfx_sprite_t*)sprites[render->spriteid];
-        gfx_sprite_t* uncompressed = buffers->uncompressed;
         gfx_sprite_t* rotated = buffers->rotated;
         gfx_sprite_t* scaled = buffers->scaled;
-        int scale = render->distance;
-        char length = render->length;
+        char scale = render->distance;
         int width, height;
             //if(scale != -1){
-        if(render->spriteid > 0){
-            gfx_RotateSprite(sprite, rotated, render->angle);
-            memcpy(uncompressed, rotated, rotated->width * rotated->height + 2);
-        }
-        width = uncompressed->width * scale / 100;
-        height = uncompressed->height * scale / 100;
+        gfx_RotateSprite(sprite, rotated, render->angle);
+        width = rotated->width * scale / 100;
+        height = rotated->height * scale / 100;
         scaled->width = width;
         scaled->height = height;
-        gfx_ScaleSprite(uncompressed, scaled);
+        gfx_ScaleSprite(rotated, scaled);
         gfx_TransparentSprite(scaled, render->x - (scaled->width>>1), render->y);
     }
 }
@@ -83,8 +78,8 @@ void GUI_RenderFrame(gfx_sprite_t **sprites, buffers_t *buffers, renderitem_t *r
 int compare_objects(const void *p, const void *q) {
     renderitem_t x = *(renderitem_t*)p;
     renderitem_t y = *(renderitem_t*)q;
-    long dx = x.distance;
-    long dy = y.distance;
+    unsigned int dx = x.distance;
+    unsigned int dy = y.distance;
     /* Avoid return x - y, which can cause undefined behaviour
      because of signed integer overflow. */
     if (dx < dy)

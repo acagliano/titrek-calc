@@ -35,10 +35,10 @@ warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
 6:
- narada : converted! (2050 > 211 bytes)
- phaser : converted! (1026 > 133 bytes)
- torp_photon : converted! (1026 > 117 bytes)
- torp_quantum : converted! (1026 > 136 bytes)
+ narada : converted! (4098 > 231 bytes)
+ phaser : converted! (4098 > 258 bytes)
+ torp_photon : converted! (4098 > 1238 bytes)
+ torp_quantum : converted! (4098 > 606 bytes)
  shield_flare : converted! (1026 > 178 bytes)
  explosion : converted! (1026 > 524 bytes)
 

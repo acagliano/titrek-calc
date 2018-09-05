@@ -19,11 +19,11 @@ signed char byteCos(unsigned char x){
     else if(x < 128) return -cosLUT[127 - x];
     else if(x < 192) return -cosLUT[x - 128];
     else if(x < 256) return cosLUT[255 - x];*/
-    return cosLUT[x/4];
+    return cosLUT[x>>2];
 }
 
 signed char byteSin(unsigned char x){
-    return sinLUT[x/4];
+    return sinLUT[x>>2];
 }
 
 unsigned char byteATan(long non_x, long x){
@@ -58,14 +58,6 @@ void AnglesToVectors(Position_t *pos){
     //pos->vectors[2] = z vector
 }
 
-char AngleOpsBounded(char angle, char operand){
-    bool operation = true;
-    if(operand < 0) operation = false;
-    if(operation) angle = ((angle + operand) <= 71) ? angle+operand : 72 - (angle+operand);
-    if(!operation) { operand = -operand; angle = ((angle - operand) >= 0) ? angle-operand : 72 + (angle-operand);}
-    return angle;
-}
-
 
 char lcars_GetIntLength(char value){
     return 1 + (value > 9) + (value > 99);
@@ -77,7 +69,7 @@ unsigned int text_GetCenterX(char* text, int viewer_width){
     return (viewer_width>>1) - pixellen;
 }
 
-char calcSpriteScale(unsigned long d, unsigned int render_distance){
+/*char calcSpriteScale(unsigned long d, unsigned int render_distance){
     unsigned int s, g;
     if(d >= render_distance) return -1;
     if(d >= 1024) { s = 49 * 32 + 25; g = 99; }
@@ -85,7 +77,7 @@ char calcSpriteScale(unsigned long d, unsigned int render_distance){
     else { s = 15 * 32 + 25; g = 31; }
     while( d >= g ) { s -= 32; d -= g; g -= 2; }
     return 32 - (s/50);
-}
+}*/
 
 /*
  This is an example function using an array of ints.
@@ -96,6 +88,7 @@ char calcSpriteScale(unsigned long d, unsigned int render_distance){
  Call heapsort() by passing in the array to sort and its size
  WARNING: This will sort in-place. It changes the original array passed to it.
  */
+/*
 int gt(renderitem_t x,renderitem_t y){return x.distance>y.distance;}
 void popheap(renderitem_t* arr,int size){
     //I'll never call this if arr is NULL or size 0
@@ -156,4 +149,4 @@ void heapsort(renderitem_t* arr,int size){
     }
     return;
 }
-
+*/

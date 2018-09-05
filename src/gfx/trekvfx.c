@@ -5,11 +5,11 @@
 #include <fileioc.h>
 uint8_t *trekvfx[6] = {
  (uint8_t*)0,
- (uint8_t*)211,
- (uint8_t*)344,
- (uint8_t*)461,
- (uint8_t*)597,
- (uint8_t*)775,
+ (uint8_t*)231,
+ (uint8_t*)489,
+ (uint8_t*)1727,
+ (uint8_t*)2333,
+ (uint8_t*)2511,
 };
 
 bool trekvfx_init(void) {

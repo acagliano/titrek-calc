@@ -325,8 +325,8 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
             distance = (unsigned int)sqrt(r_GetDistance(dx, dy, dz));
             if(distance <= sens_range){
                 int render_x, render_y, conv_dist;
-                char anglexz = byteATan(dz, dx);
-                char angley = byteATan(dy, dx);
+                unsigned char anglexz = byteATan(dz, dx);
+                unsigned char angley = byteATan(dy, dx);
                 gfx_SetTextXY(xStart + 20, yStart + 78);
                 gfx_PrintUInt(anglexz, 2);
                 gfx_SetTextXY(xStart + 60, yStart + 78);
@@ -335,10 +335,9 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                 gfx_PrintUInt(distance, 6);
                 gfx_SetTextXY(xStart + 20, yStart + 98);
                 gfx_PrintUInt(RENDER_DISTANCE, 6);
-                anglexz = AngleOpsBounded(anglexz, -18);
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
-                render_x = conv_dist * byteCos(anglexz - 64) / 127;
-                render_y = conv_dist * byteSin(anglexz - 64) / 127;
+                render_x = conv_dist * byteCos(anglexz-64) / 127;
+                render_y = conv_dist * byteSin(anglexz-64) / 127;
                 gfx_SetColor(242);
                 switch(entity->entitytype){
                     case et_ship:
