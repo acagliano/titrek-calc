@@ -63,9 +63,9 @@ typedef struct {
         unsigned long z;
     } coords;
     struct {
-        signed char x;
-        signed char y;
-        signed char z;
+        signed short x;
+        signed short y;
+        signed short z;
     } vectors;
     u_angles_t angles;
 } Position_t;

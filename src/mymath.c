@@ -2,9 +2,9 @@
 #include <string.h>
 #include <math.h>
 #include <stdlib.h>
-const char cosLUT[64] = {127, 126, 124, 121, 117, 111, 105, 97, 89, 80, 70, 59, 48, 36, 24, 11, 0, -11, -24, -36, -48, -59, -70, -80, -89, -97, -105, -111, -117, -121, -124, -126, -127, -126, -124, -121, -117, -111, -105, -97, -89, -80, -70, -59, -48, -36, -24, -11, 0, 11, 24, 36, 48, 59, 70, 80, 89, 97, 105, 111, 117, 121, 126, 127};
-const char sinLUT[64] = {0, 11, 24, 36, 48, 59, 70, 80, 89, 97, 105, 111, 117, 121, 124, 126, 127, 126, 124, 121, 117, 111, 105, 97, 89, 80, 70, 59, 48, 36, 24, 11, 0, -11, -24, -36, -48, -59, -70, -80, -89, -97, -105, -111, -117, -121, -124, -126, -127, -126, -124, -121, -117, -111, -105, -97, -89, -80, -70, -59, -48, -36, -24, -11};
-const int arctanLUT[16] = {0, 12, 25, 38, 52, 67, 84, 104, 126, 154, 190, 237, 306, 418, 638, 1289};
+const short cosLUT[256] = {128, 127, 127, 127, 127, 127, 126, 126, 125, 124, 124, 123, 122, 121, 120, 119, 118, 117, 115, 114, 112, 111, 109, 108, 106, 104, 102, 100, 98, 96, 94, 92, 90, 88, 85, 83, 81, 78, 76, 73, 71, 68, 65, 63, 60, 57, 54, 51, 48, 46, 43, 40, 37, 34, 31, 28, 24, 21, 18, 15, 12, 9, 6, 3, 0, -3, -6, -9, -12, -15, -18, -21, -24, -28, -31, -34, -37, -40, -43, -46, -48, -51, -54, -57, -60, -63, -65, -68, -71, -73, -76, -78, -81, -83, -85, -88, -90, -92, -94, -96, -98, -100, -102, -104, -106, -108, -109, -111, -112, -114, -115, -117, -118, -119, -120, -121, -122, -123, -124, -124, -125, -126, -126, -127, -127, -127, -127, -127, -128, -127, -127, -127, -127, -127, -126, -126, -125, -124, -124, -123, -122, -121, -120, -119, -118, -117, -115, -114, -112, -111, -109, -108, -106, -104, -102, -100, -98, -96, -94, -92, -90, -88, -85, -83, -81, -78, -76, -73, -71, -68, -65, -63, -60, -57, -54, -51, -48, -46, -43, -40, -37, -34, -31, -28, -24, -21, -18, -15, -12, -9, -6, -3, 0, 3, 6, 9, 12, 15, 18, 21, 24, 28, 31, 34, 37, 40, 43, 46, 48, 51, 54, 57, 60, 63, 65, 68, 71, 73, 76, 78, 81, 83, 85, 88, 90, 92, 94, 96, 98, 100, 102, 104, 106, 108, 109, 111, 112, 114, 115, 117, 118, 119, 120, 121, 122, 123, 124, 124, 125, 126, 126, 127, 127, 127, 127, 127};
+
+const int arctanLUT[64] = {0, 3, 6, 9, 12, 15, 18, 22, 25, 28, 31, 35, 38, 41, 45, 48, 52, 56, 60, 63, 67, 71, 76, 80, 84, 89, 94, 99, 104, 109, 115, 120, 126, 133, 140, 147, 154, 162, 171, 180, 190, 200, 211, 224, 237, 252, 268, 286, 306, 329, 354, 384, 418, 458, 507, 565, 638, 731, 856, 1029, 1289, 1721, 2585, 5173};
 
 
 unsigned long r_GetDistance(int xdiff, int ydiff, int zdiff){
@@ -14,20 +14,16 @@ unsigned long r_GetDistance(int xdiff, int ydiff, int zdiff){
     return distance;
 }
 
-signed char byteCos(unsigned char x){
-    /*if(x < 64) return cosLUT[x];
-    else if(x < 128) return -cosLUT[127 - x];
-    else if(x < 192) return -cosLUT[x - 128];
-    else if(x < 256) return cosLUT[255 - x];*/
-    return cosLUT[x>>2];
+signed short byteCos(unsigned char x){
+    return cosLUT[x];
 }
 
-signed char byteSin(unsigned char x){
-    return sinLUT[x>>2];
+signed short byteSin(unsigned char x){
+    return byteCos(x-64);
 }
 
 unsigned char byteATan(long non_x, long x){
-    char index = 15, quadrant;
+    char index = 63, quadrant;
     int value;
     if(x == 0){     // handle infinity
         if(non_x > 0) return 63;    // 90 degrees
@@ -37,23 +33,24 @@ unsigned char byteATan(long non_x, long x){
         if(x > 0) return 0;
         if(x < 0) return 127;
     }
+    
     if(non_x > 0 && x > 0) quadrant = 0;
     else if(non_x > 0 && x < 0) quadrant = 1;
     else if(non_x < 0 && x < 0) quadrant = 2;
     else quadrant = 3;
     if(!(quadrant & 1))  value = abs(127 * non_x / x);
     else value = abs(127 * x / non_x);
-    while(index >= 0){
+    while(index > 0){
         if(value >= arctanLUT[index]) break;
         index--;
     }
-   return 64 * quadrant + (4 * index);
+   return 64 * quadrant + index;
 }
 
 void AnglesToVectors(Position_t *pos){
     unsigned char xzangle = pos->angles.xz, yangle = pos->angles.y;
-    pos->vectors.x = byteCos(xzangle) * byteCos(yangle) / 127;
-    pos->vectors.z = byteSin(xzangle) * byteCos(yangle) / 127;
+    pos->vectors.x = byteCos(xzangle) * byteCos(yangle) / 128;
+    pos->vectors.z = byteSin(xzangle) * byteCos(yangle) / 128;
     pos->vectors.y = byteSin(yangle);
     //pos->vectors[2] = z vector
 }
@@ -67,6 +64,15 @@ unsigned int text_GetCenterX(char* text, int viewer_width){
     unsigned char length = strlen(text) + 2;
     unsigned char pixellen = length * 5 / 2;
     return (viewer_width>>1) - pixellen;
+}
+
+char compareAngles(unsigned char x, unsigned char y){
+    unsigned char diff = (x >= y) ? x - y : y - x;
+    unsigned char alt = 256 - diff;
+    char result = (diff <= alt) ? diff : alt;
+    result = (diff <= alt) ? result : -result;
+    if(x<y) result = -result;
+    return result;
 }
 
 /*char calcSpriteScale(unsigned long d, unsigned int render_distance){

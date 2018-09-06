@@ -185,8 +185,8 @@ void gfx_DrawSpeedIndicator(char speed, char maxspeed_warp, char maxspeed_impuls
 }
 
 void gfx_RenderOrientation(unsigned char anglexz, unsigned char angley, int dialx, unsigned char dialy){
-    char vectorx = 10 * byteCos(anglexz - 64) / 127;
-    char vectory = 10 * byteSin(anglexz - 64) / 127;
+    char vectorx = 10 * byteCos(anglexz - 64) / 128;
+    char vectory = 10 * byteSin(anglexz - 64) / 128;
     gfx_SetColor(255);
     gfx_SetTextXY(dialx - 9, dialy - 18);
     gfx_PrintUInt(anglexz,3);
@@ -194,8 +194,8 @@ void gfx_RenderOrientation(unsigned char anglexz, unsigned char angley, int dial
     gfx_Line(dialx, dialy+1, dialx + vectorx, dialy + 1 + vectory);
     gfx_PrintStringXY("Rot", dialx - 9, dialy + 15);
     dialx += 30;
-    vectorx = 10 * byteCos(angley) / 127;
-    vectory = 10 * byteSin(angley) / 127;
+    vectorx = 10 * byteCos(angley) / 128;
+    vectory = -10 * byteSin(angley) / 128;
     gfx_SetTextXY(dialx - 9, dialy - 18);
     gfx_PrintUInt(angley,3);
     gfx_Circle(dialx, dialy+1, 10);

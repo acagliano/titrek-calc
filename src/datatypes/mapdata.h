@@ -63,7 +63,7 @@ typedef struct {
     unsigned char spriteid;
     unsigned int x,y;
     unsigned int distance;
-    unsigned char angle;
+    char angle;
 } renderitem_t;
 
 #endif

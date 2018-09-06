@@ -404,7 +404,11 @@ void main(void) {
                         // copy and offset position
                         Position_t *playerpos = &player->position;
                         Position_t *entitypos = &slot->position;
-                        memcpy(entitypos, playerpos, sizeof(Position_t));
+                        entitypos->coords.x = playerpos->coords.x;
+                        entitypos->coords.y = playerpos->coords.y;
+                        entitypos->coords.z = playerpos->coords.z;
+                        entitypos->angles.xz = playerpos->angles.xz;
+                        entitypos->angles.y = playerpos->angles.y;
                         slot->speed = activeweapon->stats.weapstats.speed;
                         entitypos->angles.xz += player->target.angles.xz;
                         entitypos->angles.y += player->target.angles.y;
@@ -553,7 +557,7 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.y+=4;
+                    player->position.angles.y++;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
@@ -582,7 +586,7 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.y-=4;
+                    player->position.angles.y--;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
@@ -610,11 +614,11 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.xz+=4;
+                    player->position.angles.xz++;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.xz < 32) player->target.angles.xz+=4;
+                    if(player->target.angles.xz < 31) player->target.angles.xz+=4;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Right]){
@@ -633,7 +637,7 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.xz-=4;
+                    player->position.angles.xz--;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
