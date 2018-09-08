@@ -314,6 +314,12 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
             gfx_TransparentSprite(uncompressed, xmid - (ship_icon_width>>1), ymid - (ship_icon_height>>1));
         free(uncompressed);
     }
+    if(icons && (uncompressed = gfx_MallocSprite(senslock_width, senslock_height))){
+        zx7_Decompress(uncompressed, senslock_compressed);
+        gfx_TransparentSprite(uncompressed, xStart + 2, yStart + 86);
+        free(uncompressed);
+    }
+    if(!player->target.sensor) gfx_PrintStringXY("no target", xStart+ 20, yStart+88);
     for(i = 0; i < map_size; i++){
         MapData_t *entity = &map[i];
         if(entity->entitytype){
@@ -327,15 +333,15 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                 int render_x, render_y, conv_dist;
                 unsigned char anglexz = byteATan(dz, dx);
                 unsigned char angley = byteATan(dy, dx);
-                if(entity->entitytype>1){
-                    gfx_SetTextXY(xStart + 20, yStart + 78);
-                    gfx_PrintUInt(anglexz, 2);
-                    gfx_SetTextXY(xStart + 60, yStart + 78);
-                    gfx_PrintUInt(angley, 2);
-                    gfx_SetTextXY(xStart + 20, yStart + 88);
-                    gfx_PrintUInt(distance, 6);
-                    gfx_SetTextXY(xStart + 20, yStart + 98);
-                    gfx_PrintUInt(RENDER_DISTANCE, 6);
+                if(player->target.sensor - 1 == i) {
+                    gfx_SetTextXY(xStart + 20, yStart + 82);
+                    gfx_PrintUInt(distance, lcars_GetIntLength(distance));
+                    gfx_PrintString("km, ");
+                    gfx_SetTextXY(xStart + 20, yStart + 92);
+                    gfx_PrintUInt(anglexz, lcars_GetIntLength(anglexz));
+                    gfx_PrintString("x");
+                    gfx_PrintUInt(angley, lcars_GetIntLength(angley));
+                    gfx_PrintString(" deg");
                 }
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
                 render_x = conv_dist * byteCos(anglexz-64) / 128;
@@ -357,6 +363,10 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                 }
                 gfx_SetColor(color);
                 gfx_FillCircle(xmid + render_x, ymid + render_y, size);
+                if(player->target.sensor - 1 == i) {
+                    gfx_SetColor(239);
+                    gfx_Circle(xmid + render_x, ymid + render_y, size+1);
+                }
             }
         }
     }

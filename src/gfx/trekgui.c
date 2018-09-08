@@ -3,7 +3,7 @@
 #include "trekgui.h"
 
 #include <fileioc.h>
-uint8_t *trekgui[22] = {
+uint8_t *trekgui[23] = {
  (uint8_t*)0,
  (uint8_t*)69,
  (uint8_t*)116,
@@ -26,6 +26,7 @@ uint8_t *trekgui[22] = {
  (uint8_t*)2588,
  (uint8_t*)2644,
  (uint8_t*)2675,
+ (uint8_t*)2792,
 };
 
 bool trekgui_init(void) {

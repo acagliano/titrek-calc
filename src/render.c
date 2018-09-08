@@ -39,7 +39,7 @@ char GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *pl
                 renderitem_t *render = &renderbuffer[count++];
                 render->spriteid = item->entitytype-1;
                 render->distance = (RENDER_DISTANCE - distance) * 100 / RENDER_DISTANCE;
-                render->angle = diff_xz;
+                render->angle = diff_xz>>1;
                 diff_xz += 32;
                 render->x = vWidth * diff_xz / 64 ;
                 diff_y += 32;

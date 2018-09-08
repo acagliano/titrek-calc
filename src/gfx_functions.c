@@ -15,7 +15,7 @@
 #include <math.h>
 
 
-const char *trek_version = "v0.73 alpha";
+const char *trek_version = "v0.75 alpha";
 
 
 void lcars_DrawHealthBar(int percent, char scale, int x, int y, bool text){

@@ -19,8 +19,7 @@ void map_MoveObjects(MapData_t* map, char tick){
         MapData_t *entity = &map[i];
         if(entity->entitytype){
             if(entity->mobile){
-                if(!tick) proc_MoveEntity(&entity->position, entity->speed>>1);
-                else proc_MoveEntity(&entity->position, entity->speed % 2);
+                proc_MoveEntity(&entity->position, entity->speed, tick);
                 if(!entity->entitystats.weapon.range--) memset(entity, 0, sizeof(MapData_t));
             }
         }

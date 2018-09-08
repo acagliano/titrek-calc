@@ -73,6 +73,7 @@ typedef struct {
 typedef struct {
     angles_t angles;
     char target;
+    char sensor;
 } target_t;
 
 typedef struct {

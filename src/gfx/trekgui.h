@@ -6,9 +6,9 @@
 
 #include <stdbool.h>
 
-#define trekgui_num 22
+#define trekgui_num 23
 
-extern uint8_t *trekgui[22];
+extern uint8_t *trekgui[23];
 #define tactical_width 20
 #define tactical_height 41
 #define tactical_compressed ((gfx_sprite_t*)trekgui[0])
@@ -75,6 +75,9 @@ extern uint8_t *trekgui[22];
 #define target_width 30
 #define target_height 30
 #define target_compressed ((gfx_sprite_t*)trekgui[21])
+#define senslock_width 12
+#define senslock_height 12
+#define senslock_compressed ((gfx_sprite_t*)trekgui[22])
 bool trekgui_init(void);
 
 #endif

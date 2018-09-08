@@ -437,6 +437,23 @@ void main(void) {
                 char i = (activeweapon->techtype == tt_phaser) ? tt_torpedo : tt_phaser;
                 activeweapon = init_SetPointer(&ShipModules, looplimit, i, 0);
             }
+            if(player->ScreenSelected == SCRN_SENSORS){
+                char i;
+                char size = sizeof(MapMain) / sizeof(MapData_t);
+                for(i = (player->target.sensor + 1); i <= size; i++){
+                    if(i){
+                        MapData_t *item = &MapMain[i-1];
+                        if(item->entitytype){
+                            int dx = item->position.coords.x - player->position.coords.x;
+                            int dy = item->position.coords.y - player->position.coords.y;
+                            int dz = item->position.coords.z - player->position.coords.z;
+                            unsigned int distance = sqrt(r_GetDistance(dx, dy, dz));
+                            if(distance <= sensors->stats.sysstats.sensor_range) break;
+                        }
+                    }
+                }
+                player->target.sensor = (i <= size) ? i : 0;
+            }
         }
         keys_prior[k_Alpha] = key;
         
@@ -842,11 +859,8 @@ void main(void) {
         }
         gfx_DrawSpeedIndicator(speed, topspeed_warp, topspeed_impulse, gfx_initialized[gui_enabled]);
         integrityhealth = integrity->health * 100 / integrity->maxHealth;
-        if(speed){
-            bool remainder = player->tick % 2;
-            if(!remainder) proc_MoveEntity(&player->position, speed>>1);
-            else proc_MoveEntity(&player->position, speed % 2);
-        }
+        if(speed) proc_MoveEntity(&player->position, speed, player->tick % 2);
+        
         map_MoveObjects(&MapMain, player->tick % 2);
         gfx_BlitBuffer();
         player->tick++;

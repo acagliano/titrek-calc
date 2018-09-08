@@ -81,9 +81,11 @@ void PROC_PowerDraw(Module_t *ShipModules, char repairing){
     }
 }
 
-void proc_MoveEntity(Position_t *pos, char speed){
+void proc_MoveEntity(Position_t *pos, char speed, bool tickodd){
     int coord_x = pos->coords.x, coord_y = pos->coords.y, coord_z = pos->coords.z;
     int vector_x = pos->vectors.x, vector_y = pos->vectors.y, vector_z = pos->vectors.z;
+    if(!tickodd) speed = speed>>1;
+    if(tickodd) speed = (speed % 2) ? speed % 2 : speed>>1;
     coord_x += (speed * vector_x);
     coord_y += (speed * vector_y);
     coord_z += (speed * vector_z);

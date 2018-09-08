@@ -5,7 +5,7 @@ using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-22:
+23:
  tactical : converted! (822 > 69 bytes)
  power_alert : converted! (402 > 47 bytes)
  ship_alert : converted! (1742 > 173 bytes)
@@ -28,6 +28,7 @@ transparent color : 0x0000
  ship_icon : converted! (258 > 56 bytes)
  range_icon : converted! (146 > 31 bytes)
  target : converted! (902 > 117 bytes)
+ senslock : converted! (146 > 26 bytes)
 
 --- trekvfx (C) ---
 using built-in xlibc palette ...
@@ -65,6 +66,7 @@ exporting appvar: trekgui.8xp
  ship_icon
  range_icon
  target
+ senslock
 exporting appvar: trekvfx.8xp
  narada
  phaser
@@ -73,7 +75,7 @@ exporting appvar: trekvfx.8xp
  shield_flare
  explosion
 
-converted in 0 s
+converted in 1 s
 
 [warning] image quality might be too low.
 please try grouping similar images, reducing image colors, 
