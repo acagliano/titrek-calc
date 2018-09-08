@@ -25,13 +25,13 @@ char GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *pl
         item_x = item->position.coords.x;
         item_y = item->position.coords.y;
         item_z = item->position.coords.z;
-        distance_x = item_x - player_x;
-        distance_y = item_y - player_y;
-        distance_z = item_z - player_z;
-        distance = (unsigned int)sqrt(r_GetDistance(distance_x, distance_y, distance_z));
+        distance_x = (item_x>>8) - (player_x>>8);
+        distance_y = (item_y>>8) - (player_y>>8);
+        distance_z = (item_z>>8) - (player_z>>8);
+        distance = (unsigned long)sqrt(r_GetDistance(distance_x, distance_y, distance_z));
         if(distance < RENDER_DISTANCE){
-            unsigned char objectvect_xz = byteATan(distance_z, distance_x);
-            unsigned char objectvect_y = byteATan(distance_y, distance_x);
+            unsigned char objectvect_xz = byteATan(distance_y, distance_x);
+            unsigned char objectvect_y = byteATan(distance_z, distance_x);
             char diff_xz = compareAngles(objectvect_xz, playerpos->angles.xz);
             char diff_y = compareAngles(objectvect_y, playerpos->angles.y);
             if((abs(diff_xz) <= 32) && (abs(diff_y) <= 32)){

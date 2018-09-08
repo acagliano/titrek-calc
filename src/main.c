@@ -430,10 +430,10 @@ void main(void) {
                     if(i){
                         MapData_t *item = &MapMain[i-1];
                         if(item->entitytype){
-                            int dx = item->position.coords.x - player->position.coords.x;
-                            int dy = item->position.coords.y - player->position.coords.y;
-                            int dz = item->position.coords.z - player->position.coords.z;
-                            unsigned int distance = sqrt(r_GetDistance(dx, dy, dz));
+                            int dx = (item->position.coords.x>>8) - (player->position.coords.x>>8);
+                            int dy = (item->position.coords.y>>8) - (player->position.coords.y>>8);
+                            int dz = (item->position.coords.z>>8) - (player->position.coords.z>>8);
+                            unsigned long distance = sqrt(r_GetDistance(dx, dy, dz));
                             if(distance <= sensors->stats.sysstats.sensor_range) break;
                         }
                     }
@@ -560,7 +560,7 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.y++;
+                    player->position.angles.y+=2;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
@@ -589,7 +589,7 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.y--;
+                    player->position.angles.y-=2;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
@@ -617,7 +617,7 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.xz++;
+                    player->position.angles.xz+=2;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
@@ -640,7 +640,7 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.xz--;
+                    player->position.angles.xz-=2;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:

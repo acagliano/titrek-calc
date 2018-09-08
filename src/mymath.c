@@ -9,7 +9,6 @@ const int arctanLUT[64] = {0, 3, 6, 9, 12, 15, 18, 22, 25, 28, 31, 35, 38, 41, 4
 
 unsigned long r_GetDistance(int xdiff, int ydiff, int zdiff){
     unsigned long distance;
-    xdiff = xdiff>>8; ydiff = ydiff>>8; zdiff = zdiff>8;
     distance = xdiff * xdiff + ydiff * ydiff + zdiff * zdiff;
     return distance;
 }
@@ -28,6 +27,7 @@ unsigned char byteATan(long non_x, long x){
     if(x == 0){     // handle infinity
         if(non_x > 0) return 63;    // 90 degrees
         if(non_x < 0) return 191;    // 270 degrees
+        if(x == 0) return 0;
     }
     if(non_x == 0){
         if(x > 0) return 0;
@@ -50,8 +50,8 @@ unsigned char byteATan(long non_x, long x){
 void AnglesToVectors(Position_t *pos){
     unsigned char xzangle = pos->angles.xz, yangle = pos->angles.y;
     pos->vectors.x = byteCos(xzangle) * byteCos(yangle) / 128;
-    pos->vectors.z = byteSin(xzangle) * byteCos(yangle) / 128;
-    pos->vectors.y = byteSin(yangle);
+    pos->vectors.y = byteSin(xzangle) * byteCos(yangle) / 128;
+    pos->vectors.z = byteSin(yangle);
     //pos->vectors[2] = z vector
 }
 

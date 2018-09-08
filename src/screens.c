@@ -325,14 +325,14 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
         if(entity->entitytype){
             unsigned long distance;
             unsigned char color, size;
-            int dx = entity->position.coords.x - player->position.coords.x;
-            int dy = entity->position.coords.y - player->position.coords.y;
-            int dz = entity->position.coords.z - player->position.coords.z;
-            distance = (unsigned int)sqrt(r_GetDistance(dx, dy, dz));
+            long dx = (entity->position.coords.x>>8) - (player->position.coords.x>>8);
+            long dy = (entity->position.coords.y>>8) - (player->position.coords.y>>8);
+            long dz = (entity->position.coords.z>>8) - (player->position.coords.z>>8);
+            distance = (unsigned long)sqrt(r_GetDistance(dx, dy, dz));
             if(distance <= sens_range){
                 int render_x, render_y, conv_dist;
-                unsigned char anglexz = byteATan(dz, dx);
-                unsigned char angley = byteATan(dy, dx);
+                unsigned char anglexz = byteATan(dy, dx);
+                unsigned char angley = byteATan(dz, dx);
                 if(player->target.sensor - 1 == i) {
                     gfx_SetTextXY(xStart + 20, yStart + 82);
                     gfx_PrintUInt(distance, lcars_GetIntLength(distance));
@@ -342,6 +342,12 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                     gfx_PrintString("x");
                     gfx_PrintUInt(angley, lcars_GetIntLength(angley));
                     gfx_PrintString(" deg");
+                   gfx_SetTextXY(xStart + 20, yStart + 102);
+                    gfx_PrintUInt(entity->position.coords.x>>8, 5);
+                    gfx_SetTextXY(xStart + 20, yStart + 112);
+                    gfx_PrintUInt(entity->position.coords.y>>8, 5);
+                    gfx_SetTextXY(xStart + 20, yStart + 122);
+                    gfx_PrintUInt(entity->position.coords.z>>8, 5);
                 }
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
                 render_x = conv_dist * byteCos(anglexz-64) / 128;
