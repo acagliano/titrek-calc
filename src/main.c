@@ -83,17 +83,7 @@ renderitem_t renderbuffer[20] = {0};
 Module_t *activeweapon = NULL;
 gfx_sprite_t *sprites[trekvfx_num];
 const char *GameSave = "TrekSave";
-#define shields ((Module_t*)&ShipModules[tt_shield-1])
-#define integrity ((Module_t*)&ShipModules[tt_integrity-1])
-#define lifesupport ((Module_t*)&ShipModules[tt_lifesupport-1])
-#define warpdrive ((Module_t*)&ShipModules[tt_warpdrive-1])
-#define impulsedrive ((Module_t*)&ShipModules[tt_impulsedrive-1])
-#define phaser ((Module_t*)&ShipModules[tt_phaser-1])
-#define torpedo ((Module_t*)&ShipModules[tt_torpedo-1])
-#define sensors ((Module_t*)&ShipModules[tt_sensor-1])
-#define transporter ((Module_t*)&ShipModules[tt_transporter-1])
-#define auxpower ((Module_t*)&ShipModules[tt_auxiliary-1])
-#define warpcore ((Module_t*)&ShipModules[tt_warpcore-1])
+#include "moduledefaults.h"
 
 void main(void) {
     bool loopgame = true, key = false;
@@ -404,15 +394,11 @@ void main(void) {
                         // copy and offset position
                         Position_t *playerpos = &player->position;
                         Position_t *entitypos = &slot->position;
-                        entitypos->coords.x = playerpos->coords.x;
-                        entitypos->coords.y = playerpos->coords.y;
-                        entitypos->coords.z = playerpos->coords.z;
-                        entitypos->angles.xz = playerpos->angles.xz;
-                        entitypos->angles.y = playerpos->angles.y;
+                        memcpy(entitypos, playerpos, sizeof(Position_t));
                         slot->speed = activeweapon->stats.weapstats.speed;
-                        entitypos->angles.xz += player->target.angles.xz;
-                        entitypos->angles.y += player->target.angles.y;
-                        AnglesToVectors(entitypos);
+                        //entitypos->angles.xz += player->target.angles.xz;
+                        //entitypos->angles.y += player->target.angles.y;
+                        // AnglesToVectors(entitypos);
                         entitypos->coords.x += (entitypos->vectors.x<<4);
                         entitypos->coords.y += (entitypos->vectors.y<<4);
                         entitypos->coords.z += (entitypos->vectors.z<<4);
@@ -533,7 +519,7 @@ void main(void) {
             shiphit.bleedthrough = damage;
             drv = 0;
             if(integrity->online){
-                drv = integrity->stats.sysstats.resistance;
+                drv = integrity->stats.sysstats.resistance * int_drv / 100;
                 if(int_drv < 25) drv = drv>>1;
                 if(int_drv == 0) drv = 0;
                 integrity->health -= damage>>1;
@@ -578,7 +564,7 @@ void main(void) {
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.y < 32) player->target.angles.y+=4;
+                    if(player->target.angles.y < 32) player->target.angles.y+=2;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Down]){
@@ -607,7 +593,7 @@ void main(void) {
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.y > -32) player->target.angles.y-=4;
+                    if(player->target.angles.y > -32) player->target.angles.y-=2;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Up]){
@@ -635,7 +621,7 @@ void main(void) {
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.xz < 31) player->target.angles.xz+=4;
+                    if(player->target.angles.xz < 31) player->target.angles.xz+=2;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Right]){
@@ -658,7 +644,7 @@ void main(void) {
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
-                    if(player->target.angles.xz > -32) player->target.angles.xz-=4;
+                    if(player->target.angles.xz > -32) player->target.angles.xz-=2;
                     break;
                 case SCRN_POWER:
                     if(key && !keys_prior[k_Left]){
@@ -675,22 +661,7 @@ void main(void) {
       
         
         if(player->tick % POWER_INTERVAL == 0){
-            PROC_PowerDraw(&ShipModules, modulerepairing);
-            if(speed < 10 && speed > 0){
-                impulsedrive->powerReserve -= speed;
-                if(impulsedrive->powerReserve <= 0) {
-                    impulsedrive->powerReserve = 0;
-                    impulsedrive->online = false;
-                }
-            }
-            if(speed >= 10){
-                warpdrive->powerReserve -= (speed / 2);
-                if(warpdrive->powerReserve <= 0) {
-                    warpdrive->powerReserve = 0;
-                    warpdrive->online = false;
-                }
-            }
-            PROC_PowerCycle(&ShipModules, warpcore, auxpower, modulerepairing, &player, !player->powersource);
+            proc_PowerCycle(&ShipModules, looplimit, modulerepairing, speed, &player, !player->powersource, warpcore, auxpower);
         }
 
         if(player->tick % REPAIR_INTERVAL == 0){

@@ -365,7 +365,7 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
                 gfx_FillCircle(xmid + render_x, ymid + render_y, size);
                 if(player->target.sensor - 1 == i) {
                     gfx_SetColor(239);
-                    gfx_Circle(xmid + render_x, ymid + render_y, size+1);
+                    gfx_Rectangle(xmid + render_x - size - 1, ymid + render_y - size - 1, (size<<1) + 3, (size<<1) + 3);
                 }
             }
         }

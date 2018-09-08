@@ -12,12 +12,27 @@ void Module_NoPower(Module_t* module){
     module->online = false;
 }
 
-void PROC_PowerCycle(Module_t *ShipModules, Module_t *warpcore, Module_t *auxpower, char repairing, Player_t *player, bool powerwarp){
+void proc_DrawPower(Module_t *module){
+    // process module energy expenditure
+    module->powerReserve -= module->powerDraw;
+    if(module->powerReserve <= 0) Module_NoPower(module);
+}
+
+void proc_ConditionalDraw(Module_t *module, char draw){
+    module->powerReserve -= draw;
+    if(module->powerReserve <= 0) {
+        module->powerReserve = 0;
+        module->online = false;
+    }
+}
+
+void proc_PowerCycle(Module_t *ShipModules, char limit, char repairing, char speed, Player_t *player, bool powerwarp, Module_t *warpcore, Module_t *auxpower){
     // process energy production and charge modules
     unsigned char i;
     char warphealth, drawreduction = 100;
     int powerout;
     bool status = true;
+    
     if(warpcore->techtype == tt_warpcore && warpcore->online && powerwarp == true){
         warphealth = warpcore->health * 100 / warpcore->maxHealth;
         powerout = warpcore->stats.sysstats.powerOut;
@@ -33,17 +48,26 @@ void PROC_PowerCycle(Module_t *ShipModules, Module_t *warpcore, Module_t *auxpow
         auxpower->powerReserve = 0;
         player->powersource = 1;
     }
-    for(i = 0; i < 15; i++){
+    for(i = 0; i < limit; i++){
         Module_t *module = &ShipModules[i];
            // gfx_DrawPowerStatusIcon(false);
-        if(!powerout) break;
-        if(module->techtype && (module->techtype <= tt_transporter) && module->powerReserve < 256 && i != repairing){
-            if(drawreduction == 100 && (module->powerDraw == module->powerDefault))
+        if(module->techtype){
+            // if module online and draws power constantly, draw power
+            if(module->online && module->pdConstant) proc_DrawPower(module);
+            // if module repairing and not at max health
+            if(i == repairing && module->health < module->maxHealth) proc_DrawPower(module);
+            if(module->techtype == tt_impulsedrive)
+                if(speed && (speed < 10)) proc_ConditionalDraw(module, speed);
+            if(module->techtype == tt_warpdrive)
+                if(speed && (speed >= 10)) proc_ConditionalDraw(module, speed>>1);
+            if((module->techtype <= tt_transporter) && module->powerReserve < 256 && i != repairing){
+                if(drawreduction == 100 && (module->powerDraw == module->powerDefault))
                 drawreduction = (module->powerReserve < 256) ? 120 : 100;
-            powerout -= (module->powerDefault * drawreduction / 100);
-            module->powerReserve += (module->powerDefault * drawreduction / 100);
-            if(module->powerReserve < 64) status = false;
-            if(module->powerReserve >= 256) module->powerReserve = 256;
+                powerout -= (module->powerDefault * drawreduction / 100);
+                module->powerReserve += (module->powerDefault * drawreduction / 100);
+                if(module->powerReserve < 64) status = false;
+                if(module->powerReserve >= 256) module->powerReserve = 256;
+            }
         }
     }
     auxpower->powerReserve += powerout;
@@ -63,23 +87,6 @@ void PROC_PowerCycle(Module_t *ShipModules, Module_t *warpcore, Module_t *auxpow
     }
 }
 
-void PROC_PowerDraw(Module_t *ShipModules, char repairing){
-    // process module energy expenditure
-    unsigned char i;
-    for(i = 0; i < 15; i++){
-        Module_t* module = &ShipModules[i];
-        if(module->techtype){
-            if(module->online == true && module->pdConstant){
-               module->powerReserve -= module->powerDraw;
-               if(module->powerReserve <= 0) Module_NoPower(module);
-            }
-            else if(i == repairing && module->health < module->maxHealth){
-                module->powerReserve -= module->powerDraw;
-                if(module->powerReserve <= 0) Module_NoPower(module);
-            }
-        }
-    }
-}
 
 void proc_MoveEntity(Position_t *pos, char speed, bool tickodd){
     int coord_x = pos->coords.x, coord_y = pos->coords.y, coord_z = pos->coords.z;
