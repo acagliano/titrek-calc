@@ -21,31 +21,6 @@ signed short byteSin(unsigned char x){
     return byteCos(x-64);
 }
 
-unsigned char byteATan(long non_x, long x){
-    char index = 63, quadrant;
-    int value;
-    if(x == 0){     // handle infinity
-        if(non_x > 0) return 63;    // 90 degrees
-        if(non_x < 0) return 191;    // 270 degrees
-        if(x == 0) return 0;
-    }
-    if(non_x == 0){
-        if(x > 0) return 0;
-        if(x < 0) return 127;
-    }
-    
-    if(non_x > 0 && x > 0) quadrant = 0;
-    else if(non_x > 0 && x < 0) quadrant = 1;
-    else if(non_x < 0 && x < 0) quadrant = 2;
-    else quadrant = 3;
-    if(!(quadrant & 1))  value = abs(127 * non_x / x);
-    else value = abs(127 * x / non_x);
-    while(index > 0){
-        if(value >= arctanLUT[index]) break;
-        index--;
-    }
-   return 64 * quadrant + index;
-}
 
 void AnglesToVectors(Position_t *pos){
     unsigned char xzangle = pos->angles.xz, yangle = pos->angles.y;

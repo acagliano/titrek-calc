@@ -58,9 +58,9 @@ typedef struct {
     speed_t speed;
     speed_t topspeed;
     struct {
-        unsigned long x;
-        unsigned long y;
-        unsigned long z;
+        signed long x;
+        signed long y;
+        signed long z;
     } coords;
     struct {
         signed short x;

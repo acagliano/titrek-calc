@@ -6,9 +6,9 @@
 
 #include <stdbool.h>
 
-#define trekgui_num 23
+#define trekgui_num 25
 
-extern uint8_t *trekgui[23];
+extern uint8_t *trekgui[25];
 #define tactical_width 20
 #define tactical_height 41
 #define tactical_compressed ((gfx_sprite_t*)trekgui[0])
@@ -78,6 +78,12 @@ extern uint8_t *trekgui[23];
 #define senslock_width 12
 #define senslock_height 12
 #define senslock_compressed ((gfx_sprite_t*)trekgui[22])
+#define ship_select_1_width 94
+#define ship_select_1_height 52
+#define ship_select_1_compressed ((gfx_sprite_t*)trekgui[23])
+#define ship_select_2_width 98
+#define ship_select_2_height 48
+#define ship_select_2_compressed ((gfx_sprite_t*)trekgui[24])
 bool trekgui_init(void);
 
 #endif

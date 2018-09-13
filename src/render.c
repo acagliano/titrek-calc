@@ -9,41 +9,38 @@
 #include "equates.h"
 #include "gfx/trekvfx.h"
 #include <compression.h>
+//#include "asm/asmheaders.h"
 
 char GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *playerpos){
     char i, count = 0;
     double val = 180/M_PI;
-    unsigned long player_x = playerpos->coords.x;
-    unsigned long player_y = playerpos->coords.y;
-    unsigned long player_z = playerpos->coords.y;
-    unsigned long item_x, item_y, item_z;
-    long distance_x, distance_y, distance_z;
-    unsigned long distance;
+    signed long player_x = playerpos->coords.x;
+    signed long player_y = playerpos->coords.y;
+    signed long player_z = playerpos->coords.y;
     memset(renderbuffer, 0, sizeof(renderitem_t) * 20);
     for(i=0; i<20; i++){
         MapData_t *item = &map[i];
-        item_x = item->position.coords.x;
-        item_y = item->position.coords.y;
-        item_z = item->position.coords.z;
-        distance_x = (item_x>>8) - (player_x>>8);
-        distance_y = (item_y>>8) - (player_y>>8);
-        distance_z = (item_z>>8) - (player_z>>8);
-        distance = (unsigned long)sqrt(r_GetDistance(distance_x, distance_y, distance_z));
-        if(distance < RENDER_DISTANCE){
-            unsigned char objectvect_xz = byteATan(distance_y, distance_x);
-            unsigned char objectvect_y = byteATan(distance_z, distance_x);
-            char diff_xz = compareAngles(objectvect_xz, playerpos->angles.xz);
-            char diff_y = compareAngles(objectvect_y, playerpos->angles.y);
-            if((abs(diff_xz) <= 32) && (abs(diff_y) <= 32)){
-                int vcenter = vHeight>>1 + yStart;
-                renderitem_t *render = &renderbuffer[count++];
-                render->spriteid = item->entitytype-1;
-                render->distance = (RENDER_DISTANCE - distance) * 100 / RENDER_DISTANCE;
-                render->angle = diff_xz>>1;
-                diff_xz += 32;
-                render->x = vWidth * diff_xz / 64 ;
-                diff_y += 32;
-                render->y = vHeight * diff_y / 64 + (2 * (RENDER_DISTANCE - distance));
+        if(item->entitytype){
+            signed long dx = (item->position.coords.x>>8) - (player_x>>8);
+            signed long dy = (item->position.coords.y>>8) - (player_y>>8);
+            signed long dz = (item->position.coords.z>>8) - (player_z>>8);
+            unsigned long distance = (unsigned long)sqrt(r_GetDistance(dx, dy, dz));
+            if(distance < RENDER_DISTANCE){
+                unsigned char objectvect_xz = atan2d(dy, dx);
+                unsigned char objectvect_y = atan2d(dz, abs(dx));
+                char diff_xz = compareAngles(objectvect_xz, playerpos->angles.xz);
+                char diff_y = compareAngles(objectvect_y, playerpos->angles.y);
+                if((abs(diff_xz) <= 45) && (abs(diff_y) <= 45)){
+                    int vcenter = vHeight>>1 + yStart;
+                    renderitem_t *render = &renderbuffer[count++];
+                    render->spriteid = item->entitytype-1;
+                    render->distance = (RENDER_DISTANCE - distance) * 100 / RENDER_DISTANCE;
+                    render->angle = diff_xz>>1;
+                    diff_xz += 32;
+                    render->x = vWidth * diff_xz / 64 ;
+                    diff_y += 32;
+                    render->y = vHeight * diff_y / 64 + (2 * (RENDER_DISTANCE - distance));
+                }
             }
         }
     }

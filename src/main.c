@@ -89,6 +89,7 @@ void main(void) {
     bool loopgame = true, key = false;
     char looplimit = sizeof(ShipModules) / sizeof(Module_t);
     bool gfx_initialized[2];
+    ti_var_t import;
     animation_t animation[2] = {0};
     animation_t *temp;
     gfx_sprite_t* uncompressed;
@@ -146,107 +147,70 @@ void main(void) {
     }
     gfx_SetTextFGColor(255);
 	/* Fill in the body of the main function here */
-    for(i = 1; i <= 11; i++){
-        Module_t *module;
-        if(i <= 9) module = &ShipModules[i-1];
-        else {
-            if(i == 10) module = &ShipModules[tt_warpcore-1];
-            if(i == 11) module = &ShipModules[tt_auxiliary-1];
-        }
-        module->online = true;
-        module->techtype = i;
-        module->health = 50;
-        module->maxHealth = 50;
-        module->powerReserve = 256;
-        module->powerDraw = 5;
-        module->powerDefault = 5;
-        module->pdConstant = true;
-        switch(i){
-            case tt_shield:
-                strcpy(module->techname, "Shields");
-                module->location = 0;
-                module->stats.shieldstats.resistance = 5;
-                module->stats.shieldstats.modulation = randInt(0, 255);
-                break;
-            case tt_integrity:
-                module->location = 0;
-                module->stats.sysstats.resistance = 1;
-                strcpy(module->techname, "Integrity");
-                break;
-            case tt_lifesupport:
-                module->location = aft;
-                strcpy(module->techname, "LifeSupp");
-                break;
-            case tt_warpdrive:
-                module->location = nacelles;
-                module->pdConstant = false;
-                module->stats.sysstats.topSpeed = 11;
-                strcpy(module->techname, "WarpDrive");
-                break;
-            case tt_impulsedrive:
-                module->location = aft;
-                module->pdConstant = false;
-                module->stats.sysstats.topSpeed = 4;
-                module->powerDraw = 4;
-                module->powerDefault = 4;
-                strcpy(module->techname, "ImpulseDr");
-                break;
-            case tt_transporter:
-                module->location = saucer;
-                module->pdConstant = false;
-                strcpy(module->techname, "Transport");
-                break;
-            case tt_sensor:
-                module->location = saucer;
-                module->stats.sysstats.sensor_range = 300;
-                module->pdConstant = true;
-                strcpy(module->techname, "Sensors");
-                break;
-            case tt_phaser:
-                module->location = saucer;
-                module->powerDraw = 10;
-                module->powerDefault = 10;
-                module->pdConstant = false;
-                module->stats.weapstats.charge = 0;
-                module->stats.weapstats.maxCharge = 5;
-                module->stats.weapstats.damage_shield = 2;
-                module->stats.weapstats.damage_hull = 1;
-                module->stats.weapstats.range = 25;
-                module->stats.weapstats.speed = 20;
-                strcpy(module->techname, "Phasers");
-                strcpy(module->stats.weapstats.weapname, "Pulse");
-                break;
-            case tt_torpedo:
-                module->location = saucer;
-                module->pdConstant = false;
-                module->stats.weapstats.damage_shield = 1;
-                module->stats.weapstats.damage_hull = 3;
-                module->stats.weapstats.range = 50;
-                module->stats.weapstats.speed = 10;
-                strcpy(module->techname, "Torpedo");
-                strcpy(module->stats.weapstats.weapname, "Photon");
-                break;
-            case 10:
-                module->techtype = tt_warpcore;
-                module->pdConstant = false;
-                strcpy(module->techname, "WarpCore");
-                module->powerReserve = 256;
-                module->stats.sysstats.powerOut = 50;
-                break;
-            case 11:
-                module->techtype = tt_auxiliary;
-                module->pdConstant = false;
-                strcpy(module->techname, "AuxPower");
-                module->powerReserve = 0;
-                module->stats.sysstats.auxiliarymax = 5000;
-                break;
-            default:
-                strcpy(module->techname, "Unsupport");
-        }
+   // Select ship to use
+    gfx_ZeroScreen();
+    gfx_SetTextFGColor(231);
+    gfx_PrintStringXY("Select Ship Class:", 75, 30);
+    i = 0;
+    gfx_SetColor(231);
+    gfx_FillRectangle(50, 50, 100, 150);
+    gfx_FillRectangle(175, 50, 100, 150);
+    if(!(import = ti_Open("TrekShip", "r"))) {
+        gfx_End();
+        prgm_CleanUp();
+        ti_CloseAll();
+        return;
     }
+    gfx_SetTextFGColor(0);
+    gfx_PrintStringXY("Constitution", 57, 55);
+    gfx_PrintStringXY("heavy cruiser", 53, 125);
+    zx7_Decompress(buffers.uncompressed, drv_icon_compressed);
+    gfx_TransparentSprite(buffers.uncompressed, 60, 140);
+    zx7_Decompress(buffers.uncompressed, health_icon_compressed);
+    gfx_TransparentSprite(buffers.uncompressed, 60, 155);
+    zx7_Decompress(buffers.uncompressed, hull_dmg_icon_compressed);
+    gfx_TransparentSprite(buffers.uncompressed, 60, 170);
+    gfx_PrintStringXY("* 3", 75, 142);
+    gfx_PrintStringXY("* 2", 75, 157);
+    gfx_PrintStringXY("* 2", 75, 172);
+    gfx_PrintStringXY("Defiant", 195, 55);
+    gfx_PrintStringXY("combat vessel", 178, 125);
+    zx7_Decompress(buffers.uncompressed, impulsespeed_icon_compressed);
+    gfx_TransparentSprite(buffers.uncompressed, 185, 140);
+    zx7_Decompress(buffers.uncompressed, splash_dmg_icon_compressed);
+    gfx_TransparentSprite(buffers.uncompressed, 190, 155);
+    gfx_PrintStringXY("+ 2", 210, 144);
+    gfx_PrintStringXY("* 2", 210, 157);
+    gfx_PrintStringXY("Quantum", 177, 168);
+    gfx_PrintStringXY("Torpedoes", 177, 178);
     
+    zx7_Decompress(buffers.uncompressed, ship_select_1_compressed);
+    gfx_TransparentSprite(buffers.uncompressed, 50, 70);
     
-    
+    zx7_Decompress(buffers.uncompressed, ship_select_2_compressed);
+    gfx_TransparentSprite(buffers.uncompressed, 175, 70);
+    gfx_BlitBuffer();
+    gfx_SetTextFGColor(255);
+    do {
+        key = os_GetCSC();
+        gfx_SetColor(0);
+        gfx_Rectangle((i * 125) + 49, 49, 102, 152);
+        gfx_Rectangle((i * 125) + 48, 48, 104, 154);
+        gfx_Rectangle((i * 125) + 47, 47, 106, 156);
+        if(key == sk_Left) i--;
+        if(key == sk_Right) i++;
+        if(i < 0) i = 0;
+        if(i > 1) i = 1;
+        gfx_SetColor(228);
+        gfx_Rectangle((i * 125) + 49, 49, 102, 152);
+        gfx_Rectangle((i * 125) + 48, 48, 104, 154);
+        gfx_Rectangle((i * 125) + 47, 47, 106, 156);
+        gfx_BlitBuffer();
+        
+    } while (key != sk_Enter);
+    if(i == 1) ti_Seek(15 * sizeof(Module_t), SEEK_SET, import);
+    ti_Read(&ShipModules, sizeof(Module_t), 15, import);
+    gfx_SetDrawBuffer();
     activeweapon = phaser;
     boot_ClearVRAM();
     DrawGUI();
@@ -399,9 +363,9 @@ void main(void) {
                         //entitypos->angles.xz += player->target.angles.xz;
                         //entitypos->angles.y += player->target.angles.y;
                         // AnglesToVectors(entitypos);
-                        entitypos->coords.x += (entitypos->vectors.x<<4);
-                        entitypos->coords.y += (entitypos->vectors.y<<4);
-                        entitypos->coords.z += (entitypos->vectors.z<<4);
+                        entitypos->coords.x += entitypos->vectors.x;
+                        entitypos->coords.y += entitypos->vectors.y;
+                        entitypos->coords.z += entitypos->vectors.z;
                         if(activeweapon->techtype == tt_phaser)
                             slot->entitytype = et_phaser;
                         else slot->entitytype = et_photon_projectile;
@@ -413,7 +377,6 @@ void main(void) {
                 }
             }
         }
-        
         keys_prior[k_2nd] = key;
     
         kb_ScanGroup(2);
@@ -489,6 +452,7 @@ void main(void) {
             }
         }
         keys_prior[k_Mul] = key;
+        
         key = kb_Data[6] & kb_Add;
         if( (key && (!keys_prior[k_Add] || player->tick % 5 == 0))){
             if(speed < 10 && speed < topspeed_impulse) player->position.speed.impulse++;
@@ -725,14 +689,6 @@ void main(void) {
                         
                     }
                     gfx_RenderOrientation(anglexz, angley, xStart+17, yStart+vHeight-25);
-                    gfx_Rectangle(xStart + vWidth - 85, yStart+vHeight-23, 85, 23);
-                    gfx_PrintStringXY("Sector:", xStart+vWidth-82, yStart+vHeight-20);
-                    gfx_SetTextXY(xStart+vWidth-82, yStart+vHeight-10);
-                    gfx_PrintUInt(player->position.coords.x>>24, 3);
-                    gfx_PrintString(":");
-                    gfx_PrintUInt(player->position.coords.y>>24, 3);
-                    gfx_PrintString(":");
-                    gfx_PrintUInt(player->position.coords.z>>24, 3);
                 }
                 if(player->ScreenSelected == SCRN_VIEW_TARG){
                     gfx_sprite_t *uncompressed;

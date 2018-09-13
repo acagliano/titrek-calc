@@ -10,6 +10,7 @@
 #include <math.h>
 #include <debug.h>
 #include <stdio.h>
+//#include "asm/asmheaders.h"
 
 
 void GUI_PowerReport(Module_t *ShipModules, char limit, char selected, bool icons_initialized, bool sourcewarp) {
@@ -267,22 +268,43 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     gfx_PrintStringXY("+z", xmid + sens_scrn_origin_x - 20, ymid - 10);
     gfx_PrintStringXY("-x", xmid - 15, yStart + vHeight - 15);
     gfx_PrintStringXY("-z", xmid - sens_scrn_origin_x + 5, ymid - 10); //changed
-    gfx_PrintStringXY("Coordinates:", xStart + 3, yStart + 16);
-    gfx_PrintStringXY("sect", xStart + 9, yStart + 26);
-    gfx_PrintStringXY("coord", xStart + 51, yStart + 26);
-    gfx_SetTextXY(xStart + 2, yStart + 36);
+    gfx_PrintStringXY("Quad: ", xStart + 3, yStart + 16);
+    if(player->position.coords.z >= 0){
+        if(player->position.coords.x >= 0){
+            if(player->position.coords.y >= 0) gfx_PrintString("Alpha");
+            else if(player->position.coords.y < 0) gfx_PrintString("Beta");
+        }
+        else if(player->position.coords.x < 0){
+            if(player->position.coords.y > 0) gfx_PrintString("Gamma");
+            else if(player->position.coords.y < 0) gfx_PrintString("Delta");
+        }
+    }
+    else if(player->position.coords.z < 0){
+        if(player->position.coords.x > 0){
+            if(player->position.coords.y > 0) gfx_PrintString("Epsilon");
+            else if(player->position.coords.y < 0) gfx_PrintString("Zeta");
+        }
+        else if(player->position.coords.x < 0){
+            if(player->position.coords.y > 0) gfx_PrintString("Eta");
+            else if(player->position.coords.y < 0) gfx_PrintString("Theta");
+        }
+    }
+    gfx_PrintStringXY("Coordinates:", xStart + 3, yStart + 26);
+    gfx_PrintStringXY("sect", xStart + 9, yStart + 36);
+    gfx_PrintStringXY("coord", xStart + 51, yStart + 36);
+    gfx_SetTextXY(xStart + 2, yStart + 46);
     gfx_PrintString("X: ");
     coord_temp = player->position.coords.x>>8;
     gfx_PrintUInt(coord_temp>>16, 3);
     gfx_PrintString("  |  ");
     gfx_PrintUInt(coord_temp&0xffff, 5);
-    gfx_SetTextXY(xStart + 2, yStart + 46);
+    gfx_SetTextXY(xStart + 2, yStart + 56);
     gfx_PrintString("Y: ");
     coord_temp = player->position.coords.y>>8;
     gfx_PrintUInt(coord_temp>>16, 3);
     gfx_PrintString("  |  ");
     gfx_PrintUInt(coord_temp&0xffff, 5);
-    gfx_SetTextXY(xStart + 2, yStart + 56);
+    gfx_SetTextXY(xStart + 2, yStart + 66);
     gfx_PrintString("Z: ");
     coord_temp = player->position.coords.z>>8;
     gfx_PrintUInt(coord_temp>>16, 3);
@@ -290,16 +312,16 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     gfx_PrintUInt(coord_temp&0xffff, 5);
     if(icons && (uncompressed = gfx_MallocSprite(range_icon_width, range_icon_height))){
         zx7_Decompress(uncompressed, range_icon_compressed);
-        gfx_TransparentSprite(uncompressed, xStart + 2, yStart + 66);
+        gfx_TransparentSprite(uncompressed, xStart + 2, yStart + 76);
         free(uncompressed);
     }
     if(sensors->online){
-        gfx_SetTextXY(xStart + 20, yStart + 68);
+        gfx_SetTextXY(xStart + 20, yStart + 78);
         gfx_PrintUInt(sens_range, lcars_GetIntLength(sens_range));
         gfx_PrintString(" / ");
         gfx_PrintUInt(sensors->stats.sysstats.sensor_range, lcars_GetIntLength(sensors->stats.sysstats.sensor_range));
     }
-    else gfx_PrintStringXY("offline", xStart + 20, yStart + 68);
+    else gfx_PrintStringXY("offline", xStart + 20, yStart + 78);
     if(!sensors->online) return;
     gfx_SetColor(191);
     gfx_Line(xmid, ymid, line_x2 + xmid, line_y2 + ymid);
@@ -316,37 +338,37 @@ void GUI_SensorReadout(MapData_t *map, unsigned int map_size, Player_t *player, 
     }
     if(icons && (uncompressed = gfx_MallocSprite(senslock_width, senslock_height))){
         zx7_Decompress(uncompressed, senslock_compressed);
-        gfx_TransparentSprite(uncompressed, xStart + 2, yStart + 86);
+        gfx_TransparentSprite(uncompressed, xStart + 2, yStart + 96);
         free(uncompressed);
     }
-    if(!player->target.sensor) gfx_PrintStringXY("no target", xStart+ 20, yStart+88);
+    if(!player->target.sensor) gfx_PrintStringXY("no target", xStart+ 20, yStart+98);
     for(i = 0; i < map_size; i++){
         MapData_t *entity = &map[i];
         if(entity->entitytype){
             unsigned long distance;
             unsigned char color, size;
-            long dx = (entity->position.coords.x>>8) - (player->position.coords.x>>8);
-            long dy = (entity->position.coords.y>>8) - (player->position.coords.y>>8);
-            long dz = (entity->position.coords.z>>8) - (player->position.coords.z>>8);
+            signed long dx = (entity->position.coords.x>>8) - (player->position.coords.x>>8);
+            signed long dy = (entity->position.coords.y>>8) - (player->position.coords.y>>8);
+            signed long dz = (entity->position.coords.z>>8) - (player->position.coords.z>>8);
             distance = (unsigned long)sqrt(r_GetDistance(dx, dy, dz));
             if(distance <= sens_range){
                 int render_x, render_y, conv_dist;
-                unsigned char anglexz = byteATan(dy, dx);
-                unsigned char angley = byteATan(dz, dx);
+                unsigned char anglexz = atan2d(dy, dx);
+                unsigned char angley = atand(dz, dx);
                 if(player->target.sensor - 1 == i) {
-                    gfx_SetTextXY(xStart + 20, yStart + 82);
+                    gfx_SetTextXY(xStart + 20, yStart + 92);
                     gfx_PrintUInt(distance, lcars_GetIntLength(distance));
                     gfx_PrintString("km, ");
-                    gfx_SetTextXY(xStart + 20, yStart + 92);
+                    gfx_SetTextXY(xStart + 20, yStart + 102);
                     gfx_PrintUInt(anglexz, lcars_GetIntLength(anglexz));
                     gfx_PrintString("x");
                     gfx_PrintUInt(angley, lcars_GetIntLength(angley));
                     gfx_PrintString(" deg");
-                   gfx_SetTextXY(xStart + 20, yStart + 102);
+                   gfx_SetTextXY(xStart + 20, yStart + 112);
                     gfx_PrintUInt(entity->position.coords.x>>8, 5);
-                    gfx_SetTextXY(xStart + 20, yStart + 112);
-                    gfx_PrintUInt(entity->position.coords.y>>8, 5);
                     gfx_SetTextXY(xStart + 20, yStart + 122);
+                    gfx_PrintUInt(entity->position.coords.y>>8, 5);
+                    gfx_SetTextXY(xStart + 20, yStart + 132);
                     gfx_PrintUInt(entity->position.coords.z>>8, 5);
                 }
                 conv_dist = distance * sens_scrn_origin_x / sens_range;
