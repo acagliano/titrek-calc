@@ -524,7 +524,8 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.y+=2;
+                    if(player->position.angles.y < 62 || player->position.angles.y >= 194)
+                        player->position.angles.y+=2;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:
@@ -553,7 +554,8 @@ void main(void) {
             Module_t* module;
             switch(player->ScreenSelected){
                 case SCRN_VIEW:
-                    player->position.angles.y-=2;
+                    if(player->position.angles.y > 194 || player->position.angles.y <= 62)
+                        player->position.angles.y-=2;
                     AnglesToVectors(&player->position);
                     break;
                 case SCRN_VIEW_TARG:

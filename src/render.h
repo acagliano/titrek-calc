@@ -10,6 +10,8 @@ typedef struct {
     gfx_sprite_t* scaled;
 } buffers_t;
 
+
+
 char GUI_PrepareFrame(MapData_t *map, renderitem_t *renderbuffer, Position_t *playerpos);
 void GUI_RenderFrame(gfx_sprite_t **sprites, buffers_t *buffers, renderitem_t *renderbuffer, char count);
 void gfxinit_DecompressAll(gfx_sprite_t **array);
