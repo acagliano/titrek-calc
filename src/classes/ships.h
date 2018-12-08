@@ -78,25 +78,30 @@ char module_SetOnlineState(module_t* module, char state);   // set module state 
 // EX: 73% of STEP_NORMAL might return 73% of 20 (16), or 70% effectiveness.
 // EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
 
+enum SystemModules {
+    INTEGRITY,
+    WARPCORE,
+    WARPDRIVE,
+    IMPULSEDRIVE,
+    LIFESUPPORT,
+    SENSORS,
+    TRANSPORTERS,
+    MAX_MODULES     // must always be last, see below
+};
+
 
 typedef struct {
-    module_t integrity;
-    module_t warpcore;
-    module_t warpdrive;
-    module_t impulsedrive;
-    module_t lifesupport;
-    module_t sensors;
-    module_t transporters;
+    module_t system[MAX_MODULES];
     module_t tactical[6];    // tactical or shield modules
     module_t misc[3];       // miscellaneous modules
 } ship_t;
 // Core system defines
-#define integrity (module_t*)&ship->integrity;
-#define warpcore (module_t*)&ship->warpcore;
-#define warpdrive (module_t*)&ship->warpdrive;
-#define impulsedrive (module_t*)&ship->impulsedrive;
-#define lifesupport (module_t*)&ship->lifesupport;
-#define sensors (module_t*)&ship->sensors;
-#define transporters (module_t*)&ship->transporters;
+#define integrity (module_t*)&ship->system[INTEGRITY];
+#define warpcore (module_t*)&ship->system[WARPCORE];
+#define warpdrive (module_t*)&ship->system[WARPDRIVE];
+#define impulsedrive (module_t*)&ship->system[IMPULSEDRIVE];
+#define lifesupport (module_t*)&ship->system[LIFESUPPORT];
+#define sensors (module_t*)&ship->system[SENSORS];
+#define transporters (module_t*)&ship->system[TRANSPORTERS];
 
 #endif

@@ -33,12 +33,10 @@ enum ProjectileTypes {
 };
 
 typedef struct {
-    int powerdrain;
     int protection;
 } shield_stats_t;
 
 typedef struct {
-    int powerdrain;
     int protection;
     int weight;
 } integrity_stats_t;
@@ -52,7 +50,6 @@ typedef struct {
 } engine_stats_t;
 
 typedef struct {
-    int powerdrain;
     int targetxz;       // angles for targetting
     int targetxy;       // angles for targetting
     int maxrange;
@@ -63,29 +60,33 @@ typedef struct {
     int reloadtime;
     int shielddamage;
     int normaldamage;
-} weapon_stats_t;
+} projectile_stats_t;
 
-typedef union {
-    weapon_stats_t weapon_stats;
-    sensor_stats_t sensor_stats;
-    integrity_stats_t integrity_stats;
-    shield_stats_t shield_stats;
-    generator_stats_t generator_stats;
-    engine_stats_t engine_stats;
+typedef struct {
+    int powerdrain;
+    union module {
+        weapon_stats_t weapon_stats;
+        sensor_stats_t sensor_stats;
+        integrity_stats_t integrity_stats;
+        shield_stats_t shield_stats;
+        generator_stats_t generator_stats;
+        engine_stats_t engine_stats;
+    } module;
 } module_stats_t;
 
-typedef union {
-    module_stats_t module_stats;
-    projectile_stats_t projectile_stats;
-} sub_stats_t;
+
+typedef struct
 
 
 typedef struct {
-    int techid;     // this is just its place in array, but also its id
-    int techclass;   // ship module, projectile, etc
+    int techclass;      // cooresponds to TechClasses above
     int techtype;   // used to determine if compatible
+    int techid;     // this is just its place in array, but also its id
     int powerdrain; // how much base power this module uses
-    sub_stats_t techinfo;    // import tech-specific info
+    union techinfo {
+        module_stats_t module_stats;
+        projectile_stats_t projectile_stats;
+    } techinfo;
 } stats_t;
 
 #endif
