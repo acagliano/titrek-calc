@@ -9,10 +9,32 @@
 #define DRAW_RESERVE 2
 
 enum ModuleClasses {
-    MODCLASS_SYSTEM = 1,
-    MODCLASS_TACTICAL,
-    MODCLASS_MISC
+    MC_SYSTEM = 1,
+    MC_TACTICAL,
+    MC_MISC
 };
+
+enum SysTypes {
+    M_INTEG,
+    M_LIFESUP,
+    M_CORE,
+    M_WARPDR,
+    M_IMPDR,
+    M_NAVSENS,
+    M_TRANS,
+    M_COMMS,
+    M_SYSMAX
+};
+
+
+enum TactTypes {
+    M_TACTSENS,
+    M_SHIELD,
+    M_PHASER,
+    M_TORPEDO
+};
+
+// for miscellaneous, there is no types, just ids.
 
 typedef struct {
     char priority;          // determines which module draws power first
@@ -59,14 +81,36 @@ void health_DamageModule(health_t* health, int amount);
 #define STEP_DEFAULT 20
 #define STEP_MID 10
 #define STEP_LOW 5
+
+// Module Stats Union
+typedef struct {
+    unsigned char techid;
+    bool reclaimable;
+    union data {
+        
+    };
+} stats_t;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 typedef struct {
     unsigned char techclass;    // locked, determines compatible module classes
     unsigned char techtype;     // locked, determines compatible modules
-    unsigned char techid;   // corresponds to equipped tech id (tech.h)
     char online;            // is module online
     power_t power;          // power control
     health_t health;        // health monitor
-    stats_t stats;
+    stats_t* stats;
 } module_t;
 char module_GetOnlineState(module_t* module);   // return online, offline, or repairing
 char module_SetOnlineState(module_t* module, char state);   // set module state or return no power or no health
@@ -78,30 +122,21 @@ char module_SetOnlineState(module_t* module, char state);   // set module state 
 // EX: 73% of STEP_NORMAL might return 73% of 20 (16), or 70% effectiveness.
 // EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
 
-enum SystemModules {
-    INTEGRITY,
-    WARPCORE,
-    WARPDRIVE,
-    IMPULSEDRIVE,
-    LIFESUPPORT,
-    SENSORS,
-    TRANSPORTERS,
-    MAX_MODULES     // must always be last, see below
-};
 
 
 typedef struct {
-    module_t system[MAX_MODULES];
+    module_t system[M_SYSMAX];
     module_t tactical[6];    // tactical or shield modules
     module_t misc[3];       // miscellaneous modules
 } ship_t;
 // Core system defines
-#define integrity (module_t*)&ship->system[INTEGRITY];
-#define warpcore (module_t*)&ship->system[WARPCORE];
-#define warpdrive (module_t*)&ship->system[WARPDRIVE];
-#define impulsedrive (module_t*)&ship->system[IMPULSEDRIVE];
-#define lifesupport (module_t*)&ship->system[LIFESUPPORT];
-#define sensors (module_t*)&ship->system[SENSORS];
-#define transporters (module_t*)&ship->system[TRANSPORTERS];
+#define integrity (module_t*)&ship->system[M_INTEG];
+#define lifesupport (module_t*)&ship->system[M_LIFESUP];
+#define warpcore (module_t*)&ship->system[M_CORE];
+#define warpdrive (module_t*)&ship->system[M_WARPDR];
+#define impulsedrive (module_t*)&ship->system[M_IMPDR];
+#define navsens (module_t*)&ship->system[M_NAVSENS];
+#define transporters (module_t*)&ship->system[M_TRANS];
+#define comms (module_t*)&ship->system[M_COMMS];
 
 #endif
