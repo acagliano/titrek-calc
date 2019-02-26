@@ -22,9 +22,14 @@ enum SysTypes {
     M_IMPDR,
     M_NAVSENS,
     M_TRANS,
-    M_COMMS,
     M_SYSMAX
 };
+typedef struct { int drv; } integ_data_t;
+typedef struct { int occupancy; } lifesup_data_t;
+typedef struct { int output; } core_data_t;
+typedef struct { int maxspeed; } engine_data_t;
+typedef struct { int maxrange; } navsens_data_t;
+typedef struct { int maxrange; int maxtargets; } trans_data_t;
 
 
 enum TactTypes {
@@ -33,6 +38,9 @@ enum TactTypes {
     M_PHASER,
     M_TORPEDO
 };
+typedef struct { int maxrange; int maxtargets; } targsens_data_t;
+typedef struct { /* should i make this a bunch of health modules, for gridded system? */ } shield_data_t;
+typedef struct { int range; int speed; int shielddamage; int hulldamage; } weapon_data_t;
 
 // for miscellaneous, there is no types, just ids.
 
@@ -87,7 +95,17 @@ typedef struct {
     unsigned char techid;
     bool reclaimable;
     union data {
-        
+        // system data
+        integ_data_t integ_data;
+        lifesup_data_t lifesup_data;
+        core_data_t core_data;
+        engine_data_t engine_data;
+        navsens_data_t navsens_data;
+        trans_data_t trans_data;
+        // tactical data
+        targsens_data_t targsens_data;
+        shield_data_t shield_data;
+        weapon_data_t weapon_data;
     };
 } stats_t;
 
