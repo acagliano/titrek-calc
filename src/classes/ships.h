@@ -30,6 +30,15 @@ typedef struct { int output; } core_data_t;
 typedef struct { int maxspeed; } engine_data_t;
 typedef struct { int maxrange; } navsens_data_t;
 typedef struct { int maxrange; int maxtargets; } trans_data_t;
+// this union will join all core ship system data structs into one
+typedef union {
+    integ_data_t integ_data;
+    lifesup_data_t lifesup_data;
+    core_data_t core_data;
+    engine_data_t engine_data;
+    navsens_data_t navsens_data;
+    trans_data_t trans_data;
+} sys_data_t;
 
 
 enum TactTypes {
@@ -41,6 +50,12 @@ enum TactTypes {
 typedef struct { int maxrange; int maxtargets; } targsens_data_t;
 typedef struct { /* should i make this a bunch of health modules, for gridded system? */ } shield_data_t;
 typedef struct { int range; int speed; int shielddamage; int hulldamage; } weapon_data_t;
+// This union combines all tactical modules into 1
+typedef union {
+    targsens_data_t targsens_data;
+    shield_data_t shield_data;
+    weapon_data_t weapon_data;
+} tact_data_t;
 
 // for miscellaneous, there is no types, just ids.
 
@@ -96,23 +111,11 @@ typedef struct {
     bool reclaimable;
     union data {
         // system data
-        integ_data_t integ_data;
-        lifesup_data_t lifesup_data;
-        core_data_t core_data;
-        engine_data_t engine_data;
-        navsens_data_t navsens_data;
-        trans_data_t trans_data;
+        sys_data_t sys_data;
         // tactical data
-        targsens_data_t targsens_data;
-        shield_data_t shield_data;
-        weapon_data_t weapon_data;
+        tact_data_t tact_data;
     };
 } stats_t;
-
-
-
-
-
 
 
 
@@ -128,10 +131,12 @@ typedef struct {
     char online;            // is module online
     power_t power;          // power control
     health_t health;        // health monitor
-    stats_t* stats;
+    stats_t stats;
 } module_t;
 char module_GetOnlineState(module_t* module);   // return online, offline, or repairing
 char module_SetOnlineState(module_t* module, char state);   // set module state or return no power or no health
+void* module_GetDataPtr(module_t* module);
+void* module_GetSysDataPtr(module_t* module, unsigned char type);
 //int module_GetEffectiveness(module_t* module, char steps);  // get % effectiveness of module
     // steps indicate how quickly changes to health or power of a module effect performance.
     // more steps equal greater sensitivity, but less fluctuation in performance
