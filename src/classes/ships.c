@@ -76,6 +76,21 @@ void* module_GetSysDataPtr(module_t* module, unsigned char type){
     }
 }
 
+void* module_GetTactDataPtr(module_t* module, unsigned char type){
+    switch(type){
+        case M_TACTSENS:
+            return (void*)&module->stats.tact_data.integ_data;
+        case M_SHIELD:
+            return (void*)&module->stats.tact_data.shield_data;
+        case M_PHASER:
+        case M_TORPEDO:
+            return (void*)&module->stats.tact_data.weapon_data;
+        default:
+            return NULL;
+    }
+}
+
+
 /*int module_GetEffectiveness(module_t* module, char steps){
     int effective = module->power.usage * module->health.current * 100 / module->power.baseusage / module->health.max;
     effective = ceil(effective * steps / 100);

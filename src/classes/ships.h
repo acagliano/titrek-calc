@@ -137,6 +137,7 @@ char module_GetOnlineState(module_t* module);   // return online, offline, or re
 char module_SetOnlineState(module_t* module, char state);   // set module state or return no power or no health
 void* module_GetDataPtr(module_t* module);
 void* module_GetSysDataPtr(module_t* module, unsigned char type);
+void* module_GetTactDataPtr(module_t* module, unsigned char type);
 //int module_GetEffectiveness(module_t* module, char steps);  // get % effectiveness of module
     // steps indicate how quickly changes to health or power of a module effect performance.
     // more steps equal greater sensitivity, but less fluctuation in performance
