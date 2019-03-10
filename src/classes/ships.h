@@ -48,7 +48,7 @@ enum TactTypes {
     M_TORPEDO
 };
 typedef struct { int maxrange; int maxtargets; } targsens_data_t;
-typedef struct { /* should i make this a bunch of health modules, for gridded system? */ } shield_data_t;
+typedef struct { char placeholder; } shield_data_t;
 typedef struct { int range; int speed; int shielddamage; int hulldamage; } weapon_data_t;
 // This union combines all tactical modules into 1
 typedef union {
@@ -109,12 +109,12 @@ void health_DamageModule(health_t* health, int amount);
 typedef struct {
     unsigned char techid;
     bool reclaimable;
-    union data {
+    union Data {
         // system data
         sys_data_t sys_data;
         // tactical data
         tact_data_t tact_data;
-    };
+    } data;
 } stats_t;
 
 

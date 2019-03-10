@@ -1,7 +1,7 @@
 
 #ifndef mymath_h
 #define mymath_h
-#include "datatypes/playerdata.h"
+/*#include "datatypes/playerdata.h"
 #include "datatypes/mapdata.h"
 
 unsigned long r_GetDistance(int xdiff, int ydiff, int zdiff);
@@ -30,5 +30,5 @@ void heapsort(renderitem_t* arr,int size);
 #define atan2d(y,x) (atan2(y,x) * 128/M_PI)
 #define atand(y,x) (atan(y/x) * 128/M_PI)
 #define asind(y,d) (asin(y/d) * 128/M_PI)
-
+*/
 #endif

@@ -1,7 +1,7 @@
 
 #ifndef gfx_functions_h
 #define gfx_functions_h
-#include <stdbool.h>
+/*#include <stdbool.h>
 #include "datatypes/mapdata.h"
 #include "datatypes/shipmodules.h"
 #include "datatypes/playerdata.h"
@@ -33,5 +33,5 @@ void gfx_DrawSpeedIndicator(char speed, char maxspeed_warp, char maxspeed_impuls
 void gfx_RenderOrientation(unsigned char anglexz, unsigned char angley, int dialx, unsigned char dialy);
 //void GUI_ViewScreen(MapData_t *map, Position_t *playerpos);
 extern const char *trek_version;
-
+*/
 #endif

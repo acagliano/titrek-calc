@@ -1,3 +1,4 @@
+#include <stddef.h>
 #include "ships.h"
 
 // POWER FUNCTIONS
@@ -46,11 +47,11 @@ void* module_GetDataPtr(module_t* module){
     void* data;
     switch(class){
         case MC_SYSTEM:
-            data = module_GetSysDataPtr(&module, type);
+            data = module_GetSysDataPtr(module, type);
             break;
         
         case MC_TACTICAL:
-            data = module_GetTactDataPtr(&module, type);
+            data = module_GetTactDataPtr(module, type);
             break;
     }
     return data;
@@ -59,18 +60,18 @@ void* module_GetDataPtr(module_t* module){
 void* module_GetSysDataPtr(module_t* module, unsigned char type){
     switch(type){
         case M_INTEG:
-            return (void*)&module->stats.sys_data.integ_data;
+            return (void*)&module->stats.data.sys_data.integ_data;
         case M_LIFESUP:
-            return (void*)&module->stats.sys_data.lifesup_data;
+            return (void*)&module->stats.data.sys_data.lifesup_data;
         case M_CORE:
-            return (void*)&module->stats.sys_data.core_data;
+            return (void*)&module->stats.data.sys_data.core_data;
         case M_WARPDR:
         case M_IMPDR:
-            return (void*)&module->stats.sys_data.engine_data;
+            return (void*)&module->stats.data.sys_data.engine_data;
         case M_NAVSENS:
-            return (void*)&module->stats.sys_data.navsens_data;
+            return (void*)&module->stats.data.sys_data.navsens_data;
         case M_TRANS:
-            return (void*)&module->stats.sys_data.trans_data;
+            return (void*)&module->stats.data.sys_data.trans_data;
         default:
             return NULL;
     }
@@ -79,12 +80,12 @@ void* module_GetSysDataPtr(module_t* module, unsigned char type){
 void* module_GetTactDataPtr(module_t* module, unsigned char type){
     switch(type){
         case M_TACTSENS:
-            return (void*)&module->stats.tact_data.integ_data;
+            return (void*)&module->stats.data.tact_data.targsens_data;
         case M_SHIELD:
-            return (void*)&module->stats.tact_data.shield_data;
+            return (void*)&module->stats.data.tact_data.shield_data;
         case M_PHASER:
         case M_TORPEDO:
-            return (void*)&module->stats.tact_data.weapon_data;
+            return (void*)&module->stats.data.tact_data.weapon_data;
         default:
             return NULL;
     }

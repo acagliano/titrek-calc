@@ -60,11 +60,11 @@ typedef struct {
     int reloadtime;
     int shielddamage;
     int normaldamage;
-} projectile_stats_t;
+} weapon_stats_t;
 
 typedef struct {
     int powerdrain;
-    union module {
+    union Module {
         weapon_stats_t weapon_stats;
         sensor_stats_t sensor_stats;
         integrity_stats_t integrity_stats;
@@ -75,8 +75,6 @@ typedef struct {
 } module_stats_t;
 
 
-typedef struct
-
 
 typedef struct {
     int techclass;      // cooresponds to TechClasses above
@@ -85,8 +83,8 @@ typedef struct {
     int powerdrain; // how much base power this module uses
     union techinfo {
         module_stats_t module_stats;
-        projectile_stats_t projectile_stats;
+        weapon_stats_t weapon_stats;
     } techinfo;
-} stats_t;
+} tech_stats_t;
 
 #endif
