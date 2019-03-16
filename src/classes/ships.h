@@ -146,12 +146,13 @@ void* module_GetTactDataPtr(module_t* module, unsigned char type);
 // EX: 73% of STEP_NORMAL might return 73% of 20 (16), or 70% effectiveness.
 // EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
 
-
+#define TACT_MAX 6
+#define MISC_MAX 3
 
 typedef struct {
     module_t system[M_SYSMAX];
-    module_t tactical[6];    // tactical or shield modules
-    module_t misc[3];       // miscellaneous modules
+    module_t tactical[TACT_MAX];    // tactical or shield modules
+    module_t misc[MISC_MAX];       // miscellaneous modules
 } ship_t;
 // Core system defines
 #define integrity (module_t*)&ship->system[M_INTEG];
