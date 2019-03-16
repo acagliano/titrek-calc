@@ -1,34 +1,10 @@
-// convpng v6.8
+// convpng v7.0
 #include <stdint.h>
 #include "trekgui.h"
 
 #include <fileioc.h>
-uint8_t *trekgui[25] = {
+uint8_t *trekgui[1] = {
  (uint8_t*)0,
- (uint8_t*)69,
- (uint8_t*)116,
- (uint8_t*)289,
- (uint8_t*)468,
- (uint8_t*)622,
- (uint8_t*)672,
- (uint8_t*)710,
- (uint8_t*)796,
- (uint8_t*)2106,
- (uint8_t*)2164,
- (uint8_t*)2227,
- (uint8_t*)2265,
- (uint8_t*)2284,
- (uint8_t*)2306,
- (uint8_t*)2326,
- (uint8_t*)2351,
- (uint8_t*)2425,
- (uint8_t*)2562,
- (uint8_t*)2588,
- (uint8_t*)2644,
- (uint8_t*)2675,
- (uint8_t*)2792,
- (uint8_t*)2818,
- (uint8_t*)3113,
 };
 
 bool trekgui_init(void) {
