@@ -6,12 +6,12 @@ warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
 1:
- shipinterior : converted! (38402 > 1421 bytes)
+ shipinterior : converted! (38402 > 1666 bytes)
 
 exporting appvar: trekgui.8xv
  shipinterior
 
-converted in 0 s
+converted in 1 s
 
 [warning] image quality might be too low.
 please try grouping similar images, reducing image colors, 
