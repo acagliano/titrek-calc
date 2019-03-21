@@ -37,27 +37,23 @@
 void DrawFrame(gfx_sprite_t **sprites, unsigned char screen);
 
 ship_t Ship;
-gfx_sprite_t *sprites[2];
+gfx_sprite_t *sprites[trekgui_num + 1];
 
 void main(void) {
     unsigned char screen = 0;
     bool loopgame = true;
     unsigned int i;
     gfx_Begin();
+    if(!trekgui_init()) return;
     sprites[0] = gfx_MallocSprite(shipinterior_width, shipinterior_height);
     sprites[1] = gfx_MallocSprite(shipinterior_width, shipinterior_height);
     zx7_Decompress(sprites[0], shipinterior_compressed);
-    gfx_PrintString("Waiting...");
-    os_GetKey();
     gfx_FlipSpriteY(sprites[0], sprites[1]);
-    gfx_PrintString("Waiting...");
-    os_GetKey();
     int_Disable();
     gfx_SetDefaultPalette(gfx_8bpp);
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
-    if(!trekgui_init()) return;
     do {
         unsigned char key = os_GetCSC();
         DrawFrame(sprites, screen);
