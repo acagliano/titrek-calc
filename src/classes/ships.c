@@ -46,47 +46,56 @@ void* module_GetDataPtr(module_t* module){
     void* data;
     switch(class){
         case MC_SYSTEM:
-            data = module_GetSysDataPtr(&module->moduleclass);
+            data = module_GetSysDataPtr(&module->data);
             break;
         
         case MC_TACTICAL:
-            data = module_GetTactDataPtr(&module->moduleclass);
+            data = module_GetTactDataPtr(&module->data);
             break;
     }
     return data;
 }
 
-void* module_GetSysDataPtr(class_t* moduleclass){
-    unsigned char type = moduleclass->techtype;
+void* module_GetSysDataPtr(data_t* data){
+    unsigned char type = data->techtype;
     switch(type){
         case M_INTEG:
-            return (void*)&moduleclass->data.sys_data.integ_data;
+            return (void*)&data->type.system.integrity;
+            break;
         case M_LIFESUP:
-            return (void*)&moduleclass->data.sys_data.lifesup_data;
+            return (void*)&data->type.system.lifesupport;
+            break;
         case M_CORE:
-            return (void*)&moduleclass->data.sys_data.core_data;
+            return (void*)&data->type.system.core;
+            break;
         case M_WARPDR:
         case M_IMPDR:
-            return (void*)&moduleclass->data.sys_data.engine_data;
+            return (void*)&data->type.system.engine;
+            break;
         case M_NAVSENS:
-            return (void*)&moduleclass->data.sys_data.navsens_data;
+            return (void*)&data->type.system.navsens;
+            break;
         case M_TRANS:
-            return (void*)&moduleclass->data.sys_data.trans_data;
+            return (void*)&data->type.system.transport;
+            break;
         default:
             return NULL;
     }
 }
 
-void* module_GetTactDataPtr(class_t* moduleclass){
-    unsigned char type = moduleclass->techtype;
+void* module_GetTactDataPtr(data_t* data){
+    unsigned char type = data->techtype;
     switch(type){
         case M_TACTSENS:
-            return (void*)&moduleclass->data.tact_data.tact_t.targsens_data;
+            return (void*)&data->type.tactical.targsens;
+            break;
         case M_SHIELD:
-            return (void*)&moduleclass->data.tact_data.tact_t.shield_data;
+            return (void*)&data->type.tactical.shields;
+            break;
         case M_PHASER:
         case M_TORPEDO:
-            return (void*)&moduleclass->data.tact_data.tact_t.weapon_data;
+            return (void*)&data->type.tactical.weapons;
+            break;
         default:
             return NULL;
     }

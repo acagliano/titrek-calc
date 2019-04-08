@@ -24,22 +24,6 @@ enum SysTypes {
     M_TRANS,
     M_SYSMAX
 };
-typedef struct { int drv; } integ_data_t;
-typedef struct { int occupancy; } lifesup_data_t;
-typedef struct { int output; } core_data_t;
-typedef struct { int maxspeed; } engine_data_t;
-typedef struct { int maxrange; } navsens_data_t;
-typedef struct { int maxrange; int maxtargets; } trans_data_t;
-// this union will join all core ship system data structs into one
-typedef union {
-    integ_data_t integ_data;
-    lifesup_data_t lifesup_data;
-    core_data_t core_data;
-    engine_data_t engine_data;
-    navsens_data_t navsens_data;
-    trans_data_t trans_data;
-} sys_data_t;
-
 
 enum TactTypes {
     M_TACTSENS,
@@ -47,18 +31,40 @@ enum TactTypes {
     M_PHASER,
     M_TORPEDO
 };
+
+//System Structs
+typedef struct { int drv; } integ_data_t;
+typedef struct { int occupancy; } lifesup_data_t;
+typedef struct { int output; } core_data_t;
+typedef struct { int maxspeed; } engine_data_t;
+typedef struct { int maxrange; } navsens_data_t;
+typedef struct { int maxrange; int maxtargets; } trans_data_t;
+
+//Tactical Structs
 typedef struct { int maxrange; int maxtargets; } targsens_data_t;
 typedef struct { char placeholder; } shield_data_t;
 typedef struct { int range; int speed; int shielddamage; int hulldamage; } weapon_data_t;
 // This union combines all tactical modules into 1
-typedef struct {
-    char techname[10];
-    union tact {
-        targsens_data_t targsens_data;
-        shield_data_t shield_data;
-        weapon_data_t weapon_data;
-    } tact_t;
-} tact_data_t;
+
+typedef union System_t {
+    trans_data_t transport;
+    integ_data_t integrity;
+    lifesup_data_t lifesupport;
+    core_data_t core;
+    engine_data_t engine;
+    navsens_data_t navsens;
+} system_t;
+
+typedef union Tactical_t {
+    weapon_data_t weapons;
+    targsens_data_t targsens;
+    shield_data_t shields;
+} tactical_t;
+
+typedef union Type_t {
+    system_t system;
+    tactical_t tactical;
+} type_t;
 
 // for miscellaneous, there is no types, just ids.
 
@@ -108,18 +114,12 @@ void health_DamageModule(health_t* health, int amount);
 #define STEP_MID 10
 #define STEP_LOW 5
 
-// Module Stats Union
+// Module Data Struct
 typedef struct {
-    unsigned char techtype;     // locked, determines compatible modules
-    bool reclaimable;
-    union Data {
-        // system data
-        sys_data_t sys_data;
-        // tactical data
-        tact_data_t tact_data;
-    } data;
-} class_t;
-
+    unsigned char techtype;
+    char techname[10];
+    type_t type;
+} data_t;
 
 
 
@@ -134,13 +134,13 @@ typedef struct {
     char online;            // is module online
     power_t power;          // power control
     health_t health;        // health monitor
-    class_t moduleclass;
+    data_t data;
 } module_t;
 char module_GetOnlineState(module_t* module);   // return online, offline, or repairing
 char module_SetOnlineState(module_t* module, char state);   // set module state or return no power or no health
 void* module_GetDataPtr(module_t* module);
-void* module_GetSysDataPtr(class_t* moduleclass);
-void* module_GetTactDataPtr(class_t* moduleclass);
+void* module_GetSysDataPtr(data_t* data);
+void* module_GetTactDataPtr(data_t* data);
 //int module_GetEffectiveness(module_t* module, char steps);  // get % effectiveness of module
     // steps indicate how quickly changes to health or power of a module effect performance.
     // more steps equal greater sensitivity, but less fluctuation in performance
