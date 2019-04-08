@@ -51,10 +51,13 @@ typedef struct { int maxrange; int maxtargets; } targsens_data_t;
 typedef struct { char placeholder; } shield_data_t;
 typedef struct { int range; int speed; int shielddamage; int hulldamage; } weapon_data_t;
 // This union combines all tactical modules into 1
-typedef union {
-    targsens_data_t targsens_data;
-    shield_data_t shield_data;
-    weapon_data_t weapon_data;
+typedef struct {
+    char techname[10];
+    union tact {
+        targsens_data_t targsens_data;
+        shield_data_t shield_data;
+        weapon_data_t weapon_data;
+    } tact_t;
 } tact_data_t;
 
 // for miscellaneous, there is no types, just ids.
@@ -107,7 +110,7 @@ void health_DamageModule(health_t* health, int amount);
 
 // Module Stats Union
 typedef struct {
-    unsigned char techid;
+    unsigned char techtype;     // locked, determines compatible modules
     bool reclaimable;
     union Data {
         // system data
@@ -115,7 +118,7 @@ typedef struct {
         // tactical data
         tact_data_t tact_data;
     } data;
-} stats_t;
+} class_t;
 
 
 
@@ -126,18 +129,18 @@ typedef struct {
 
 
 typedef struct {
+    unsigned char techid;
     unsigned char techclass;    // locked, determines compatible module classes
-    unsigned char techtype;     // locked, determines compatible modules
     char online;            // is module online
     power_t power;          // power control
     health_t health;        // health monitor
-    stats_t stats;
+    class_t moduleclass;
 } module_t;
 char module_GetOnlineState(module_t* module);   // return online, offline, or repairing
 char module_SetOnlineState(module_t* module, char state);   // set module state or return no power or no health
 void* module_GetDataPtr(module_t* module);
-void* module_GetSysDataPtr(module_t* module, unsigned char type);
-void* module_GetTactDataPtr(module_t* module, unsigned char type);
+void* module_GetSysDataPtr(class_t* moduleclass);
+void* module_GetTactDataPtr(class_t* moduleclass);
 //int module_GetEffectiveness(module_t* module, char steps);  // get % effectiveness of module
     // steps indicate how quickly changes to health or power of a module effect performance.
     // more steps equal greater sensitivity, but less fluctuation in performance
@@ -147,12 +150,10 @@ void* module_GetTactDataPtr(module_t* module, unsigned char type);
 // EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
 
 #define TACT_MAX 6
-#define MISC_MAX 3
 
 typedef struct {
     module_t system[M_SYSMAX];
     module_t tactical[TACT_MAX];    // tactical or shield modules
-    module_t misc[MISC_MAX];       // miscellaneous modules
 } ship_t;
 // Core system defines
 #define integrity (module_t*)&ship->system[M_INTEG];
@@ -163,5 +164,7 @@ typedef struct {
 #define navsens (module_t*)&ship->system[M_NAVSENS];
 #define transporters (module_t*)&ship->system[M_TRANS];
 #define comms (module_t*)&ship->system[M_COMMS];
+void module_SetHealthMax(health_t* health);
+void module_SetPowerMax(power_t* power);
 
 #endif

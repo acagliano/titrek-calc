@@ -36,8 +36,9 @@
 /* Put your function prototypes here */
 void DrawFrame(gfx_sprite_t **sprites, unsigned char screen);
 
-ship_t Ship;
+ship_t Ship = {0};
 gfx_sprite_t *sprites[trekgui_num + 1];
+
 
 void main(void) {
     unsigned char screen = 0;
@@ -54,6 +55,12 @@ void main(void) {
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
+    for(i = 0; i < M_SYSMAX; i++){
+        Ship.system[i].techclass = MC_SYSTEM;
+        Ship.system[i].moduleclass.techtype = i;
+        module_SetHealthMax(&Ship.system[i].health);
+        module_SetPowerMax(&Ship.system[i].power);
+    }
     do {
         unsigned char key = os_GetCSC();
         DrawFrame(sprites, screen);
@@ -76,8 +83,14 @@ void DrawFrame(gfx_sprite_t **sprites, unsigned char screen){
     Screen_Background(sprites, screen);
     gfx_SetTextFGColor(255);
     switch(screen){
+        case 1:
+            Screen_UITactStats(&Ship.tactical[0], TACT_MAX);
+            break;
         case 2:
             Screen_UISysStats(&Ship.system[0], M_SYSMAX);
+            break;
+        case 3:
+            Screen_UIPowerStats(&Ship.system[0], M_SYSMAX + TACT_MAX);
             break;
     }
     gfx_BlitBuffer();

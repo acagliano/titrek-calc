@@ -43,54 +43,65 @@ char module_SetOnlineState(module_t* module, char state){
 
 void* module_GetDataPtr(module_t* module){
     unsigned char class = module->techclass;
-    unsigned char type = module->techtype;
     void* data;
     switch(class){
         case MC_SYSTEM:
-            data = module_GetSysDataPtr(module, type);
+            data = module_GetSysDataPtr(&module->moduleclass);
             break;
         
         case MC_TACTICAL:
-            data = module_GetTactDataPtr(module, type);
+            data = module_GetTactDataPtr(&module->moduleclass);
             break;
     }
     return data;
 }
 
-void* module_GetSysDataPtr(module_t* module, unsigned char type){
+void* module_GetSysDataPtr(class_t* moduleclass){
+    unsigned char type = moduleclass->techtype;
     switch(type){
         case M_INTEG:
-            return (void*)&module->stats.data.sys_data.integ_data;
+            return (void*)&moduleclass->data.sys_data.integ_data;
         case M_LIFESUP:
-            return (void*)&module->stats.data.sys_data.lifesup_data;
+            return (void*)&moduleclass->data.sys_data.lifesup_data;
         case M_CORE:
-            return (void*)&module->stats.data.sys_data.core_data;
+            return (void*)&moduleclass->data.sys_data.core_data;
         case M_WARPDR:
         case M_IMPDR:
-            return (void*)&module->stats.data.sys_data.engine_data;
+            return (void*)&moduleclass->data.sys_data.engine_data;
         case M_NAVSENS:
-            return (void*)&module->stats.data.sys_data.navsens_data;
+            return (void*)&moduleclass->data.sys_data.navsens_data;
         case M_TRANS:
-            return (void*)&module->stats.data.sys_data.trans_data;
+            return (void*)&moduleclass->data.sys_data.trans_data;
         default:
             return NULL;
     }
 }
 
-void* module_GetTactDataPtr(module_t* module, unsigned char type){
+void* module_GetTactDataPtr(class_t* moduleclass){
+    unsigned char type = moduleclass->techtype;
     switch(type){
         case M_TACTSENS:
-            return (void*)&module->stats.data.tact_data.targsens_data;
+            return (void*)&moduleclass->data.tact_data.tact_t.targsens_data;
         case M_SHIELD:
-            return (void*)&module->stats.data.tact_data.shield_data;
+            return (void*)&moduleclass->data.tact_data.tact_t.shield_data;
         case M_PHASER:
         case M_TORPEDO:
-            return (void*)&module->stats.data.tact_data.weapon_data;
+            return (void*)&moduleclass->data.tact_data.tact_t.weapon_data;
         default:
             return NULL;
     }
 }
 
+
+void module_SetHealthMax(health_t* health){
+    health->current = 50;
+    health->max = 50;
+}
+
+void module_SetPowerMax(power_t* power){
+    power->capacity = 100;
+    power->current = 100;
+}
 
 /*int module_GetEffectiveness(module_t* module, char steps){
     int effective = module->power.usage * module->health.current * 100 / module->power.baseusage / module->health.max;
