@@ -22,14 +22,16 @@ enum SysTypes {
     M_IMPDR,
     M_NAVSENS,
     M_TRANS,
-    M_SYSMAX
+    M_COMMS,
+    SYS_MAX
 };
 
 enum TactTypes {
     M_TACTSENS,
     M_SHIELD,
     M_PHASER,
-    M_TORPEDO
+    M_TORPEDO,
+    TACT_MAX
 };
 
 //System Structs
@@ -48,7 +50,7 @@ typedef struct { int range; int speed; int shielddamage; int hulldamage; } weapo
 
 typedef union System_t {
     trans_data_t transport;
-    integ_data_t integrity;
+    integ_data_t integ;
     lifesup_data_t lifesupport;
     core_data_t core;
     engine_data_t engine;
@@ -62,7 +64,7 @@ typedef union Tactical_t {
 } tactical_t;
 
 typedef union Type_t {
-    system_t system;
+    system_t coresys;
     tactical_t tactical;
 } type_t;
 
@@ -149,21 +151,13 @@ void* module_GetTactDataPtr(data_t* data);
 // EX: 73% of STEP_NORMAL might return 73% of 20 (16), or 70% effectiveness.
 // EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
 
-#define TACT_MAX 6
 
 typedef struct {
-    module_t system[M_SYSMAX];
+    module_t system[SYS_MAX];
     module_t tactical[TACT_MAX];    // tactical or shield modules
 } ship_t;
 // Core system defines
-#define integrity (module_t*)&ship->system[M_INTEG];
-#define lifesupport (module_t*)&ship->system[M_LIFESUP];
-#define warpcore (module_t*)&ship->system[M_CORE];
-#define warpdrive (module_t*)&ship->system[M_WARPDR];
-#define impulsedrive (module_t*)&ship->system[M_IMPDR];
-#define navsens (module_t*)&ship->system[M_NAVSENS];
-#define transporters (module_t*)&ship->system[M_TRANS];
-#define comms (module_t*)&ship->system[M_COMMS];
+
 void module_SetHealthMax(health_t* health);
 void module_SetPowerMax(power_t* power);
 

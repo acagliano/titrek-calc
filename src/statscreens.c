@@ -5,7 +5,7 @@
 #include <graphx.h>
 #include <compression.h>
 
-char mainsys_strings[][10] = {"Integrity", "LifeSupp", "WarpCore", "WarpDrive", "Impulse", "NavSens", "Transport"};
+char mainsys_strings[][10] = {"Integrity", "LifeSupp", "WarpCore", "WarpDrive", "Impulse", "NavSens", "Transport", "Comms"};
 
 void Screen_UISysStats(module_t* system, unsigned char count){
     unsigned char i;
@@ -19,7 +19,7 @@ void Screen_UISysStats(module_t* system, unsigned char count){
         }
         else {
             signed int health = health_GetHealthPercent(&module->health);
-            gfx_PrintString(mainsys_strings[module->moduleclass.techtype]);
+            gfx_PrintString(mainsys_strings[module->data.techtype]);
             Stats_DrawHealthBar(health, 50, viewer_x + 100, (i + 1) * 12 + viewer_y + 5);
             //gfx_SetTextXY(viewer_x + 100, (i + 1) * 10 + viewer_y + 5);
             //gfx_PrintUInt(health, 3);

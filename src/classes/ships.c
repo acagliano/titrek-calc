@@ -60,24 +60,18 @@ void* module_GetSysDataPtr(data_t* data){
     unsigned char type = data->techtype;
     switch(type){
         case M_INTEG:
-            return (void*)&data->type.system.integrity;
-            break;
+            return (void*)&data->type.coresys.integ;
         case M_LIFESUP:
-            return (void*)&data->type.system.lifesupport;
-            break;
+            return (void*)&data->type.coresys.lifesupport;
         case M_CORE:
-            return (void*)&data->type.system.core;
-            break;
+            return (void*)&data->type.coresys.core;
         case M_WARPDR:
         case M_IMPDR:
-            return (void*)&data->type.system.engine;
-            break;
+            return (void*)&data->type.coresys.engine;
         case M_NAVSENS:
-            return (void*)&data->type.system.navsens;
-            break;
+            return (void*)&data->type.coresys.navsens;
         case M_TRANS:
-            return (void*)&data->type.system.transport;
-            break;
+            return (void*)&data->type.coresys.transport;
         default:
             return NULL;
     }
@@ -88,10 +82,8 @@ void* module_GetTactDataPtr(data_t* data){
     switch(type){
         case M_TACTSENS:
             return (void*)&data->type.tactical.targsens;
-            break;
         case M_SHIELD:
             return (void*)&data->type.tactical.shields;
-            break;
         case M_PHASER:
         case M_TORPEDO:
             return (void*)&data->type.tactical.weapons;
