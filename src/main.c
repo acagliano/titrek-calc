@@ -89,7 +89,7 @@ void DrawFrame(gfx_sprite_t **sprites, unsigned char screen){
             Screen_UISysStats(&Ship.system[0], SYS_MAX);
             break;
         case 3:
-            Screen_UIPowerStats(&Ship.system[0], SYS_MAX + TACT_MAX);
+            Screen_UIRepairSys(&Ship.system[0], SYS_MAX + TACT_MAX);
             break;
     }
     gfx_BlitBuffer();

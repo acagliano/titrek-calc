@@ -30,8 +30,7 @@ enum TactTypes {
     M_TACTSENS,
     M_SHIELD,
     M_PHASER,
-    M_TORPEDO,
-    TACT_MAX
+    M_TORPEDO
 };
 
 //System Structs
@@ -151,7 +150,7 @@ void* module_GetTactDataPtr(data_t* data);
 // EX: 73% of STEP_NORMAL might return 73% of 20 (16), or 70% effectiveness.
 // EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
 
-
+#define TACT_MAX 6
 typedef struct {
     module_t system[SYS_MAX];
     module_t tactical[TACT_MAX];    // tactical or shield modules

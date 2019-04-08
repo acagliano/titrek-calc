@@ -46,9 +46,9 @@ void Screen_UITactStats(module_t* tactical, unsigned char count){
     return;
 }
 
-void Screen_UIPowerStats(module_t* modules, unsigned char count){
+void Screen_UIRepairSys(module_t* modules, unsigned char count){
     unsigned char i;
-    gfx_PrintStringXY("[POWER STATS]", viewer_x + 75, viewer_y);
+    gfx_PrintStringXY("[REPAIR SYSTEM]", viewer_x + 70, viewer_y);
     for(i = 0; i < count; i++){
         // loop module health display
         module_t* module = &modules[i];
