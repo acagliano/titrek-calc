@@ -41,57 +41,7 @@ char module_SetOnlineState(module_t* module, char state){
     return SETSTATE_SUCCESS;
 }
 
-void* module_GetDataPtr(module_t* module){
-    unsigned char class = module->techclass;
-    void* data;
-    switch(class){
-        case MC_SYSTEM:
-            data = module_GetSysDataPtr(&module->data);
-            break;
-        
-        case MC_TACTICAL:
-            data = module_GetTactDataPtr(&module->data);
-            break;
-    }
-    return data;
-}
 
-void* module_GetSysDataPtr(data_t* data){
-    unsigned char type = data->techtype;
-    switch(type){
-        case M_INTEG:
-            return (void*)&data->type.coresys.integ;
-        case M_LIFESUP:
-            return (void*)&data->type.coresys.lifesupport;
-        case M_CORE:
-            return (void*)&data->type.coresys.core;
-        case M_WARPDR:
-        case M_IMPDR:
-            return (void*)&data->type.coresys.engine;
-        case M_NAVSENS:
-            return (void*)&data->type.coresys.navsens;
-        case M_TRANS:
-            return (void*)&data->type.coresys.transport;
-        default:
-            return NULL;
-    }
-}
-
-void* module_GetTactDataPtr(data_t* data){
-    unsigned char type = data->techtype;
-    switch(type){
-        case M_TACTSENS:
-            return (void*)&data->type.tactical.targsens;
-        case M_SHIELD:
-            return (void*)&data->type.tactical.shields;
-        case M_PHASER:
-        case M_TORPEDO:
-            return (void*)&data->type.tactical.weapons;
-            break;
-        default:
-            return NULL;
-    }
-}
 
 
 void module_SetHealthMax(health_t* health){

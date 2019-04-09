@@ -1,3 +1,4 @@
+#include <tice.h>
 #include <string.h>
 #include "classes/ships.h"
 #include "statscreens.h"
@@ -7,12 +8,16 @@
 
 char mainsys_strings[][10] = {"Integrity", "LifeSupp", "WarpCore", "WarpDrive", "Impulse", "NavSens", "Transport", "Comms"};
 
-void Screen_UISysStats(module_t* system, unsigned char count){
+int text_GetCenterX(char* string, char fontwidth){
+    return (LCD_WIDTH - gfx_GetStringWidth(string)) / 2;
+}
+
+void Screen_UIModuleStats(char *title, module_t* modules, unsigned char count){
     unsigned char i;
-    gfx_PrintStringXY("[SYSTEM STATS]", viewer_x + 80, viewer_y);
+    gfx_PrintStringXY(title, text_GetCenterX(title, 6), viewer_y);
     for(i = 0; i < count; i++){
         // loop module health display
-        module_t* module = &system[i];
+        module_t* module = &modules[i];
         gfx_SetTextXY(viewer_x, (i + 1) * 12 + viewer_y + 5);
         if(!module->techclass){
             gfx_PrintString("module unloaded");
@@ -28,23 +33,6 @@ void Screen_UISysStats(module_t* system, unsigned char count){
     return;
 }
 
-void Screen_UITactStats(module_t* tactical, unsigned char count){
-    unsigned char i;
-    gfx_PrintStringXY("[TACTICAL STATS]", viewer_x + 75, viewer_y);
-    for(i = 0; i < count; i++){
-        // loop module health display
-        module_t* module = &tactical[i];
-        gfx_SetTextXY(viewer_x, (i + 1) * 10 + viewer_y + 5);
-        if(!module->techclass){
-            gfx_PrintString("module unloaded");
-        }
-        else {
-            signed int health = health_GetHealthPercent(&module->health);
-            gfx_PrintUInt(health, 3);
-        }
-    }
-    return;
-}
 
 void Screen_UIRepairSys(module_t* modules, unsigned char count){
     unsigned char i;

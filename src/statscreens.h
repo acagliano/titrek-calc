@@ -8,8 +8,7 @@
 
 extern char mainsys_strings[][10];
 
-void Screen_UISysStats(module_t* system, unsigned char count);
-void Screen_UITactStats(module_t* tactical, unsigned char count);
+void Screen_UIModuleStats(char *title, module_t* modules, unsigned char count);
 void Screen_UIRepairSys(module_t* modules, unsigned char count);
 void Screen_UIViewer(void);
 void Screen_UIInventory(void);

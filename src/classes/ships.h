@@ -15,26 +15,36 @@ enum ModuleClasses {
 };
 
 enum SysTypes {
-    M_INTEG,
-    M_LIFESUP,
-    M_CORE,
-    M_WARPDR,
-    M_IMPDR,
-    M_NAVSENS,
-    M_TRANS,
-    M_COMMS,
+    INTEG,
+    LIFESUP,
+    CORE,
+    WARPDR,
+    IMPDR,
+    NAVSENS,
+    TRANS,
+    COMMS,
     SYS_MAX
 };
 
 enum TactTypes {
-    M_TACTSENS,
-    M_SHIELD,
-    M_PHASER,
-    M_TORPEDO
+    TACTSENS,
+    SHIELD,
+    PHASER,
+    TORPEDO
+};
+
+enum ShipZones {
+    FORWARD,
+    STARBOARD,
+    AFT,
+    PORT,
+    DORSAL,
+    VENTRAL,
+    SHIP_ALL
 };
 
 //System Structs
-typedef struct { int drv; } integ_data_t;
+typedef struct { unsigned char drv; } integ_data_t;
 typedef struct { int occupancy; } lifesup_data_t;
 typedef struct { int output; } core_data_t;
 typedef struct { int maxspeed; } engine_data_t;
@@ -42,9 +52,10 @@ typedef struct { int maxrange; } navsens_data_t;
 typedef struct { int maxrange; int maxtargets; } trans_data_t;
 
 //Tactical Structs
-typedef struct { int maxrange; int maxtargets; } targsens_data_t;
-typedef struct { char placeholder; } shield_data_t;
-typedef struct { int range; int speed; int shielddamage; int hulldamage; } weapon_data_t;
+typedef struct { int maxrange; char maxtargets; } targsens_data_t;
+typedef struct { unsigned char drv; int maxhealth; int shieldhealth[SHIP_ALL]; } shield_data_t;
+typedef struct { int range; int speed; int shielddamage; int hulldamage; } phaser_data_t;
+typedef struct { int range; int speed; unsigned char compat_torps[5]; } torpedo_data_t;
 // This union combines all tactical modules into 1
 
 typedef union System_t {
@@ -57,9 +68,10 @@ typedef union System_t {
 } system_t;
 
 typedef union Tactical_t {
-    weapon_data_t weapons;
-    targsens_data_t targsens;
     shield_data_t shields;
+    torpedo_data_t torpedoes;
+    phaser_data_t phasers;
+    targsens_data_t targsens;
 } tactical_t;
 
 typedef union Type_t {
@@ -139,9 +151,6 @@ typedef struct {
 } module_t;
 char module_GetOnlineState(module_t* module);   // return online, offline, or repairing
 char module_SetOnlineState(module_t* module, char state);   // set module state or return no power or no health
-void* module_GetDataPtr(module_t* module);
-void* module_GetSysDataPtr(data_t* data);
-void* module_GetTactDataPtr(data_t* data);
 //int module_GetEffectiveness(module_t* module, char steps);  // get % effectiveness of module
     // steps indicate how quickly changes to health or power of a module effect performance.
     // more steps equal greater sensitivity, but less fluctuation in performance

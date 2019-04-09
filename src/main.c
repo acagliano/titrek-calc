@@ -83,13 +83,13 @@ void DrawFrame(gfx_sprite_t **sprites, unsigned char screen){
     gfx_SetTextFGColor(255);
     switch(screen){
         case 1:
-            Screen_UITactStats(&Ship.tactical[0], TACT_MAX);
+            Screen_UIModuleStats("[TACTICAL CONTROL]", &Ship.tactical[0], TACT_MAX);
             break;
         case 2:
-            Screen_UISysStats(&Ship.system[0], SYS_MAX);
+            Screen_UIModuleStats("[MAIN SYS CONTROL]", &Ship.system[0], SYS_MAX);
             break;
         case 3:
-            Screen_UIRepairSys(&Ship.system[0], SYS_MAX + TACT_MAX);
+            //Screen_UIRepairSys(&Ship.system[0], SYS_MAX + TACT_MAX);
             break;
     }
     gfx_BlitBuffer();
