@@ -8,24 +8,42 @@
 
 char mainsys_strings[][10] = {"Integrity", "LifeSupp", "WarpCore", "WarpDrive", "Impulse", "NavSens", "Transport", "Comms"};
 
-int text_GetCenterX(char* string, char fontwidth){
+int text_GetCenterX(char* string){
     return (LCD_WIDTH - gfx_GetStringWidth(string)) / 2;
 }
 
+int num_GetLength(int number){
+    return 1 + (number >= 10) + (number >= 100);
+}
+
 void Screen_UIModuleStats(char *title, module_t* modules, unsigned char count){
-    unsigned char i;
-    gfx_PrintStringXY(title, text_GetCenterX(title, 6), viewer_y);
+    unsigned char i, cur_y;
+    int cur_x;
+    gfx_PrintStringXY(title, text_GetCenterX(title), viewer_y);
     for(i = 0; i < count; i++){
         // loop module health display
         module_t* module = &modules[i];
-        gfx_SetTextXY(viewer_x, (i + 1) * 12 + viewer_y + 5);
+        cur_y = i * 12 + viewer_y + 17;
+        cur_x = viewer_x;
+        gfx_SetTextXY(cur_x, cur_y);
         if(!module->techclass){
             gfx_PrintString("module unloaded");
         }
         else {
-            signed int health = health_GetHealthPercent(&module->health);
+            signed int health = health_GetHealthPercent(&module->health),
+                        spend = power_GetPowerSpend(&module->power),
+                        spendpercent = power_GetSpendPercent(&module->power),
+                        source = power_GetDrawSource(&module->power);
             gfx_PrintString(mainsys_strings[module->data.techtype]);
-            Stats_DrawHealthBar(health, 50, viewer_x + 100, (i + 1) * 12 + viewer_y + 5);
+            cur_x += 100;
+            Stats_DrawHealthBar(health, 50, cur_x, cur_y);
+            cur_x += 55;
+            if(source < 2){
+                unsigned int draw = power_GetPowerDraw(&module->power);
+                gfx_SetTextXY(cur_x, cur_y);
+                gfx_PrintUInt(draw, num_GetLength(draw));
+            }
+            
             //gfx_SetTextXY(viewer_x + 100, (i + 1) * 10 + viewer_y + 5);
             //gfx_PrintUInt(health, 3);
         }

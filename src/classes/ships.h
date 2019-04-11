@@ -85,17 +85,28 @@ typedef struct {
     char priority;          // determines which module draws power first
     signed int capacity;        // how much power a module can store
     signed int current;         // the amount of power the module currently has
-    signed int baseusage;           // baseline power usage
-    signed int usage;          // how much power the module expends when active
+    signed int spend;           // power spend per cycle
+    signed int base;           // default power usage
+    signed int draw;          // power taken from core or auxiliary
     bool alwaysUse;          // boolean to specify if the module is always using power when active
     char drawFrom;
 } power_t;
 // Related Functions
+#define POWER_INC 1
+#define POWER_DEC -1
+#define POWSRC_WARP 0
+#define POWSRC_AUX 1
+#define POWSRC_RESERVE 2
 signed int power_GetBatteryPercent(power_t* power); // returns % of battery remain
-signed int power_GetExpendPercent(power_t* power);   // returns power expend/usage
+signed int power_GetSpendPercent(power_t* power);   // returns power expend/usage
+signed int power_GetPowerSpend(power_t* power);
+void power_ChangeSpend(power_t* power, char amount);
+signed int power_GetPowerDraw(power_t* power);
+void power_ChangeDraw(power_t* power, char amount, char generated);
 //bool power_ExpendThisCycle(power_t* power);     // returns if module should use power
 //bool power_ReserveThisCycle(power_t* power);      // returns if module should recieve power
-void power_SetDraw(power_t* power, char source);
+void power_SetDrawSource(power_t* power, char source);
+char power_GetDrawSource(power_t* power);
 /*#define power_SetDrawCore(power_t* power) \
 power_SetDraw(power_t* power, DRAW_CORE)    // set module to draw from warp core
 #define power_SetDrawAux(power_t* power) \
