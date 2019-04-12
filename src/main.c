@@ -34,21 +34,17 @@
 #include "statscreens.h"
 #include "gfx/trekgui.h"
 /* Put your function prototypes here */
-void DrawFrame(gfx_sprite_t **sprites, unsigned char screen);
+void DrawFrame(unsigned char screen);
 
 ship_t Ship = {0};
-gfx_sprite_t *sprites[trekgui_num + 1];
 
 void main(void) {
     unsigned char screen = 0;
     bool loopgame = true;
     unsigned int i;
+    gfx_sprite_t* gfx_sprites = malloc(trekgui_uncompressed_size);
     gfx_Begin();
-    if(!trekgui_init()) return;
-    sprites[0] = gfx_MallocSprite(shipinterior_width, shipinterior_height);
-    sprites[1] = gfx_MallocSprite(shipinterior_width, shipinterior_height);
-    zx7_Decompress(sprites[0], shipinterior_compressed);
-    gfx_FlipSpriteY(sprites[0], sprites[1]);
+    if(!trekgui_init(gfx_sprites)) return;
     int_Disable();
     gfx_SetDefaultPalette(gfx_8bpp);
     gfx_SetDrawBuffer();
@@ -62,7 +58,7 @@ void main(void) {
     }
     do {
         unsigned char key = os_GetCSC();
-        DrawFrame(sprites, screen);
+        DrawFrame(screen);
         if(key == sk_Clear) loopgame = false;
         if(key == sk_Yequ) screen = 0;
         if(key == sk_Window) screen = 1;
@@ -70,16 +66,15 @@ void main(void) {
         if(key == sk_Trace) screen = 3;
         if(key == sk_Graph) screen = 4;
     } while(loopgame == true);
-    free(sprites[0]);
-    free(sprites[1]);
+    free(gfx_sprites);
     gfx_End();
     int_Enable();
     pgrm_CleanUp();
     return;
 }
 
-void DrawFrame(gfx_sprite_t **sprites, unsigned char screen){
-    Screen_Background(sprites, screen);
+void DrawFrame(unsigned char screen){
+    Screen_Background(screen);
     gfx_SetTextFGColor(255);
     switch(screen){
         case 1:

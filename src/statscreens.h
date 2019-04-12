@@ -17,7 +17,7 @@ void Screen_UIReplicator(void);
 void Screen_UISensors(void);
 
 void Stats_DrawHealthBar(unsigned char percent, unsigned int length, int x, int y);
-void Screen_Background(gfx_sprite_t **sprites, unsigned char active);
+void Screen_Background(unsigned char active);
 
 
 #endif

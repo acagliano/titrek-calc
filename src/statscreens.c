@@ -89,12 +89,11 @@ void Stats_DrawHealthBar(unsigned char percent, unsigned int length, int x, int 
 
 
 
-void Screen_Background(gfx_sprite_t** sprites, unsigned char active) {
+void Screen_Background(unsigned char active) {
     static char *version = "v0.81 pre-alpha";
     int i;
     gfx_SetTextFGColor(255);
-    gfx_Sprite(sprites[0], 0, 0);
-    gfx_Sprite(sprites[1], 160, 0);
+    gfx_Sprite(shipinterior, 0, 0);
     for(i = 0; i < 320; i++){
         gfx_SetColor(0);
         gfx_Rectangle(i * 64, 216, 64, 20);
