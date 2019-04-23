@@ -5,8 +5,13 @@ using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-8:
- shipinterior : converted!
+15:
+ shipinterior_left : converted!
+ shipinterior_right : converted!
+ icon_shieldsstable : converted!
+ icon_shieldscollapse : converted!
+ icon_shieldsfail : converted!
+ icon_shieldsoff : converted!
  icon_health : converted!
  icon_online : converted!
  icon_offline : converted!
@@ -14,9 +19,16 @@ transparent color : 0x0000
  icon_sourcereserve : converted!
  icon_powerdraw : converted!
  icon_powerspend : converted!
+ icon_frequency : converted!
+ icon_shieldstrength : converted!
 
 exporting appvar: trekgui.8xv
- shipinterior
+ shipinterior_left
+ shipinterior_right
+ icon_shieldsstable
+ icon_shieldscollapse
+ icon_shieldsfail
+ icon_shieldsoff
  icon_health
  icon_online
  icon_offline
@@ -24,9 +36,11 @@ exporting appvar: trekgui.8xv
  icon_sourcereserve
  icon_powerdraw
  icon_powerspend
-compression: (77663 > 3316 bytes)
+ icon_frequency
+ icon_shieldstrength
+compression: (36851 > 4564 bytes)
 
-converted in 1 s
+converted in 0 s
 
 [warning] image quality might be too low.
 please try grouping similar images, reducing image colors, 

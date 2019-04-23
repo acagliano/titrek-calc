@@ -1,30 +1,33 @@
 // convpng v7.0
 #include <stdint.h>
-#include <compression.h>
 #include "trekgui.h"
 
 #include <fileioc.h>
-uint8_t *trekgui[8] = {
+uint8_t *trekgui[15] = {
  (uint8_t*)0,
- (uint8_t*)76802,
- (uint8_t*)76925,
- (uint8_t*)77048,
- (uint8_t*)77171,
- (uint8_t*)77294,
- (uint8_t*)77417,
- (uint8_t*)77540,
+ (uint8_t*)13150,
+ (uint8_t*)26128,
+ (uint8_t*)29497,
+ (uint8_t*)32418,
+ (uint8_t*)34885,
+ (uint8_t*)35938,
+ (uint8_t*)36027,
+ (uint8_t*)36154,
+ (uint8_t*)36281,
+ (uint8_t*)36372,
+ (uint8_t*)36476,
+ (uint8_t*)36546,
+ (uint8_t*)36639,
+ (uint8_t*)36748,
 };
 
 bool trekgui_init(void *decompressed_addr) {
     unsigned int data, i;
-    ti_var_t appvar;
-    ti_CloseAll();
-    appvar = ti_Open("trekgui", "r");
-    zx7_Decompress(decompressed_addr, ti_GetDataPtr(appvar));
-   // data = (unsigned int)decompressed_addr - (unsigned int)trekgui[0];
+
+    data = (unsigned int)decompressed_addr - (unsigned int)trekgui[0];
     for (i = 0; i < trekgui_num; i++) {
-        trekgui[i] += (unsigned int)decompressed_addr;
+        trekgui[i] += data;
     }
 
-    return (bool)appvar;
+    return true;
 }

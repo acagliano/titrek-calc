@@ -22,7 +22,6 @@ enum SysTypes {
     IMPDR,
     NAVSENS,
     TRANS,
-    COMMS,
     SYS_MAX
 };
 
@@ -53,31 +52,10 @@ typedef struct { int maxrange; int maxtargets; } trans_data_t;
 
 //Tactical Structs
 typedef struct { int maxrange; char maxtargets; } targsens_data_t;
-typedef struct { unsigned char drv; int maxhealth; int shieldhealth[SHIP_ALL]; } shield_data_t;
-typedef struct { int range; int speed; int shielddamage; int hulldamage; } phaser_data_t;
-typedef struct { int range; int speed; unsigned char compat_torps[5]; } torpedo_data_t;
+typedef struct { unsigned int resistance;  int frequency; int maxhealth; int shieldhealth[SHIP_ALL]; } shield_data_t;
+typedef struct { int yield; int range; int speed; } phaser_data_t;
+typedef struct { int equipped; unsigned char compatible[10]; } torpedo_data_t;
 // This union combines all tactical modules into 1
-
-typedef union System_t {
-    trans_data_t transport;
-    integ_data_t integ;
-    lifesup_data_t lifesupport;
-    core_data_t core;
-    engine_data_t engine;
-    navsens_data_t navsens;
-} system_t;
-
-typedef union Tactical_t {
-    shield_data_t shields;
-    torpedo_data_t torpedoes;
-    phaser_data_t phasers;
-    targsens_data_t targsens;
-} tactical_t;
-
-typedef union Type_t {
-    system_t coresys;
-    tactical_t tactical;
-} type_t;
 
 // for miscellaneous, there is no types, just ids.
 
@@ -87,7 +65,6 @@ typedef struct {
     signed int current;         // the amount of power the module currently has
     signed int spend;           // power spend per cycle
     signed int base;           // default power usage
-    signed int draw;          // power taken from core or auxiliary
     bool alwaysUse;          // boolean to specify if the module is always using power when active
     char drawFrom;
 } power_t;
@@ -102,7 +79,6 @@ signed int power_GetSpendPercent(power_t* power);   // returns power expend/usag
 signed int power_GetPowerSpend(power_t* power);
 void power_ChangeSpend(power_t* power, char amount);
 signed int power_GetPowerDraw(power_t* power);
-void power_ChangeDraw(power_t* power, char amount, char generated);
 //bool power_ExpendThisCycle(power_t* power);     // returns if module should use power
 //bool power_ReserveThisCycle(power_t* power);      // returns if module should recieve power
 void power_SetDrawSource(power_t* power, char source);
@@ -139,10 +115,20 @@ void health_DamageModule(health_t* health, int amount);
 #define STEP_LOW 5
 
 // Module Data Struct
-typedef struct {
-    unsigned char techtype;
-    char techname[10];
-    type_t type;
+typedef union Data_t {
+    // Core System Modules
+    trans_data_t transport;
+    integ_data_t integ;
+    lifesup_data_t lifesupport;
+    core_data_t core;
+    engine_data_t engine;
+    navsens_data_t navsens;
+    // Shield Modules
+    shield_data_t shields;
+    // Weapons Modules
+    torpedo_data_t torpedoes;
+    phaser_data_t phasers;
+    targsens_data_t targsens;
 } data_t;
 
 
@@ -154,8 +140,9 @@ typedef struct {
 
 typedef struct {
     unsigned char techid;
+    unsigned char techtype;     // locked, determines compatible tech type
     unsigned char techclass;    // locked, determines compatible module classes
-    char online;            // is module online
+    bool online, typelocked;            // is module online
     power_t power;          // power control
     health_t health;        // health monitor
     data_t data;
@@ -170,10 +157,16 @@ char module_SetOnlineState(module_t* module, char state);   // set module state 
 // EX: 73% of STEP_NORMAL might return 73% of 20 (16), or 70% effectiveness.
 // EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
 
-#define TACT_MAX 6
+#define MISC_MAX 3
+#define SHIELD_MAX 2
+#define WEAP_MAX 3
 typedef struct {
+    health_t hull;      // hull hitpoints
     module_t system[SYS_MAX];
-    module_t tactical[TACT_MAX];    // tactical or shield modules
+    module_t shield[SHIELD_MAX];
+    module_t weapon[WEAP_MAX];    // tactical or shield modules
+    module_t misc[MISC_MAX];
+    unsigned char sys_selected;
 } ship_t;
 // Core system defines
 

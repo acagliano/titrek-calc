@@ -30,17 +30,7 @@ void power_ChangeSpend(power_t* power, char amount){
 }
 
 signed int power_GetPowerDraw(power_t* power){
-    return power->draw;
-}
-
-void power_ChangeDraw(power_t* power, char amount, char generated){
-    signed int draw = power->draw;
-    if(amount == POWER_INC)
-        if(draw < (2 * power->base)) draw++;
-    if(amount == POWER_DEC)
-        if(draw > 0) draw--;
-    draw = (amount < generated) ? amount : generated;
-    power->draw = draw;
+    return power->base;
 }
 
 // HEALTH FUNCTIONS
