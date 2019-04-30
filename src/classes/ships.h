@@ -8,13 +8,7 @@
 #define DRAW_AUX 1
 #define DRAW_RESERVE 2
 
-enum ModuleClasses {
-    MC_SYSTEM = 1,
-    MC_TACTICAL,
-    MC_MISC
-};
-
-enum SysTypes {
+enum ModuleTypes {
     INTEG,
     LIFESUP,
     CORE,
@@ -22,15 +16,14 @@ enum SysTypes {
     IMPDR,
     NAVSENS,
     TRANS,
-    SYS_MAX
+    SYS_MAX,
+    SHIELD = SYS_MAX,
+    ARMOR,
+    PHASER,
+    TORPEDO,
+    TARG_SENS
 };
 
-enum TactTypes {
-    TACTSENS,
-    SHIELD,
-    PHASER,
-    TORPEDO
-};
 
 enum ShipZones {
     FORWARD,
@@ -139,9 +132,10 @@ typedef union Data_t {
 
 
 typedef struct {
+    bool unlocked, assigned;
     unsigned char techid;
     unsigned char techtype;     // locked, determines compatible tech type
-    unsigned char techclass;    // locked, determines compatible module classes
+//    unsigned char techclass;    // locked, determines compatible module classes
     bool online, typelocked;            // is module online
     power_t power;          // power control
     health_t health;        // health monitor
@@ -157,20 +151,16 @@ char module_SetOnlineState(module_t* module, char state);   // set module state 
 // EX: 73% of STEP_NORMAL might return 73% of 20 (16), or 70% effectiveness.
 // EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
 
-#define MISC_MAX 3
-#define SHIELD_MAX 2
-#define WEAP_MAX 3
+#define TACT_MAX 6
 typedef struct {
     health_t hull;      // hull hitpoints
     module_t system[SYS_MAX];
-    module_t shield[SHIELD_MAX];
-    module_t weapon[WEAP_MAX];    // tactical or shield modules
-    module_t misc[MISC_MAX];
-    unsigned char sys_selected;
+    module_t tactical[TACT_MAX];
+    unsigned char sys_selected, def_selected, off_selected;
 } ship_t;
 // Core system defines
 
-void module_SetHealthMax(health_t* health);
+void module_SetHealthMax(health_t* health, int max);
 void module_SetPowerMax(power_t* power);
 
 #endif

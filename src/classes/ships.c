@@ -62,9 +62,9 @@ char module_SetOnlineState(module_t* module, char state){
 
 
 
-void module_SetHealthMax(health_t* health){
-    health->current = 50;
-    health->max = 50;
+void module_SetHealthMax(health_t* health, int max){
+    health->current = max;
+    health->max = max;
 }
 
 void module_SetPowerMax(power_t* power){

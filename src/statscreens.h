@@ -9,15 +9,14 @@
 extern char mainsys_strings[][10];
 
 void Screen_UISystemStats(module_t* system, unsigned char count, unsigned char selected);
-void Screen_UIShieldStats(module_t* shields);
-void Screen_UIRepairSys(module_t* modules, unsigned char count);
+void Screen_UIDefenseStats(module_t* tactical, module_t* selected, health_t* hull);
 void Screen_UIViewer(void);
 void Screen_UIInventory(void);
 void Screen_UITransporter(void);
 void Screen_UIReplicator(void);
 void Screen_UISensors(void);
 
-int Stats_DrawHealthBar(unsigned int percent, unsigned int length, int x, int y, unsigned char border_color, unsigned char bar_color, bool icon);
+int Stats_DrawHealthBar(unsigned int percent, unsigned int length, int x, int y, unsigned char border_color, unsigned char bar_color, gfx_rletsprite_t* icon);
 void Screen_Background(unsigned char active);
 
 

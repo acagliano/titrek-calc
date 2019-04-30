@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		8526912C2278A5C800EB2735 /* server */ = {isa = PBXFileReference; lastKnownFileType = folder; path = server; sourceTree = "<group>"; };
 		858C25B11ED38DE100028EB4 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bin; sourceTree = "<group>"; };
 		858C25B21ED38DE100028EB4 /* iconc.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iconc.png; sourceTree = "<group>"; };
 		858C25B31ED38DE100028EB4 /* makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = makefile; sourceTree = "<group>"; };
@@ -19,6 +20,7 @@
 		858C25A61ED38D4100028EB4 = {
 			isa = PBXGroup;
 			children = (
+				8526912C2278A5C800EB2735 /* server */,
 				858C25B11ED38DE100028EB4 /* bin */,
 				858C25B21ED38DE100028EB4 /* iconc.png */,
 				858C25B31ED38DE100028EB4 /* makefile */,
@@ -64,6 +66,7 @@
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
+				English,
 				en,
 			);
 			mainGroup = 858C25A61ED38D4100028EB4;

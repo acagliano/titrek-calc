@@ -56,20 +56,24 @@ void main(void) {
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
+    module_SetHealthMax(&Ship.hull, 1000);
     for(i = 0; i < SYS_MAX; i++){
-        Ship.system[i].techclass = MC_SYSTEM;
+       // Ship.system[i].techclass = MC_SYSTEM;
+        Ship.system[i].assigned = true;
         Ship.system[i].online = true;
         Ship.system[i].techtype = i;
-        module_SetHealthMax(&Ship.system[i].health);
+        module_SetHealthMax(&Ship.system[i].health, 50);
         module_SetPowerMax(&Ship.system[i].power);
     }
-    for(i = 0; i < SHIELD_MAX; i++){
-        Ship.shield[i].techclass = MC_TACTICAL;
-        Ship.shield[i].online = true;
-        Ship.shield[i].techtype = SHIELD;
-        module_SetHealthMax(&Ship.shield[i].health);
-        module_SetPowerMax(&Ship.shield[i].power);
-        Ship.shield[i].data.shields.resistance = 10;
+    for(i = 0; i < 2; i++){
+      //  Ship.shield[i].techclass = MC_TACTICAL;
+        Ship.system[i].unlocked = true;
+        Ship.system[i].assigned = true;
+        Ship.tactical[i].online = true;
+        Ship.tactical[i].techtype = SHIELD;
+        module_SetHealthMax(&Ship.tactical[i].health, 50);
+        module_SetPowerMax(&Ship.tactical[i].power);
+        Ship.tactical[i].data.shields.resistance = 10;
     }
     do {
         unsigned char key = os_GetCSC();
@@ -84,9 +88,9 @@ void main(void) {
             char i;
             char modnum = randInt(0, SYS_MAX - 1);
             char randnum = randInt(5, 10);
-            for(i = 0; i < SHIELD_MAX; i++){
-                module_t *shield = &Ship.shield[i];
-                if(shield->online){
+            for(i = 0; i < TACT_MAX; i++){
+                module_t *shield = &Ship.tactical[i];
+                if((shield->techtype == SHIELD) && shield->online){
                     int health = health_GetHealthPercent(&shield->health);
                     int drv = shield->data.shields.resistance;
                     drv = health * drv / 100;
@@ -94,10 +98,44 @@ void main(void) {
                     randnum -= drv;
                 }
             }
+            health_DamageModule(&Ship.hull, -(randnum));
             health_DamageModule(&Ship.system[modnum].health, -(randnum));
         }
-        if(key == sk_Down) if(Ship.sys_selected < (SYS_MAX - 1)) Ship.sys_selected++;
-        if(key == sk_Up) if(Ship.sys_selected > 0) Ship.sys_selected--;
+        if(key == sk_Down) {
+            char i;
+            switch(screen){
+                case 1:
+                    for(i = Ship.def_selected + 1; i < (TACT_MAX - 1); i++){
+                        int type = Ship.tactical[i].techtype;
+                        if( type == SHIELD || type == ARMOR ){
+                            Ship.def_selected = i;
+                            break;
+                        }
+                    }
+                    break;
+                case 3:
+                    if(Ship.sys_selected < (SYS_MAX - 1)) Ship.sys_selected++;
+                    break;
+            }
+        }
+        if(key == sk_Up){
+            char i;
+            switch(screen){
+                case 1:
+                    for(i = Ship.def_selected - 1; i >= 0; i--){
+                        int type = Ship.tactical[i].techtype;
+                        if( type == SHIELD || type == ARMOR ){
+                            Ship.def_selected = i;
+                            break;
+                        }
+                    }
+                    break;
+                case 3:
+                    if(Ship.sys_selected > 0) Ship.sys_selected--;
+                    break;
+            }
+        }
+            
     } while(loopgame == true);
     free(gfx_sprites);
     gfx_End();
@@ -114,7 +152,7 @@ void DrawFrame(unsigned char screen){
             // GUI
             break;
         case 1:
-            Screen_UIShieldStats(&Ship.shield[0]);
+            Screen_UIDefenseStats(&Ship.tactical[0], &Ship.tactical[Ship.def_selected], &Ship.hull);
             break;
         case 2:
             

@@ -2,6 +2,9 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "self:StarTrek-CE.xcodeproj">
+      location = "group:../server">
+   </FileRef>
+   <FileRef
+      location = "self:">
    </FileRef>
 </Workspace>

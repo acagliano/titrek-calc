@@ -55,7 +55,7 @@ extern uint8_t *trekgui[15];
 #define icon_shieldstrength_height 11
 #define icon_shieldstrength ((gfx_rletsprite_t*)trekgui[14])
 bool trekgui_init(void *decompressed_addr);
-#define trekgui_uncompressed_size 36851
-#define trekgui_compressed_size 4564
+#define trekgui_uncompressed_size 36859
+#define trekgui_compressed_size 4554
 
 #endif
