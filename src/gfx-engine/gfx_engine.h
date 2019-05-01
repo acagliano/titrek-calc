@@ -1,6 +1,7 @@
 
 #ifndef gfx_engine_h
 #define gfx_engine_h
+#include "classes/coords.h"
 
 // ENGINE TYPEDEFS
 enum Objects {
@@ -24,6 +25,7 @@ enum Particles {
 
 typedef struct {
     unsigned char objectid;     // Cooresponds to enum Objects, and index of sprite
+    coords_t coords;            // access using [mapentity_t].coords.{x,y,z}
     unsigned int radius;        // Radius of round object, or max size of irregular
     bool irregular;             // True if object is irregular
     int rand_seed;              // Seed used to generate object (if irregular) - server-supplied

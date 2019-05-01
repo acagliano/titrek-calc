@@ -153,6 +153,7 @@ char module_SetOnlineState(module_t* module, char state);   // set module state 
 
 #define TACT_MAX 6
 typedef struct {
+    coords_t coords;
     health_t hull;      // hull hitpoints
     module_t system[SYS_MAX];
     module_t tactical[TACT_MAX];
