@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		85236C23227B2F7D00FA59F1 /* usb */ = {isa = PBXFileReference; lastKnownFileType = folder; path = usb; sourceTree = "<group>"; };
 		8526912C2278A5C800EB2735 /* server */ = {isa = PBXFileReference; lastKnownFileType = folder; path = server; sourceTree = "<group>"; };
 		858C25B11ED38DE100028EB4 /* bin */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bin; sourceTree = "<group>"; };
 		858C25B21ED38DE100028EB4 /* iconc.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iconc.png; sourceTree = "<group>"; };
@@ -20,6 +21,7 @@
 		858C25A61ED38D4100028EB4 = {
 			isa = PBXGroup;
 			children = (
+				85236C23227B2F7D00FA59F1 /* usb */,
 				8526912C2278A5C800EB2735 /* server */,
 				858C25B11ED38DE100028EB4 /* bin */,
 				858C25B21ED38DE100028EB4 /* iconc.png */,
