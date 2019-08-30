@@ -1,0 +1,111 @@
+; Zilog eZ80 ANSI C Compiler Release 3.4
+; -optsize -noreduceopt -nomodsect -peephole -globalopt
+; -localcse -const=ROM 
+	FILE	"SRC\GFX\TREKGUI.C"
+	.assume ADL=1
+	SEGMENT DATA
+_trekgui:
+	DW24	0
+	DW24	13150
+	DW24	26128
+	DW24	29497
+	DW24	32418
+	DW24	34885
+	DW24	35938
+	DW24	36027
+	DW24	36154
+	DW24	36281
+	DW24	36372
+	DW24	36476
+	DW24	36546
+	DW24	36639
+	DW24	36748
+;    1	// convpng v7.0
+;    2	#include <stdint.h>
+;    3	#include "trekgui.h"
+;    4	
+;    5	#include <fileioc.h>
+;    6	uint8_t *trekgui[15] = {
+	SEGMENT CODE
+;    7	 (uint8_t*)0,
+;    8	 (uint8_t*)13150,
+;    9	 (uint8_t*)26128,
+;   10	 (uint8_t*)29497,
+;   11	 (uint8_t*)32418,
+;   12	 (uint8_t*)34885,
+;   13	 (uint8_t*)35938,
+;   14	 (uint8_t*)36027,
+;   15	 (uint8_t*)36154,
+;   16	 (uint8_t*)36281,
+;   17	 (uint8_t*)36372,
+;   18	 (uint8_t*)36476,
+;   19	 (uint8_t*)36546,
+;   20	 (uint8_t*)36639,
+;   21	 (uint8_t*)36748,
+;   22	};
+;   23	
+;   24	bool trekgui_init(void *decompressed_addr) {
+_trekgui_init:
+	LD	HL,-9
+	CALL	__frameset
+;   25	    unsigned int data, i;
+;   26	
+;   27	    data = (unsigned int)decompressed_addr - (unsigned int)trekgui[0];
+	LD	BC,(_trekgui)
+	LD	HL,(IX+6)
+	OR	A,A
+	SBC	HL,BC
+	LD	(IX+-6),HL
+;   28	    for (i = 0; i < trekgui_num; i++) {
+	LD	BC,0
+	LD	(IX+-3),BC
+	JR	L_3
+L_1:
+;   29	        trekgui[i] += data;
+	LD	HL,(IX+-3)
+	LD	BC,HL
+	ADD	HL,HL
+	ADD	HL,BC
+	LD	BC,_trekgui
+	ADD	HL,BC
+	LD	(IX+-9),HL
+	LD	HL,(HL)
+	LD	IY,(IX+-9)
+	LD	BC,(IX+-6)
+	ADD	HL,BC
+	LD	(IY),HL
+	LD	BC,(IX+-3)
+	INC	BC
+	LD	(IX+-3),BC
+;   30	    }
+L_3:
+	LD	BC,15
+	LD	HL,(IX+-3)
+	OR	A,A
+	SBC	HL,BC
+	JR	C,L_1
+;   31	
+;   32	    return true;
+	LD	A,1
+;   33	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _trekgui_init ***************************
+;Name                         Addr/Register   Size   Type
+;_trekgui                            STATIC     45   variable
+;data                                  IX-6      3   variable
+;i                                     IX-3      3   variable
+;decompressed_addr                     IX+6      3   parameter
+
+
+; Stack Frame Size: 18 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+	XREF __frameset:ROM
+	XDEF _trekgui_init
+	XDEF _trekgui
+	END

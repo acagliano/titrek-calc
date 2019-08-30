@@ -1,0 +1,442 @@
+; Zilog eZ80 ANSI C Compiler Release 3.4
+; -optsize -noreduceopt -nomodsect -peephole -globalopt
+; -localcse -const=ROM 
+	FILE	"SRC\CLASSES\SHIPS.C"
+	.assume ADL=1
+	SEGMENT CODE
+;    1	#include <stddef.h>
+;    2	#include "ships.h"
+;    3	
+;    4	// POWER FUNCTIONS
+;    5	signed int power_GetBatteryPercent(power_t* power){
+_power_GetBatteryPercent:
+	CALL	__frameset0
+;    6	    return power->current * 100 / power->capacity;
+	LD	IY,(IX+6)
+	LD	HL,(IY+4)
+	LD	A,100
+	CALL	__imul_b
+	LD	BC,(IY+1)
+	CALL	__idivs
+;    7	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _power_GetBatteryPercent ***************************
+;Name                         Addr/Register   Size   Type
+;power                                 IX+6      3   parameter
+
+
+; Stack Frame Size: 9 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;    8	
+;    9	signed int power_GetSpendPercent(power_t* power){
+_power_GetSpendPercent:
+	CALL	__frameset0
+;   10	    return power->spend * 100 / power->base;
+	LD	IY,(IX+6)
+	LD	HL,(IY+7)
+	LD	A,100
+	CALL	__imul_b
+	LD	BC,(IY+10)
+	CALL	__idivs
+;   11	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _power_GetSpendPercent ***************************
+;Name                         Addr/Register   Size   Type
+;power                                 IX+6      3   parameter
+
+
+; Stack Frame Size: 9 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   12	
+;   13	void power_SetDrawSource(power_t* power, char source){
+_power_SetDrawSource:
+	CALL	__frameset0
+;   14	    power->drawFrom = source;
+	LD	A,(IX+9)
+	LD	IY,(IX+6)
+	LD	(IY+14),A
+;   15	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _power_SetDrawSource ***************************
+;Name                         Addr/Register   Size   Type
+;source                                IX+9      1   parameter
+;power                                 IX+6      3   parameter
+
+
+; Stack Frame Size: 12 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   16	
+;   17	char power_GetDrawSource(power_t* power){
+_power_GetDrawSource:
+	CALL	__frameset0
+;   18	    return power->drawFrom;
+	LD	IY,(IX+6)
+	LD	A,(IY+14)
+;   19	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _power_GetDrawSource ***************************
+;Name                         Addr/Register   Size   Type
+;power                                 IX+6      3   parameter
+
+
+; Stack Frame Size: 9 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   20	
+;   21	signed int power_GetPowerSpend(power_t* power){
+_power_GetPowerSpend:
+	CALL	__frameset0
+;   22	    return power->spend;
+	LD	IY,(IX+6)
+	LD	HL,(IY+7)
+;   23	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _power_GetPowerSpend ***************************
+;Name                         Addr/Register   Size   Type
+;power                                 IX+6      3   parameter
+
+
+; Stack Frame Size: 9 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   24	
+;   25	void power_ChangeSpend(power_t* power, char amount){
+_power_ChangeSpend:
+	LD	HL,-6
+	CALL	__frameset
+;   26	    if(amount == POWER_INC)
+	LD	A,(IX+9)
+	CP	A,1
+	JR	NZ,L_11
+;   27	        if(power->spend < (2 * power->base)) power->spend++;
+	LD	IY,(IX+6)
+	LD	BC,(IY+7)
+	LD	(IX+-3),BC
+	LD	HL,(IY+10)
+	ADD	HL,HL
+	LD	BC,HL
+	LD	HL,(IX+-3)
+	OR	A,A
+	SBC	HL,BC
+	CALL	__setflag
+	JP	P,L_11
+	LD	BC,(IX+-3)
+	INC	BC
+	LD	IY,(IX+6)
+	LD	(IY+7),BC
+L_11:
+;   28	    if(amount == POWER_DEC)
+	LD	A,(IX+9)
+	CP	A,-1
+	JR	NZ,L_12
+;   29	        if(power->spend > 0) power->spend--;
+	LD	IY,(IX+6)
+	LD	BC,(IY+7)
+	LD	(IX+-6),BC
+	OR	A,A
+	SBC	HL,HL
+	OR	A,A
+	SBC	HL,BC
+	CALL	__setflag
+	JP	P,L_12
+	LD	BC,(IX+-6)
+	DEC	BC
+	LD	IY,(IX+6)
+	LD	(IY+7),BC
+;   30	}
+L_12:
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _power_ChangeSpend ***************************
+;Name                         Addr/Register   Size   Type
+;G_1                                   IX-6      3   variable
+;G_0                                   IX-3      3   variable
+;amount                                IX+9      1   parameter
+;power                                 IX+6      3   parameter
+
+
+; Stack Frame Size: 18 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   31	
+;   32	signed int power_GetPowerDraw(power_t* power){
+_power_GetPowerDraw:
+	CALL	__frameset0
+;   33	    return power->base;
+	LD	IY,(IX+6)
+	LD	HL,(IY+10)
+;   34	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _power_GetPowerDraw ***************************
+;Name                         Addr/Register   Size   Type
+;power                                 IX+6      3   parameter
+
+
+; Stack Frame Size: 9 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   35	
+;   36	// HEALTH FUNCTIONS
+;   37	signed int health_GetHealthPercent(health_t* health){
+_health_GetHealthPercent:
+	CALL	__frameset0
+;   38	    return health->current * 100 / health->max;
+	LD	IY,(IX+6)
+	LD	HL,(IY+3)
+	LD	A,100
+	CALL	__imul_b
+	LD	BC,(IY+0)
+	CALL	__idivs
+;   39	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _health_GetHealthPercent ***************************
+;Name                         Addr/Register   Size   Type
+;health                                IX+6      3   parameter
+
+
+; Stack Frame Size: 9 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   40	
+;   41	void health_DamageModule(health_t* health, int amount){
+_health_DamageModule:
+	LD	HL,-3
+	CALL	__frameset
+;   42	    health->current += amount;
+	LD	BC,(IX+9)
+	LD	IY,(IX+6)
+	LD	HL,(IY+3)
+	ADD	HL,BC
+	LD	(IY+3),HL
+;   43	    if(health->current < 0) health->current = 0;
+	LD	HL,(IY+3)
+	CALL	__icmpzero
+	CALL	__setflag
+	JP	P,L_17
+	LD	BC,0
+	LD	IY,(IX+6)
+	LD	(IY+3),BC
+L_17:
+;   44	    if(health->current > health->max) health->current = health->max;
+	LD	IY,(IX+6)
+	LD	BC,(IY+0)
+	LD	(IX+-3),BC
+	LD	BC,(IY+3)
+	LD	HL,(IX+-3)
+	OR	A,A
+	SBC	HL,BC
+	CALL	__setflag
+	JP	P,L_18
+	LD	BC,(IX+-3)
+	LD	IY,(IX+6)
+	LD	(IY+3),BC
+;   45	}
+L_18:
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _health_DamageModule ***************************
+;Name                         Addr/Register   Size   Type
+;G_2                                   IX-3      3   variable
+;amount                                IX+9      3   parameter
+;health                                IX+6      3   parameter
+
+
+; Stack Frame Size: 15 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   46	
+;   47	
+;   48	// MODULE FUNCTIONS
+;   49	char module_GetOnlineState(module_t* module){
+_module_GetOnlineState:
+	CALL	__frameset0
+;   50	    return module->online;
+	LD	IY,(IX+6)
+	LD	A,(IY+4)
+;   51	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _module_GetOnlineState ***************************
+;Name                         Addr/Register   Size   Type
+;module                                IX+6      3   parameter
+
+
+; Stack Frame Size: 9 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   52	
+;   53	char module_SetOnlineState(module_t* module, char state){
+_module_SetOnlineState:
+	CALL	__frameset0
+;   54	    if(state){
+	LD	A,(IX+9)
+	OR	A,A
+	JR	Z,L_25
+;   55	        if(module->power.current == 0) return SETSTATE_NOPOWER;
+	LD	IY,(IX+6)
+	LD	HL,(IY+10)
+	CALL	__icmpzero
+	JR	NZ,L_23
+	LD	A,1
+	JR	L_26
+L_23:
+;   56	        if(state == 1 && module->health.current == 0) return SETSTATE_NOHEALTH;
+	LD	A,(IX+9)
+	CP	A,1
+	JR	NZ,L_25
+	LD	IY,(IX+6)
+	LD	HL,(IY+24)
+	CALL	__icmpzero
+	JR	NZ,L_25
+	LD	A,2
+	JR	L_26
+;   57	    }
+L_25:
+;   58	    module->online = state;
+	LD	A,(IX+9)
+	LD	IY,(IX+6)
+	LD	(IY+4),A
+;   59	    return SETSTATE_SUCCESS;
+	XOR	A,A
+;   60	}
+L_26:
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _module_SetOnlineState ***************************
+;Name                         Addr/Register   Size   Type
+;state                                 IX+9      1   parameter
+;module                                IX+6      3   parameter
+
+
+; Stack Frame Size: 12 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   61	
+;   62	
+;   63	
+;   64	
+;   65	void module_SetHealthMax(health_t* health, int max){
+_module_SetHealthMax:
+	CALL	__frameset0
+;   66	    health->current = max;
+	LD	BC,(IX+9)
+	LD	IY,(IX+6)
+	LD	(IY+3),BC
+;   67	    health->max = max;
+	LD	BC,(IX+9)
+	LD	(IY+0),BC
+;   68	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _module_SetHealthMax ***************************
+;Name                         Addr/Register   Size   Type
+;max                                   IX+9      3   parameter
+;health                                IX+6      3   parameter
+
+
+; Stack Frame Size: 12 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+;   69	
+;   70	void module_SetPowerMax(power_t* power){
+_module_SetPowerMax:
+	CALL	__frameset0
+;   71	    power->capacity = 100;
+	LD	BC,100
+	LD	IY,(IX+6)
+	LD	(IY+1),BC
+;   72	    power->current = 100;
+	LD	(IY+4),BC
+;   73	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _module_SetPowerMax ***************************
+;Name                         Addr/Register   Size   Type
+;power                                 IX+6      3   parameter
+
+
+; Stack Frame Size: 9 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+	XREF __idivs:ROM
+	XREF __frameset0:ROM
+	XREF __frameset:ROM
+	XREF __setflag:ROM
+	XREF __icmpzero:ROM
+	XREF __imul_b:ROM
+	XDEF _module_SetPowerMax
+	XDEF _module_SetHealthMax
+	XDEF _module_SetOnlineState
+	XDEF _module_GetOnlineState
+	XDEF _health_DamageModule
+	XDEF _health_GetHealthPercent
+	XDEF _power_GetPowerDraw
+	XDEF _power_ChangeSpend
+	XDEF _power_GetPowerSpend
+	XDEF _power_GetDrawSource
+	XDEF _power_SetDrawSource
+	XDEF _power_GetSpendPercent
+	XDEF _power_GetBatteryPercent
+	END
