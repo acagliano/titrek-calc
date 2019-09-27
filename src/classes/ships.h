@@ -2,27 +2,16 @@
 #define ships_h
 
 #include <stdbool.h>
+#include <stdint.h>
+#include "coords.h"
 #include "tech.h"
+#include "modules.h"
 // POWER CONTROL STRUCTURE
 #define DRAW_CORE 0
 #define DRAW_AUX 1
 #define DRAW_RESERVE 2
 
-enum ModuleTypes {
-    INTEG,
-    LIFESUP,
-    CORE,
-    WARPDR,
-    IMPDR,
-    NAVSENS,
-    TRANS,
-    SYS_MAX,
-    SHIELD = SYS_MAX,
-    ARMOR,
-    PHASER,
-    TORPEDO,
-    TARG_SENS
-};
+
 
 
 enum ShipZones {
@@ -154,12 +143,17 @@ char module_SetOnlineState(module_t* module, char state);   // set module state 
 #define TACT_MAX 6
 typedef struct {
     coords_t coords;
-    health_t hull;      // hull hitpoints
+    uint24_t crew;
     module_t system[SYS_MAX];
     module_t tactical[TACT_MAX];
-    unsigned char sys_selected, def_selected, off_selected;
+    module_t hull;
 } ship_t;
 // Core system defines
+
+typedef struct {
+    int mains;
+    int tactical;
+} selected_t;
 
 void module_SetHealthMax(health_t* health, int max);
 void module_SetPowerMax(power_t* power);

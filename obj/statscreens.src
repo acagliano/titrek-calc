@@ -160,21 +160,23 @@ _mainsys_strings:
 ;    3	#include "classes/ships.h"
 ;    4	#include "statscreens.h"
 ;    5	#include "gfx/trekgui.h"
-;    6	#include <graphx.h>
-;    7	#include <compression.h>
-;    8	
-;    9	char mains_title[] = "[MAIN SYS CONTROL]";
-;   10	char shields_title[] = "[DEFENSE CONTROL]";
-;   11	char tact_title[] = "[TACTICAL SYS CONTROL]";
-;   12	char version[] = "v0.84 pre-alpha";
-;   13	
-;   14	char mainsys_strings[][10] = {"Integrity", "LifeSupp", "WarpCore", "WarpDrive", "Impulse", "NavSens", "Transport"};
-	SEGMENT CODE
+;    6	#include "classes/screens.h"
+;    7	#include <graphx.h>
+;    8	#include <compression.h>
+;    9	#include "gfx-engine/gui.h"
+;   10	
+;   11	char mains_title[] = "[MAIN SYS CONTROL]";
+;   12	char shields_title[] = "[DEFENSE CONTROL]";
+;   13	char tact_title[] = "[TACTICAL SYS CONTROL]";
+;   14	char version[] = "v0.84 pre-alpha";
 ;   15	
-;   16	int text_GetCenterX(char* string){
+;   16	char mainsys_strings[][10] = {"Integrity", "LifeSupp", "WarpCore", "WarpDrive", "Impulse", "NavSens", "Transport"};
+	SEGMENT CODE
+;   17	
+;   18	int text_GetCenterX(char* string){
 _text_GetCenterX:
 	CALL	__frameset0
-;   17	    return (LCD_WIDTH - gfx_GetStringWidth(string)) / 2;
+;   19	    return (LCD_WIDTH - gfx_GetStringWidth(string)) / 2;
 	LD	BC,(IX+6)
 	PUSH	BC
 	CALL	_gfx_GetStringWidth
@@ -185,7 +187,7 @@ _text_GetCenterX:
 	SBC	HL,BC
 	LD	A,1
 	CALL	__ishru_b
-;   18	}
+;   20	}
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -201,11 +203,11 @@ _text_GetCenterX:
 ;       Spill Code: 0 (instruction)
 
 
-;   19	
-;   20	int num_GetLength(int number){
+;   21	
+;   22	int num_GetLength(int number){
 _num_GetLength:
 	CALL	__frameset0
-;   21	    return 1 + (number >= 10) + (number >= 100);
+;   23	    return 1 + (number >= 10) + (number >= 100);
 	LD	BC,10
 	LD	HL,(IX+6)
 	OR	A,A
@@ -237,7 +239,7 @@ L__6:
 	SEXT	HL
 	LD	L,B
 	ADD	HL,DE
-;   22	}
+;   24	}
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -252,14 +254,148 @@ L__6:
 ;       Spill Code: 0 (instruction)
 
 
-;   23	
-;   24	void Screen_UISystemStats(module_t* system, unsigned char count, unsigned char selected){
+;   25	
+;   26	void Screen_RenderUI(uint24_t screen, ship_t* Ship, selected_t* select){
+_Screen_RenderUI:
+	CALL	__frameset0
+;   27	    Screen_Background(screen);
+	LD	C,(IX+6)
+	LD	B,0
+	PUSH	BC
+	CALL	_Screen_Background
+	POP	BC
+;   28	    gfx_SetTextFGColor(255);
+	LD	BC,255
+	PUSH	BC
+	CALL	_gfx_SetTextFGColor
+	POP	BC
+;   29	    switch(screen & 0xff){
+	LD	A,(IX+6)
+	UEXT	HL
+	LD	L,A
+	CALL	__seqcase
+L__8:
+	DW	6
+	DW	0
+	DB	0
+	DW24	L_9	
+
+	DW24	L_9	
+
+	DW24	L_4	
+
+	DW24	L_5	
+
+	DW24	L_9	
+
+	DW24	L_9	
+
+	DW24	L_9	
+
+;   30	        case SCRN_OFF:
+;   31	            break;
+;   32	        case SCRN_SENS:
+;   33	            break;
+;   34	        case SCRN_TACT:
+L_4:
+;   35	            Screen_UITacticalStats(&Ship->tactical, select->tactical);
+	LD	IY,(IX+12)
+	LD	BC,(IY+3)
+	PUSH	BC
+	LD	BC,(IX+9)
+	LD	HL,339
+	ADD	HL,BC
+	LD	BC,HL
+	PUSH	BC
+	CALL	_Screen_UITacticalStats
+	POP	BC
+	POP	BC
+;   36	            break;
+	JR	L_9
+;   37	        case SCRN_MAINS:
+L_5:
+;   38	            Screen_UISystemStats(&Ship->system, select->mains);
+	LD	IY,(IX+12)
+	LD	BC,(IY+0)
+	PUSH	BC
+	LD	IY,(IX+9)
+	PEA	IY+15
+	CALL	_Screen_UISystemStats
+	POP	BC
+	POP	BC
+;   39	            break;
+;   40	        case SCRN_TRANSPORT:
+;   41	            break;
+;   42	        case SCRN_CARGO:
+;   43	            break;
+;   44	    }
+L_9:
+;   45	    if(screen > 0xff) {
+	LD	BC,(IX+6)
+	LD	HL,255
+	OR	A,A
+	SBC	HL,BC
+	JR	NC,L_10
+;   46	        gfx_PrintStringXY("Info Window Here", 60, 100);
+	LD	BC,100
+	PUSH	BC
+	LD	BC,60
+	PUSH	BC
+	LD	BC,L__10
+	PUSH	BC
+	CALL	_gfx_PrintStringXY
+	POP	BC
+	POP	BC
+	POP	BC
+;   47	    }
+L_10:
+;   48	    gfx_BlitBuffer();
+	LD	BC,1
+	PUSH	BC
+	CALL	_gfx_Blit
+	POP	BC
+;   49	    gfx_SetTextFGColor(0);
+	LD	BC,0
+	PUSH	BC
+	CALL	_gfx_SetTextFGColor
+	POP	BC
+;   50	    return;
+;   51	}
+	LD	SP,IX
+	POP	IX
+	RET	
+
+
+;**************************** _Screen_RenderUI ***************************
+;Name                         Addr/Register   Size   Type
+;_gfx_Blit                           IMPORT  -----   function
+;_gfx_PrintStringXY                  IMPORT  -----   function
+;_Screen_UISystemStats               IMPORT  -----   function
+;_Screen_UITacticalStats             IMPORT  -----   function
+;_gfx_SetTextFGColor                 IMPORT  -----   function
+;_Screen_Background                  IMPORT  -----   function
+;select                               IX+12      3   parameter
+;Ship                                  IX+9      3   parameter
+;screen                                IX+6      3   parameter
+
+
+; Stack Frame Size: 15 (bytes)
+;       Spill Code: 0 (instruction)
+
+
+	SEGMENT STRSECT
+L__10:
+	DB	"Info Window Here"
+	DB	0
+	SEGMENT CODE
+;   52	
+;   53	void Screen_UISystemStats(module_t* systems, uint24_t selected){
 _Screen_UISystemStats:
-	LD	HL,-29
+	LD	HL,-23
 	CALL	__frameset
-;   25	    unsigned char i, cur_y;
-;   26	    int cur_x;
-;   27	    gfx_PrintStringXY(mains_title, text_GetCenterX(mains_title), viewer_y);
+;   54	    unsigned char i, cur_y;
+;   55	    int cur_x;
+;   56	    gfx_PrintStringXY(mains_title, text_GetCenterX(mains_title), viewer_y);
 	LD	BC,20
 	PUSH	BC
 	LD	BC,_mains_title
@@ -273,43 +409,48 @@ _Screen_UISystemStats:
 	POP	BC
 	POP	BC
 	POP	BC
-;   28	    for(i = 0; i < count; i++){
-	LD	(IX+-5),0
-	JR	L_13
-L_11:
-;   29	        // loop module health display
-;   30	        module_t* module = &system[i];
-	LD	A,(IX+-5)
+;   57	    for(i = 0; i < SYS_MAX; i++){
+	LD	(IX+-1),0
+	JR	L_18
+L_16:
+;   58	        // loop module health display
+;   59	        module_t* module = &systems[i];
+	LD	A,(IX+-1)
 	UEXT	HL
 	LD	L,A
 	LD	A,54
 	CALL	__imul_b
 	LD	BC,(IX+6)
 	ADD	HL,BC
-	LD	(IX+-8),HL
-;   31	        cur_y = i * 15 + viewer_y + 17;
+	LD	(IX+-5),HL
+;   60	        cur_y = i * 15 + viewer_y + 17;
 	LD	B,15
-	LD	C,(IX+-5)
+	LD	C,(IX+-1)
 	MLT	BC
 	LD	A,C
 	ADD	A,37
-	LD	(IX+-4),A
-;   32	        cur_x = viewer_x;
-;   33	        if(selected == i) {
-	LD	A,(IX+12)
-	CP	A,(IX+-5)
-	JR	NZ,L_4
-;   34	            gfx_SetColor(231);
+	LD	(IX+-2),A
+;   61	        cur_x = viewer_x;
+;   62	        if(selected == i) {
+	LD	A,(IX+-1)
+	UEXT	HL
+	LD	L,A
+	LD	BC,HL
+	LD	HL,(IX+9)
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_14
+;   63	            gfx_SetColor(231);
 	LD	BC,231
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;   35	            gfx_FillRectangle(cur_x - 6, cur_y - 3, 5, 13);
+;   64	            gfx_FillRectangle(cur_x - 6, cur_y - 3, 5, 13);
 	LD	BC,13
 	PUSH	BC
 	LD	BC,5
 	PUSH	BC
-	LD	A,(IX+-4)
+	LD	A,(IX+-2)
 	UEXT	HL
 	LD	L,A
 	DEC	HL
@@ -323,15 +464,15 @@ L_11:
 	POP	BC
 	POP	BC
 	POP	BC
-;   36	        }
-L_4:
-;   37	        gfx_SetColor(255);
+;   65	        }
+L_14:
+;   66	        gfx_SetColor(255);
 	LD	BC,255
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;   38	        gfx_SetTextXY(cur_x, cur_y);
-	LD	A,(IX+-4)
+;   67	        gfx_SetTextXY(cur_x, cur_y);
+	LD	A,(IX+-2)
 	UEXT	HL
 	LD	L,A
 	PUSH	HL
@@ -340,48 +481,48 @@ L_4:
 	CALL	_gfx_SetTextXY
 	POP	BC
 	POP	BC
-;   39	        if(module->assigned){
-	LD	IY,(IX+-8)
+;   68	        if(module->assigned){
+	LD	IY,(IX+-5)
 	LD	A,(IY+1)
 	OR	A,A
-	JR	Z,L_12
-;   40	            signed int health = health_GetHealthPercent(&module->health),
-	LD	IY,(IX+-8)
+	JR	Z,L_17
+;   69	            signed int health = health_GetHealthPercent(&module->health),
+	LD	IY,(IX+-5)
 	PEA	IY+21
 	CALL	_health_GetHealthPercent
 	POP	BC
-	LD	(IX+-23),HL
-;   41	                        spend = power_GetPowerSpend(&module->power),
-	LD	IY,(IX+-8)
+	LD	(IX+-8),HL
+;   70	                        spend = power_GetPowerSpend(&module->power),
+	LD	IY,(IX+-5)
 	LEA	BC,IY+6
-	LD	(IX+-29),BC
+	LD	(IX+-23),BC
 	PUSH	BC
 	CALL	_power_GetPowerSpend
 	POP	BC
 	LD	(IX+-11),HL
-;   42	                        spendpercent = power_GetSpendPercent(&module->power),
-	LD	BC,(IX+-29)
+;   71	                        spendpercent = power_GetSpendPercent(&module->power),
+	LD	BC,(IX+-23)
 	PUSH	BC
 	CALL	_power_GetSpendPercent
 	POP	BC
-	LD	(IX+-26),HL
-;   43	                        source = power_GetDrawSource(&module->power),
-	LD	BC,(IX+-29)
+	LD	(IX+-14),HL
+;   72	                        source = power_GetDrawSource(&module->power),
+	LD	BC,(IX+-23)
 	PUSH	BC
 	CALL	_power_GetDrawSource
 	POP	BC
 	LD	B,A
 	SEXT	HL
 	LD	L,B
-	LD	(IX+-14),HL
-;   44	                        pow_res = power_GetBatteryPercent(&module->power);
-	LD	BC,(IX+-29)
+	LD	(IX+-17),HL
+;   73	                        pow_res = power_GetBatteryPercent(&module->power);
+	LD	BC,(IX+-23)
 	PUSH	BC
 	CALL	_power_GetBatteryPercent
 	POP	BC
 	LD	(IX+-20),HL
-;   45	            gfx_PrintString(mainsys_strings[module->techtype]);
-	LD	IY,(IX+-8)
+;   74	            gfx_PrintString(mainsys_strings[module->techtype]);
+	LD	IY,(IX+-5)
 	LD	A,(IY+3)
 	UEXT	HL
 	LD	L,A
@@ -392,310 +533,41 @@ L_4:
 	PUSH	HL
 	CALL	_gfx_PrintString
 	POP	BC
-;   46	            cur_x += 75;
-	LD	BC,105
-;   47	            cur_x = Stats_DrawHealthBar(health, 50, cur_x, cur_y, 255, 255, icon_health);
-	LD	HL,_trekgui+18
-	LD	(IX+-3),BC
-	LD	BC,(HL)
-	PUSH	BC
+;   75	            cur_x += 75;
+;   76	            stats_DrawHealthBar(health, 50, cur_x, cur_y, 255, 255);
 	LD	BC,255
 	PUSH	BC
 	PUSH	BC
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	PUSH	HL
+	LD	C,(IX+-2)
+	LD	B,0
+	PUSH	BC
 	LD	BC,105
 	PUSH	BC
 	LD	BC,50
 	PUSH	BC
-	LD	BC,(IX+-23)
+	LD	BC,(IX+-8)
 	PUSH	BC
-	CALL	_Stats_DrawHealthBar
+	CALL	_stats_DrawHealthBar
 	POP	BC
 	POP	BC
 	POP	BC
 	POP	BC
 	POP	BC
 	POP	BC
-	POP	BC
-	LD	(IX+-3),HL
-;   48	            cur_x += 5;
-	LD	IY,(IX+-3)
-	LEA	BC,IY+5
-	LD	(IX+-3),BC
-;   49	            if(module->online) {
-	LD	IY,(IX+-8)
-	LD	A,(IY+4)
-	OR	A,A
-	JR	Z,L_9
-;   50	                gfx_RLETSprite((gfx_rletsprite_t*)trekgui[9 + source], cur_x, cur_y - 2);
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	DEC	HL
-	DEC	HL
-	PUSH	HL
-	LD	BC,(IX+-3)
-	PUSH	BC
-	LD	IY,(IX+-14)
-	LEA	HL,IY+9
-	LD	BC,HL
-	ADD	HL,HL
-	ADD	HL,BC
-	LD	BC,_trekgui
-	ADD	HL,BC
-	LD	BC,(HL)
-	PUSH	BC
-	CALL	_gfx_RLETSprite
-	POP	BC
-	POP	BC
-	POP	BC
-;   51	                if(source < 2){
-	LD	HL,(IX+-14)
-	LD	BC,2
-	OR	A,A
-	SBC	HL,BC
-	JP	P,L_6
-;   52	                    unsigned int draw = power_GetPowerDraw(&module->power);
-	LD	IY,(IX+-8)
-	PEA	IY+6
-	CALL	_power_GetPowerDraw
-	POP	BC
-	LD	(IX+-17),HL
-;   53	                    cur_x += 11;
-	LD	IY,(IX+-3)
-	LEA	BC,IY+11
-	LD	(IX+-3),BC
-;   54	                    gfx_RLETSprite(icon_powerdraw, cur_x, cur_y - 2);
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	DEC	HL
-	DEC	HL
-	PUSH	HL
-	LD	HL,_trekgui+33
-	LD	BC,(IX+-3)
-	PUSH	BC
-	LD	BC,(HL)
-	PUSH	BC
-	CALL	_gfx_RLETSprite
-	POP	BC
-	POP	BC
-	POP	BC
-;   55	                    cur_x += 13;
-	LD	IY,(IX+-3)
-	LEA	IY,IY+13
-	LD	(IX+-3),IY
-;   56	                    gfx_Rectangle(cur_x, cur_y - 2, 25, 11);
-	LD	BC,11
-	PUSH	BC
-	LD	BC,25
-	PUSH	BC
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	DEC	HL
-	DEC	HL
-	PUSH	HL
-	LD	BC,(IX+-3)
-	PUSH	BC
-	CALL	_gfx_Rectangle
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-;   57	                    gfx_SetTextXY(cur_x + 5, cur_y);
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	PUSH	HL
-	LD	IY,(IX+-3)
-	LEA	BC,IY+5
-	PUSH	BC
-	CALL	_gfx_SetTextXY
-	POP	BC
-	POP	BC
-;   58	                    gfx_PrintUInt(draw, num_GetLength(draw));
-	LD	BC,(IX+-17)
-	PUSH	BC
-	CALL	_num_GetLength
-	POP	BC
-	LD	C,L
-	LD	B,0
-	PUSH	BC
-	LD	BC,(IX+-17)
-	PUSH	BC
-	CALL	_gfx_PrintUInt
-	POP	BC
-	POP	BC
-;   59	                    cur_x += 30;
-	LD	IY,(IX+-3)
-	LEA	IY,IY+30
-	LD	(IX+-3),IY
-;   60	                    cur_x = Stats_DrawHealthBar(pow_res, 20, cur_x, cur_y, 255, 55, NULL);
-	LD	BC,0
-	PUSH	BC
-	LD	BC,55
-	PUSH	BC
-	LD	BC,255
-	PUSH	BC
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	PUSH	HL
-	LD	BC,(IX+-3)
-	PUSH	BC
-	LD	BC,20
-	PUSH	BC
-	LD	BC,(IX+-20)
-	PUSH	BC
-	CALL	_Stats_DrawHealthBar
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-	LD	(IX+-3),HL
-;   61	                    gfx_FillRectangle(cur_x + 2, cur_y, 2, 7);
-	LD	BC,7
-	PUSH	BC
-	LD	BC,2
-	PUSH	BC
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	PUSH	HL
-	LD	IY,(IX+-3)
-	LEA	BC,IY+2
-	PUSH	BC
-	CALL	_gfx_FillRectangle
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-;   62	                    cur_x += 5;
-	LD	IY,(IX+-3)
-	LEA	IY,IY+5
-	LD	(IX+-3),IY
-;   63	                }
-;   64	                else {
-L_6:
-;   65	                    
-;   66	                }
-;   67	                gfx_RLETSprite(icon_powerspend, cur_x, cur_y - 2);
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	DEC	HL
-	DEC	HL
-	PUSH	HL
-	LD	HL,_trekgui+36
-	LD	BC,(IX+-3)
-	PUSH	BC
-	LD	BC,(HL)
-	PUSH	BC
-	CALL	_gfx_RLETSprite
-	POP	BC
-	POP	BC
-	POP	BC
-;   68	                cur_x += 13;
-	LD	IY,(IX+-3)
-	LEA	IY,IY+13
-	LD	(IX+-3),IY
-;   69	                gfx_Rectangle(cur_x, cur_y - 2, 25, 11);
-	LD	BC,11
-	PUSH	BC
-	LD	BC,25
-	PUSH	BC
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	DEC	HL
-	DEC	HL
-	PUSH	HL
-	LD	BC,(IX+-3)
-	PUSH	BC
-	CALL	_gfx_Rectangle
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-;   70	                gfx_SetTextXY(cur_x + 5, cur_y);
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	PUSH	HL
-	LD	IY,(IX+-3)
-	LEA	BC,IY+5
-	PUSH	BC
-	CALL	_gfx_SetTextXY
-	POP	BC
-	POP	BC
-;   71	                gfx_PrintUInt(spend, num_GetLength(spend));
-	LD	BC,(IX+-11)
-	PUSH	BC
-	CALL	_num_GetLength
-	POP	BC
-	LD	C,L
-	LD	B,0
-	PUSH	BC
-	LD	BC,(IX+-11)
-	PUSH	BC
-	CALL	_gfx_PrintUInt
-	POP	BC
-	POP	BC
-;   72	            }
-;   73	            else {
-	JR	L_12
-L_9:
-;   74	                gfx_RLETSprite(icon_offline, cur_x, cur_y - 2);
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	DEC	HL
-	DEC	HL
-	PUSH	HL
-	LD	HL,_trekgui+24
-	LD	BC,(IX+-3)
-	PUSH	BC
-	LD	BC,(HL)
-	PUSH	BC
-	CALL	_gfx_RLETSprite
-	POP	BC
-	POP	BC
-	POP	BC
-;   75	                gfx_PrintStringXY("offline", cur_x + 15, cur_y);
-	LD	A,(IX+-4)
-	UEXT	HL
-	LD	L,A
-	PUSH	HL
-	LD	IY,(IX+-3)
-	LEA	BC,IY+15
-	PUSH	BC
-	LD	BC,L__12
-	PUSH	BC
-	CALL	_gfx_PrintStringXY
-	POP	BC
-	POP	BC
-	POP	BC
-;   76	            }
-;   77	            
-;   78	            //gfx_SetTextXY(viewer_x + 100, (i + 1) * 10 + viewer_y + 5);
-;   79	            //gfx_PrintUInt(health, 3);
-;   80	        }
-;   81	    }
-L_12:
-	INC	(IX+-5)
-L_13:
-	LD	A,(IX+-5)
-	CP	A,(IX+9)
-	JR	C,L_11
-;   82	    return;
-;   83	}
+;   77	           
+;   78	            
+;   79	            //gfx_SetTextXY(viewer_x + 100, (i + 1) * 10 + viewer_y + 5);
+;   80	            //gfx_PrintUInt(health, 3);
+;   81	        }
+;   82	    }
+L_17:
+	INC	(IX+-1)
+L_18:
+	LD	A,(IX+-1)
+	CP	A,6
+	JR	C,L_16
+;   83	    return;
+;   84	}
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -703,12 +575,7 @@ L_13:
 
 ;**************************** _Screen_UISystemStats ***************************
 ;Name                         Addr/Register   Size   Type
-;_gfx_PrintUInt                      IMPORT  -----   function
-;_gfx_Rectangle                      IMPORT  -----   function
-;_power_GetPowerDraw                 IMPORT  -----   function
-;_gfx_RLETSprite                     IMPORT  -----   function
-;_trekgui                            IMPORT     45   variable
-;_Stats_DrawHealthBar                IMPORT  -----   function
+;_stats_DrawHealthBar                IMPORT  -----   function
 ;_mainsys_strings                    STATIC     70   variable
 ;_gfx_PrintString                    IMPORT  -----   function
 ;_power_GetBatteryPercent            IMPORT  -----   function
@@ -721,45 +588,40 @@ L_13:
 ;_gfx_SetColor                       IMPORT  -----   function
 ;_mains_title                        STATIC     19   variable
 ;_gfx_PrintStringXY                  IMPORT  -----   function
-;spendpercent                         IX-26      3   variable
-;health                               IX-23      3   variable
 ;pow_res                              IX-20      3   variable
-;draw                                 IX-17      3   variable
-;source                               IX-14      3   variable
+;source                               IX-17      3   variable
+;spendpercent                         IX-14      3   variable
 ;spend                                IX-11      3   variable
-;module                                IX-8      3   variable
-;i                                     IX-5      1   variable
-;cur_y                                 IX-4      1   variable
-;cur_x                                 IX-3      3   variable
-;selected                             IX+12      1   parameter
-;count                                 IX+9      1   parameter
-;system                                IX+6      3   parameter
+;health                                IX-8      3   variable
+;module                                IX-5      3   variable
+;cur_y                                 IX-2      1   variable
+;i                                     IX-1      1   variable
+;selected                              IX+9      3   parameter
+;systems                               IX+6      3   parameter
 
 
-; Stack Frame Size: 44 (bytes)
+; Stack Frame Size: 35 (bytes)
 ;       Spill Code: 0 (instruction)
 
 
-	SEGMENT STRSECT
-L__12:
-	DB	"offline"
-	DB	0
-	SEGMENT CODE
-;   84	
-;   85	void Screen_UIDefenseStats(module_t* tactical, module_t* selected, health_t* hull){
-_Screen_UIDefenseStats:
-	LD	HL,-23
+;   85	
+;   86	void Screen_UITacticalStats(module_t* tactical, uint24_t selected){
+_Screen_UITacticalStats:
+	LD	HL,-24
 	CALL	__frameset
-;   86	    unsigned char i, cur_y = viewer_y + 20;
+;   87	    unsigned char i, cur_y = viewer_y + 20;
 	LD	(IX+-5),40
-;   87	    int cur_x = viewer_x;
+;   88	    int cur_x = viewer_x;
 	LD	BC,30
-	LD	(IX+-23),BC
-;   88	    int shields_combined = 0, shields_active = 0;
+	LD	(IX+-21),BC
+;   89	    uint24_t shield_health = 0, shield_resist = 0, shield_num = 0;
 	LD	BC,0
 	LD	(IX+-8),BC
-	LD	(IX+-14),BC
-;   89	    gfx_PrintStringXY(shields_title, text_GetCenterX(shields_title), viewer_y);
+	LD	(IX+-24),BC
+	LD	(IX+-17),BC
+;   90	    bool shields_active = false;
+	LD	(IX+-18),0
+;   91	    gfx_PrintStringXY(shields_title, text_GetCenterX(shields_title), viewer_y);
 	LD	BC,20
 	PUSH	BC
 	LD	BC,_shields_title
@@ -773,11 +635,21 @@ _Screen_UIDefenseStats:
 	POP	BC
 	POP	BC
 	POP	BC
-;   90	    for(i = 0; i < TACT_MAX; i++){
+;   92	    for(i = 0; i < TACT_MAX; i++){
 	LD	(IX+-1),0
-	JR	L_26
-L_24:
-;   91	        module_t* shield = &tactical[i];
+	JR	L_33
+L_31:
+;   93	        int temp_y = 22 * i + viewer_y + 20;
+	LD	A,(IX+-1)
+	UEXT	HL
+	LD	L,A
+	LD	A,22
+	CALL	__imul_b
+	LD	IY,HL
+	LEA	BC,IY+40
+	LD	(IX+-11),BC
+;   94	        int temp_x = cur_x + 110;
+;   95	        module_t* module = &tactical[i];
 	LD	A,(IX+-1)
 	UEXT	HL
 	LD	L,A
@@ -786,41 +658,59 @@ L_24:
 	LD	BC,(IX+6)
 	ADD	HL,BC
 	LD	(IX+-4),HL
-;   92	        if(shield->techtype == SHIELD){
+;   96	        if(module->assigned){
+	LD	IY,(IX+-4)
+	LD	A,(IY+1)
+	OR	A,A
+	JR	Z,L_32
+;   97	            if(module->techtype == SHIELD){
 	LD	IY,(IX+-4)
 	LD	A,(IY+3)
-	CP	A,7
-	JR	NZ,L_25
-;   93	            int resist = shield->data.shields.resistance;
-;   94	            int health = health_GetHealthPercent(&shield->health);
+	CP	A,6
+	JR	NZ,L_26
+;   98	                if(module->online){
+	LD	IY,(IX+-4)
+	LD	A,(IY+4)
+	OR	A,A
+	JR	Z,L_26
+;   99	                    shields_active = true;
+	LD	(IX+-18),1
+;  100	                    shield_health += health_GetHealthPercent(&module->health);
 	LD	IY,(IX+-4)
 	PEA	IY+21
 	CALL	_health_GetHealthPercent
 	POP	BC
-	LD	(IX+-20),HL
-;   95	            int freq = shield->data.shields.frequency;
-;   96	            int temp_y = 22 * i + viewer_y + 20;
+	LD	BC,(IX+-8)
+	ADD	HL,BC
+	LD	(IX+-8),HL
+;  101	                    shield_resist *= module->data.shields.resistance;
+	LD	IY,(IX+-4)
+	LD	HL,(IY+27)
+	LD	BC,(IX+-24)
+	CALL	__imulu
+	LD	(IX+-24),HL
+;  102	                    shield_num++;
+	LD	BC,(IX+-17)
+	INC	BC
+	LD	(IX+-17),BC
+;  103	                }
+;  104	            }
+L_26:
+;  105	            if(selected == i) {
 	LD	A,(IX+-1)
 	UEXT	HL
 	LD	L,A
-	LD	A,22
-	CALL	__imul_b
-	LD	IY,HL
-	LEA	IY,IY+40
-	LD	(IX+-11),IY
-;   97	            int temp_x = cur_x + 110;
-;   98	            if(selected == shield) {
-	LD	BC,(IX+-4)
+	LD	BC,HL
 	LD	HL,(IX+9)
 	OR	A,A
 	SBC	HL,BC
-	JR	NZ,L_18
-;   99	                gfx_SetColor(230);
+	JR	NZ,L_27
+;  106	                gfx_SetColor(230);
 	LD	BC,230
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;  100	                gfx_FillRectangle(temp_x, temp_y, 10, 20);
+;  107	                gfx_FillRectangle(temp_x, temp_y, 10, 20);
 	LD	BC,20
 	PUSH	BC
 	LD	BC,10
@@ -834,25 +724,25 @@ L_24:
 	POP	BC
 	POP	BC
 	POP	BC
-;  101	            }
-L_18:
-;  102	            temp_x += 10;
-;  103	            gfx_SetColor(31);
+;  108	            }
+L_27:
+;  109	            temp_x += 10;
+;  110	            gfx_SetColor(31);
 	LD	BC,31
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;  104	            if(!shield->online) gfx_SetColor(160);
+;  111	            if(!module->online) gfx_SetColor(160);
 	LD	IY,(IX+-4)
 	LD	A,(IY+4)
 	OR	A,A
-	JR	NZ,L_20
+	JR	NZ,L_29
 	LD	BC,160
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-L_20:
-;  105	            gfx_FillRectangle(temp_x, temp_y, 140, 20);
+L_29:
+;  112	            gfx_FillRectangle(temp_x, temp_y, 140, 20);
 	LD	BC,20
 	PUSH	BC
 	LD	BC,140
@@ -866,12 +756,12 @@ L_20:
 	POP	BC
 	POP	BC
 	POP	BC
-;  106	            gfx_SetColor(33);
+;  113	            gfx_SetColor(33);
 	LD	BC,33
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;  107	            gfx_FillRectangle(temp_x + 2, temp_y + 2, 136, 16);
+;  114	            gfx_FillRectangle(temp_x + 2, temp_y + 2, 136, 16);
 	LD	BC,16
 	PUSH	BC
 	LD	BC,136
@@ -886,203 +776,179 @@ L_20:
 	POP	BC
 	POP	BC
 	POP	BC
-;  108	            temp_x += 5; temp_y += 6;
+;  115	            temp_x += 5; temp_y += 6;
 	LD	IY,(IX+-11)
 	LEA	BC,IY+6
-;  109	            Stats_DrawHealthBar(health, 80, temp_x, temp_y, 255, 255, icon_shieldstrength);
-	LD	HL,_trekgui+42
 	LD	(IX+-11),BC
-	LD	BC,(HL)
-	PUSH	BC
+;  116	            stats_DrawHealthBar(health_GetHealthPercent(&module->health), 80, temp_x, temp_y, 255, 255);
 	LD	BC,255
 	PUSH	BC
 	PUSH	BC
-	LD	BC,(IX+-11)
+	LD	C,(IX+-11)
+	LD	B,0
 	PUSH	BC
 	LD	BC,155
 	PUSH	BC
 	LD	BC,80
 	PUSH	BC
-	LD	BC,(IX+-20)
-	PUSH	BC
-	CALL	_Stats_DrawHealthBar
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-;  110	            if(shield->online){
 	LD	IY,(IX+-4)
-	LD	A,(IY+4)
-	OR	A,A
-	JR	Z,L_25
-;  111	                shields_combined += health;
-	LD	BC,(IX+-20)
-	LD	HL,(IX+-8)
-	ADD	HL,BC
-	LD	(IX+-8),HL
-;  112	                shields_active++;
-	LD	BC,(IX+-14)
-	INC	BC
-	LD	(IX+-14),BC
-;  113	            }
-;  114	        }
-;  115	    }
-L_25:
+	PEA	IY+21
+	CALL	_health_GetHealthPercent
+	POP	BC
+	PUSH	HL
+	CALL	_stats_DrawHealthBar
+	POP	BC
+	POP	BC
+	POP	BC
+	POP	BC
+	POP	BC
+	POP	BC
+;  117	            }
+;  118	        }
+L_32:
 	INC	(IX+-1)
-L_26:
+L_33:
 	LD	A,(IX+-1)
 	CP	A,6
-	JR	C,L_24
-;  116	    if(shields_active) {
-	LD	HL,(IX+-14)
-	CALL	__icmpzero
-	JR	Z,L_33
-;  117	        gfx_rletsprite_t* shield_icon = icon_shieldsstable;
+	JR	C,L_31
+;  119	        if(shields_active) {
+	LD	A,(IX+-18)
+	OR	A,A
+	JR	Z,L_40
+;  120	            gfx_rletsprite_t* shield_icon = icon_shieldsstable;
 	LD	HL,_trekgui+6
 	LD	BC,(HL)
-	LD	(IX+-17),BC
-;  118	        shields_combined /= shields_active;
+	LD	(IX+-14),BC
+;  121	            shield_health /= shield_num;
 	LD	HL,(IX+-8)
-	LD	BC,(IX+-14)
-	CALL	__idivs
+	LD	BC,(IX+-17)
+	CALL	__idivu
 	LD	(IX+-8),HL
-;  119	        if(shields_combined <= 50) shield_icon = icon_shieldscollapse;
+;  122	            if(shield_health <= 50) shield_icon = icon_shieldscollapse;
 	LD	BC,HL
 	LD	HL,50
 	OR	A,A
 	SBC	HL,BC
-	JP	M,L_29
+	JR	C,L_36
 	LD	HL,_trekgui+9
 	LD	BC,(HL)
-	LD	(IX+-17),BC
-L_29:
-;  120	        if(shields_combined <= 25) shield_icon = icon_shieldsfail;
+	LD	(IX+-14),BC
+L_36:
+;  123	            if(shield_health <= 25) shield_icon = icon_shieldsfail;
 	LD	BC,(IX+-8)
 	LD	HL,25
 	OR	A,A
 	SBC	HL,BC
-	CALL	__setflag
-	JP	M,L_30
+	JR	C,L_37
 	LD	HL,_trekgui+12
 	LD	BC,(HL)
-	LD	(IX+-17),BC
-L_30:
-;  121	        gfx_RLETSprite(shield_icon, cur_x, cur_y);
+	LD	(IX+-14),BC
+L_37:
+;  124	            gfx_RLETSprite(shield_icon, cur_x, cur_y);
 	LD	BC,40
 	PUSH	BC
 	LD	BC,30
 	PUSH	BC
-	LD	BC,(IX+-17)
+	LD	BC,(IX+-14)
 	PUSH	BC
 	CALL	_gfx_RLETSprite
 	POP	BC
 	POP	BC
 	POP	BC
-;  122	        cur_y += shield_icon->height + 10;
-	LD	IY,(IX+-17)
+;  125	            cur_y += shield_icon->height + 10;
+	LD	IY,(IX+-14)
 	LD	A,(IY+1)
 	ADD	A,50
-;  123	        Stats_DrawHealthBar(shields_combined, 75, cur_x, cur_y, 30, 255, icon_shieldstrength);
-	LD	HL,_trekgui+42
 	LD	(IX+-5),A
-	LD	BC,(HL)
-	PUSH	BC
+;  126	            stats_DrawHealthBar(shield_health, 75, cur_x, cur_y, 30, 255);
 	LD	BC,255
 	PUSH	BC
 	LD	BC,30
 	PUSH	BC
-	LD	A,(IX+-5)
-	UEXT	HL
-	LD	L,A
-	PUSH	HL
+	LD	C,(IX+-5)
+	LD	B,0
+	PUSH	BC
+	LD	BC,30
 	PUSH	BC
 	LD	BC,75
 	PUSH	BC
 	LD	BC,(IX+-8)
 	PUSH	BC
-	CALL	_Stats_DrawHealthBar
+	CALL	_stats_DrawHealthBar
 	POP	BC
 	POP	BC
 	POP	BC
 	POP	BC
 	POP	BC
 	POP	BC
-	POP	BC
-;  124	        cur_y += 15; cur_x = viewer_x;
+;  127	            cur_y += 15; cur_x = viewer_x;
 	LD	A,(IX+-5)
 	ADD	A,15
 	LD	(IX+-5),A
 	LD	BC,30
-	LD	(IX+-23),BC
-;  125	    }
-L_33:
-;  126	    Stats_DrawHealthBar(health_GetHealthPercent(hull), 75, cur_x, cur_y, 255, 255, NULL);
-	LD	BC,0
-	PUSH	BC
+	LD	(IX+-21),BC
+;  128	        }
+L_40:
+;  129	        stats_DrawHealthBar(health_GetHealthPercent(&tactical[TACT_MAX].health), 75, cur_x, cur_y, 255, 255);
 	LD	BC,255
 	PUSH	BC
 	PUSH	BC
-	LD	A,(IX+-5)
-	UEXT	HL
-	LD	L,A
-	PUSH	HL
-	LD	BC,(IX+-23)
+	LD	C,(IX+-5)
+	LD	B,0
+	PUSH	BC
+	LD	BC,(IX+-21)
 	PUSH	BC
 	LD	BC,75
 	PUSH	BC
-	LD	BC,(IX+12)
-	PUSH	BC
+	LD	HL,(IX+6)
+	LD	BC,324
+	ADD	HL,BC
+	LD	IY,HL
+	PEA	IY+21
 	CALL	_health_GetHealthPercent
 	POP	BC
 	PUSH	HL
-	CALL	_Stats_DrawHealthBar
+	CALL	_stats_DrawHealthBar
 	POP	BC
 	POP	BC
 	POP	BC
 	POP	BC
 	POP	BC
 	POP	BC
-	POP	BC
-;  127	}
+;  130	}
 	LD	SP,IX
 	POP	IX
 	RET	
 
 
-;**************************** _Screen_UIDefenseStats ***************************
+;**************************** _Screen_UITacticalStats ***************************
 ;Name                         Addr/Register   Size   Type
 ;_gfx_RLETSprite                     IMPORT  -----   function
 ;_trekgui                            IMPORT     45   variable
-;_Stats_DrawHealthBar                IMPORT  -----   function
+;_stats_DrawHealthBar                IMPORT  -----   function
 ;_gfx_FillRectangle                  IMPORT  -----   function
 ;_gfx_SetColor                       IMPORT  -----   function
 ;_health_GetHealthPercent            IMPORT  -----   function
 ;_shields_title                      STATIC     18   variable
 ;_gfx_PrintStringXY                  IMPORT  -----   function
-;cur_x                                IX-23      3   variable
-;health                               IX-20      3   variable
-;shield_icon                          IX-17      3   variable
-;shields_active                       IX-14      3   variable
+;shield_resist                        IX-24      3   variable
+;cur_x                                IX-21      3   variable
+;shields_active                       IX-18      1   variable
+;shield_num                           IX-17      3   variable
+;shield_icon                          IX-14      3   variable
 ;temp_y                               IX-11      3   variable
-;shields_combined                      IX-8      3   variable
+;shield_health                         IX-8      3   variable
 ;cur_y                                 IX-5      1   variable
-;shield                                IX-4      3   variable
+;module                                IX-4      3   variable
 ;i                                     IX-1      1   variable
-;hull                                 IX+12      3   parameter
 ;selected                              IX+9      3   parameter
 ;tactical                              IX+6      3   parameter
 
 
-; Stack Frame Size: 38 (bytes)
+; Stack Frame Size: 36 (bytes)
 ;       Spill Code: 0 (instruction)
 
 
-;  128	
-;  129	
-;  130	
 ;  131	
 ;  132	
 ;  133	
@@ -1093,153 +959,26 @@ L_33:
 ;  138	
 ;  139	
 ;  140	
-;  141	int Stats_DrawHealthBar(unsigned int percent, unsigned int length, int x, int y, unsigned char border_color, unsigned char bar_color, gfx_rletsprite_t* icon){
-_Stats_DrawHealthBar:
-	CALL	__frameset0
-;  142	    if(icon != NULL) {
-	LD	HL,(IX+24)
-	CALL	__icmpzero
-	JR	Z,L_36
-;  143	        gfx_RLETSprite(icon, x, y - 2);
-	LD	IY,(IX+15)
-	LEA	BC,IY+-2
-	PUSH	BC
-	LD	BC,(IX+12)
-	PUSH	BC
-	LD	BC,(IX+24)
-	PUSH	BC
-	CALL	_gfx_RLETSprite
-	POP	BC
-	POP	BC
-	POP	BC
-;  144	        x += 15;
-	LD	IY,(IX+12)
-	LEA	IY,IY+15
-	LD	(IX+12),IY
-;  145	    }
-L_36:
-;  146	    gfx_SetColor(border_color);
-	LD	C,(IX+18)
-	LD	B,0
-	PUSH	BC
-	CALL	_gfx_SetColor
-	POP	BC
-;  147	    gfx_Rectangle(x, y-1, length, 9);
-	LD	BC,9
-	PUSH	BC
-	LD	BC,(IX+9)
-	PUSH	BC
-	LD	BC,(IX+15)
-	DEC	BC
-	PUSH	BC
-	LD	BC,(IX+12)
-	PUSH	BC
-	CALL	_gfx_Rectangle
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-;  148	    length -= 2;
-	LD	IY,(IX+9)
-	LEA	IY,IY+-2
-	LD	(IX+9),IY
-;  149	    gfx_SetColor(bar_color);
-	LD	C,(IX+21)
-	LD	B,0
-	PUSH	BC
-	CALL	_gfx_SetColor
-	POP	BC
-;  150	    if(percent <= 50) gfx_SetColor(229);
-	LD	BC,(IX+6)
-	LD	HL,50
-	OR	A,A
-	SBC	HL,BC
-	JR	C,L_39
-	LD	BC,229
-	PUSH	BC
-	CALL	_gfx_SetColor
-	POP	BC
-L_39:
-;  151	    if(percent <= 25) gfx_SetColor(192);
-	LD	BC,(IX+6)
-	LD	HL,25
-	OR	A,A
-	SBC	HL,BC
-	JR	C,L_40
-	LD	BC,192
-	PUSH	BC
-	CALL	_gfx_SetColor
-	POP	BC
-L_40:
-;  152	    gfx_FillRectangle(x + 1, y, percent * length / 100, 7);
-	LD	BC,7
-	PUSH	BC
-	LD	HL,(IX+6)
-	LD	BC,(IX+9)
-	CALL	__imulu
-	LD	BC,100
-	CALL	__idivu
-	PUSH	HL
-	LD	BC,(IX+15)
-	PUSH	BC
-	LD	BC,(IX+12)
-	INC	BC
-	PUSH	BC
-	CALL	_gfx_FillRectangle
-	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-;  153	    gfx_SetColor(255);
-	LD	BC,255
-	PUSH	BC
-	CALL	_gfx_SetColor
-	POP	BC
-;  154	    return x + length;
-	LD	BC,(IX+12)
-	LD	HL,(IX+9)
-	ADD	HL,BC
-;  155	}
-	LD	SP,IX
-	POP	IX
-	RET	
-
-
-;**************************** _Stats_DrawHealthBar ***************************
-;Name                         Addr/Register   Size   Type
-;_gfx_FillRectangle                  IMPORT  -----   function
-;_gfx_Rectangle                      IMPORT  -----   function
-;_gfx_SetColor                       IMPORT  -----   function
-;_gfx_RLETSprite                     IMPORT  -----   function
-;icon                                 IX+24      3   parameter
-;bar_color                            IX+21      1   parameter
-;border_color                         IX+18      1   parameter
-;y                                    IX+15      3   parameter
-;x                                    IX+12      3   parameter
-;length                                IX+9      3   parameter
-;percent                               IX+6      3   parameter
-
-
-; Stack Frame Size: 27 (bytes)
-;       Spill Code: 0 (instruction)
-
-
-;  156	
-;  157	
-;  158	
-;  159	void Screen_Background(unsigned char active) {
+;  141	
+;  142	
+;  143	
+;  144	
+;  145	
+;  146	
+;  147	
+;  148	void Screen_Background(unsigned char active) {
 _Screen_Background:
 	LD	HL,-3
 	CALL	__frameset
-;  160	    int i;
-;  161	    gfx_SetTextFGColor(255);
+;  149	    int i;
+;  150	    gfx_SetTextFGColor(255);
 	LD	BC,255
 	PUSH	BC
 	CALL	_gfx_SetTextFGColor
 	POP	BC
-;  162	    gfx_ZeroScreen();
+;  151	    gfx_ZeroScreen();
 	CALL	_gfx_ZeroScreen
-;  163	    gfx_RLETSprite(shipinterior_left, 0, 0);
+;  152	    gfx_RLETSprite(shipinterior_left, 0, 0);
 	LD	BC,0
 	PUSH	BC
 	PUSH	BC
@@ -1249,7 +988,7 @@ _Screen_Background:
 	POP	BC
 	POP	BC
 	POP	BC
-;  164	    gfx_RLETSprite(shipinterior_right, 160, 0);
+;  153	    gfx_RLETSprite(shipinterior_right, 160, 0);
 	LD	BC,0
 	PUSH	BC
 	LD	HL,_trekgui+3
@@ -1261,17 +1000,17 @@ _Screen_Background:
 	POP	BC
 	POP	BC
 	POP	BC
-;  165	    for(i = 0; i < 320; i++){
+;  154	    for(i = 0; i < 320; i++){
 	LD	BC,0
 	LD	(IX+-3),BC
 	JR	L_45
 L_43:
-;  166	        gfx_SetColor(0);
+;  155	        gfx_SetColor(0);
 	LD	BC,0
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;  167	        gfx_Rectangle(i * 64, 216, 64, 20);
+;  156	        gfx_Rectangle(i * 64, 216, 64, 20);
 	LD	BC,20
 	PUSH	BC
 	LD	BC,64
@@ -1294,20 +1033,19 @@ L_43:
 	LD	BC,(IX+-3)
 	INC	BC
 	LD	(IX+-3),BC
-;  168	    }
+;  157	    }
 L_45:
 	LD	BC,320
 	LD	HL,(IX+-3)
 	OR	A,A
 	SBC	HL,BC
-	CALL	__setflag
 	JP	M,L_43
-;  169	    gfx_SetColor(116);
+;  158	    gfx_SetColor(116);
 	LD	BC,116
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;  170	    if(active) gfx_FillRectangle(--active*64+1, 217, 62, 18);
+;  159	    if(active) gfx_FillRectangle(--active*64+1, 217, 62, 18);
 	LD	A,(IX+6)
 	OR	A,A
 	JR	Z,L_48
@@ -1335,10 +1073,32 @@ L_45:
 	POP	BC
 	POP	BC
 L_48:
-;  171	    gfx_PrintStringXY("Defense", 4, lcars_texty);
+;  160	    gfx_PrintStringXY("Defense", 4, lcars_texty);
 	LD	BC,223
 	PUSH	BC
 	LD	BC,4
+	PUSH	BC
+	LD	BC,L__28
+	PUSH	BC
+	CALL	_gfx_PrintStringXY
+	POP	BC
+	POP	BC
+	POP	BC
+;  161	    gfx_PrintStringXY("Tact", 80, lcars_texty);
+	LD	BC,223
+	PUSH	BC
+	LD	BC,80
+	PUSH	BC
+	LD	BC,L__29
+	PUSH	BC
+	CALL	_gfx_PrintStringXY
+	POP	BC
+	POP	BC
+	POP	BC
+;  162	    gfx_PrintStringXY("Mains", 140, lcars_texty);
+	LD	BC,223
+	PUSH	BC
+	LD	BC,140
 	PUSH	BC
 	LD	BC,L__30
 	PUSH	BC
@@ -1346,10 +1106,10 @@ L_48:
 	POP	BC
 	POP	BC
 	POP	BC
-;  172	    gfx_PrintStringXY("Tact", 80, lcars_texty);
+;  163	    gfx_PrintStringXY("Repair", 200, lcars_texty);
 	LD	BC,223
 	PUSH	BC
-	LD	BC,80
+	LD	BC,200
 	PUSH	BC
 	LD	BC,L__31
 	PUSH	BC
@@ -1357,10 +1117,10 @@ L_48:
 	POP	BC
 	POP	BC
 	POP	BC
-;  173	    gfx_PrintStringXY("Mains", 140, lcars_texty);
+;  164	    gfx_PrintStringXY("Cargo", 268, lcars_texty);
 	LD	BC,223
 	PUSH	BC
-	LD	BC,140
+	LD	BC,268
 	PUSH	BC
 	LD	BC,L__32
 	PUSH	BC
@@ -1368,34 +1128,12 @@ L_48:
 	POP	BC
 	POP	BC
 	POP	BC
-;  174	    gfx_PrintStringXY("Repair", 200, lcars_texty);
-	LD	BC,223
-	PUSH	BC
-	LD	BC,200
-	PUSH	BC
-	LD	BC,L__33
-	PUSH	BC
-	CALL	_gfx_PrintStringXY
-	POP	BC
-	POP	BC
-	POP	BC
-;  175	    gfx_PrintStringXY("Cargo", 268, lcars_texty);
-	LD	BC,223
-	PUSH	BC
-	LD	BC,268
-	PUSH	BC
-	LD	BC,L__34
-	PUSH	BC
-	CALL	_gfx_PrintStringXY
-	POP	BC
-	POP	BC
-	POP	BC
-;  176	    gfx_SetTextFGColor(148);
+;  165	    gfx_SetTextFGColor(148);
 	LD	BC,148
 	PUSH	BC
 	CALL	_gfx_SetTextFGColor
 	POP	BC
-;  177	    gfx_PrintStringXY(version, 160 - (7 * strlen(version) / 2), 0);
+;  166	    gfx_PrintStringXY(version, 160 - (7 * strlen(version) / 2), 0);
 	LD	BC,0
 	PUSH	BC
 	LD	BC,_version
@@ -1417,12 +1155,12 @@ L_48:
 	POP	BC
 	POP	BC
 	POP	BC
-;  178	    gfx_SetTextFGColor(0);
+;  167	    gfx_SetTextFGColor(0);
 	LD	BC,0
 	PUSH	BC
 	CALL	_gfx_SetTextFGColor
 	POP	BC
-;  179	}
+;  168	}
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -1449,53 +1187,52 @@ L_48:
 
 
 	SEGMENT STRSECT
-L__30:
+L__28:
 	DB	"Defense"
 	DB	0
-L__31:
+L__29:
 	DB	"Tact"
 	DB	0
-L__32:
+L__30:
 	DB	"Mains"
 	DB	0
-L__33:
+L__31:
 	DB	"Repair"
 	DB	0
-L__34:
+L__32:
 	DB	"Cargo"
 	DB	0
+	XREF _stats_DrawHealthBar:ROM
 	XREF _trekgui:ROM
+	XREF _health_GetHealthPercent:ROM
+	XREF _power_GetDrawSource:ROM
+	XREF _power_GetPowerSpend:ROM
+	XREF _power_GetSpendPercent:ROM
+	XREF _power_GetBatteryPercent:ROM
 	XREF _gfx_RLETSprite:ROM
 	XREF _gfx_GetStringWidth:ROM
 	XREF _gfx_SetTextFGColor:ROM
 	XREF _gfx_SetTextXY:ROM
 	XREF _gfx_PrintStringXY:ROM
 	XREF _gfx_PrintString:ROM
-	XREF _gfx_PrintUInt:ROM
+	XREF _gfx_Blit:ROM
 	XREF _gfx_FillRectangle:ROM
 	XREF _gfx_Rectangle:ROM
 	XREF _gfx_ZeroScreen:ROM
 	XREF _gfx_SetColor:ROM
-	XREF _health_GetHealthPercent:ROM
-	XREF _power_GetDrawSource:ROM
-	XREF _power_GetPowerDraw:ROM
-	XREF _power_GetPowerSpend:ROM
-	XREF _power_GetSpendPercent:ROM
-	XREF _power_GetBatteryPercent:ROM
 	XREF _strlen:ROM
-	XREF __idivs:ROM
 	XREF __idivu:ROM
 	XREF __imulu:ROM
 	XREF __frameset0:ROM
 	XREF __frameset:ROM
 	XREF __setflag:ROM
-	XREF __icmpzero:ROM
+	XREF __seqcase:ROM
 	XREF __imul_b:ROM
 	XREF __ishru_b:ROM
 	XDEF _Screen_Background
-	XDEF _Stats_DrawHealthBar
-	XDEF _Screen_UIDefenseStats
+	XDEF _Screen_UITacticalStats
 	XDEF _Screen_UISystemStats
+	XDEF _Screen_RenderUI
 	XDEF _num_GetLength
 	XDEF _text_GetCenterX
 	XDEF _mainsys_strings

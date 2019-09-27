@@ -31,15 +31,18 @@
 #include "classes/ships.h"
 #include "classes/coords.h"
 #include "classes/tech.h"
+#include "classes/screens.h"
 #include "statscreens.h"
 #include "gfx/trekgui.h"
 /* Put your function prototypes here */
-void DrawFrame(unsigned char screen);
+#define setbits(bits, mask) (bits|mask)
+#define resbits(bits, mask) (bits^mask)
 
 ship_t Ship = {0};
+selected_t select = {0, SYS_MAX};
 
 void main(void) {
-    unsigned char screen = 0;
+    uint16_t screen = 0;
     bool loopgame = true;
     unsigned int i;
     ti_var_t appvar;
@@ -56,7 +59,7 @@ void main(void) {
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
-    module_SetHealthMax(&Ship.hull, 1000);
+    module_SetHealthMax(&Ship.hull.health, 1000);
     for(i = 0; i < SYS_MAX; i++){
        // Ship.system[i].techclass = MC_SYSTEM;
         Ship.system[i].assigned = true;
@@ -67,8 +70,8 @@ void main(void) {
     }
     for(i = 0; i < 2; i++){
       //  Ship.shield[i].techclass = MC_TACTICAL;
-        Ship.system[i].unlocked = true;
-        Ship.system[i].assigned = true;
+        Ship.tactical[i].unlocked = true;
+        Ship.tactical[i].assigned = true;
         Ship.tactical[i].online = true;
         Ship.tactical[i].techtype = SHIELD;
         module_SetHealthMax(&Ship.tactical[i].health, 50);
@@ -77,13 +80,25 @@ void main(void) {
     }
     do {
         unsigned char key = os_GetCSC();
-        DrawFrame(screen);
-        if(key == sk_Clear) loopgame = false;
-        if(key == sk_Yequ) screen = (screen == 1) ? 0 : 1;
-        if(key == sk_Window) screen = (screen == 2) ? 0 : 2;
-        if(key == sk_Zoom) screen = (screen == 3) ? 0 : 3;
-        if(key == sk_Trace) screen = (screen == 4) ? 0 : 4;
-        if(key == sk_Graph) screen = (screen == 5) ? 0 : 5;
+        Screen_RenderUI(screen, &Ship, &select);
+        if(key == sk_Clear){
+            if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
+            else loopgame = false;
+        }
+        if(key == sk_Yequ)
+            screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
+        if(key == sk_Window)
+            screen = (screen == SCRN_TACT) ? SCRN_OFF : SCRN_TACT;
+        if(key == sk_Zoom)
+            screen = (screen == SCRN_MAINS) ? SCRN_OFF : SCRN_MAINS;
+        if(key == sk_Trace)
+            screen = (screen == SCRN_TRANSPORT) ? SCRN_OFF : SCRN_TRANSPORT;
+        if(key == sk_Graph)
+            screen = (screen == SCRN_CARGO) ? SCRN_OFF : SCRN_CARGO;
+        if(key == sk_Enter){
+            if((screen == SCRN_MAINS) || (screen == SCRN_TACT))
+                screen = setbits(screen, SCRN_INFO);
+        }
         if(key == sk_Square){
             char i;
             char modnum = randInt(0, SYS_MAX - 1);
@@ -98,23 +113,23 @@ void main(void) {
                     randnum -= drv;
                 }
             }
-            health_DamageModule(&Ship.hull, -(randnum));
+            health_DamageModule(&Ship.hull.health, -(randnum));
             health_DamageModule(&Ship.system[modnum].health, -(randnum));
         }
         if(key == sk_Down) {
             char i;
             switch(screen){
                 case 1:
-                    for(i = Ship.def_selected + 1; i < (TACT_MAX - 1); i++){
+                    for(i = select.tactical + 1; i < (TACT_MAX - 1); i++){
                         int type = Ship.tactical[i].techtype;
                         if( type == SHIELD || type == ARMOR ){
-                            Ship.def_selected = i;
+                            select.tactical = i;
                             break;
                         }
                     }
                     break;
                 case 3:
-                    if(Ship.sys_selected < (SYS_MAX - 1)) Ship.sys_selected++;
+                    if(select.mains < (SYS_MAX - 1)) select.mains++;
                     break;
             }
         }
@@ -122,16 +137,16 @@ void main(void) {
             char i;
             switch(screen){
                 case 1:
-                    for(i = Ship.def_selected - 1; i >= 0; i--){
+                    for(i = select.tactical - 1; i >= 0; i--){
                         int type = Ship.tactical[i].techtype;
                         if( type == SHIELD || type == ARMOR ){
-                            Ship.def_selected = i;
+                            select.tactical = i;
                             break;
                         }
                     }
                     break;
                 case 3:
-                    if(Ship.sys_selected > 0) Ship.sys_selected--;
+                    if(select.mains > 0) select.mains--;
                     break;
             }
         }
@@ -144,29 +159,5 @@ void main(void) {
     return;
 }
 
-void DrawFrame(unsigned char screen){
-    Screen_Background(screen);
-    gfx_SetTextFGColor(255);
-    switch(screen){
-        case 0:
-            // GUI
-            break;
-        case 1:
-            Screen_UIDefenseStats(&Ship.tactical[0], &Ship.tactical[Ship.def_selected], &Ship.hull);
-            break;
-        case 2:
-            
-            break;
-        case 3:
-            Screen_UISystemStats(&Ship.system[0], SYS_MAX, Ship.sys_selected);
-            break;
-        case 4:
-            //Screen_UIRepairSys(&Ship.system[0], SYS_MAX + TACT_MAX);
-            break;
-    }
-    gfx_BlitBuffer();
-    gfx_SetTextFGColor(0);
-    return;
-}
 /* Put other functions here */
 /* Draw text on the homescreen at the given X/Y location */

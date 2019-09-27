@@ -12,13 +12,13 @@ uint8_t *trekgui[15] = {
  (uint8_t*)34885,
  (uint8_t*)35938,
  (uint8_t*)36027,
- (uint8_t*)36154,
- (uint8_t*)36281,
- (uint8_t*)36372,
- (uint8_t*)36476,
- (uint8_t*)36546,
- (uint8_t*)36639,
- (uint8_t*)36748,
+ (uint8_t*)36118,
+ (uint8_t*)36222,
+ (uint8_t*)36292,
+ (uint8_t*)36385,
+ (uint8_t*)36494,
+ (uint8_t*)36605,
+ (uint8_t*)36789,
 };
 
 bool trekgui_init(void *decompressed_addr) {
@@ -28,6 +28,4 @@ bool trekgui_init(void *decompressed_addr) {
     for (i = 0; i < trekgui_num; i++) {
         trekgui[i] += data;
     }
-
-    return true;
 }

@@ -13,13 +13,13 @@ _trekgui:
 	DW24	34885
 	DW24	35938
 	DW24	36027
-	DW24	36154
-	DW24	36281
-	DW24	36372
-	DW24	36476
-	DW24	36546
-	DW24	36639
-	DW24	36748
+	DW24	36118
+	DW24	36222
+	DW24	36292
+	DW24	36385
+	DW24	36494
+	DW24	36605
+	DW24	36789
 ;    1	// convpng v7.0
 ;    2	#include <stdint.h>
 ;    3	#include "trekgui.h"
@@ -35,13 +35,13 @@ _trekgui:
 ;   12	 (uint8_t*)34885,
 ;   13	 (uint8_t*)35938,
 ;   14	 (uint8_t*)36027,
-;   15	 (uint8_t*)36154,
-;   16	 (uint8_t*)36281,
-;   17	 (uint8_t*)36372,
-;   18	 (uint8_t*)36476,
-;   19	 (uint8_t*)36546,
-;   20	 (uint8_t*)36639,
-;   21	 (uint8_t*)36748,
+;   15	 (uint8_t*)36118,
+;   16	 (uint8_t*)36222,
+;   17	 (uint8_t*)36292,
+;   18	 (uint8_t*)36385,
+;   19	 (uint8_t*)36494,
+;   20	 (uint8_t*)36605,
+;   21	 (uint8_t*)36789,
 ;   22	};
 ;   23	
 ;   24	bool trekgui_init(void *decompressed_addr) {
@@ -84,10 +84,7 @@ L_3:
 	OR	A,A
 	SBC	HL,BC
 	JR	C,L_1
-;   31	
-;   32	    return true;
-	LD	A,1
-;   33	}
+;   31	}
 	LD	SP,IX
 	POP	IX
 	RET	

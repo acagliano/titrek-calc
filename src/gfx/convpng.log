@@ -1,11 +1,11 @@
 opened convpng.ini
 
---- trekgui (C) ---
+--- guiicons (C) ---
 using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-15:
+14:
  shipinterior_left : converted!
  shipinterior_right : converted!
  icon_shieldsstable : converted!
@@ -13,14 +13,21 @@ transparent color : 0x0000
  icon_shieldsfail : converted!
  icon_shieldsoff : converted!
  icon_health : converted!
- icon_online : converted!
- icon_offline : converted!
  icon_sourcemain : converted!
  icon_sourcereserve : converted!
  icon_powerdraw : converted!
  icon_powerspend : converted!
  icon_frequency : converted!
  icon_shieldstrength : converted!
+ deflected : converted!
+
+--- moduleicons (C) ---
+using built-in xlibc palette ...
+warning: might ignore transparent color value for a fixed palette.
+transparent color index : 0
+transparent color : 0x0000
+1:
+ armor : converted!
 
 exporting appvar: trekgui.8xv
  shipinterior_left
@@ -30,17 +37,17 @@ exporting appvar: trekgui.8xv
  icon_shieldsfail
  icon_shieldsoff
  icon_health
- icon_online
- icon_offline
  icon_sourcemain
  icon_sourcereserve
  icon_powerdraw
  icon_powerspend
  icon_frequency
  icon_shieldstrength
-compression: (36859 > 4554 bytes)
+ deflected
+ armor
+compression: (36963 > 4656 bytes)
 
-converted in 1 s
+converted in 0 s
 
 [warning] image quality might be too low.
 please try grouping similar images, reducing image colors, 

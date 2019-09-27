@@ -1,6 +1,6 @@
 
 //The client-side space rendering for TI-trek-CE
-
+/*
 #include <stdint.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -12,7 +12,6 @@
 #include <fileioc.h>
 
 #include "gfx_engine.h"
-
 
 //Sort objects by Z axis. Assumes they've already been transformed.
 //Return number of objects in the array
@@ -125,4 +124,4 @@ void GatherObjects(mapentity_t **objects, vec3_t start, uint8_t rotmin, uint8_t 
 }
 
 
-
+*/

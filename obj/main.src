@@ -5,36 +5,11 @@
 	.assume ADL=1
 	SEGMENT DATA
 _Ship:
+	DL	0
+	DL	0
+	DL	0
 	DW	0
 	DB	0
-	DW	0
-	DB	0
-	DB	0
-	DB	0
-	DB	0
-	DB	0
-	DB	0
-	DB	0
-	DB	0
-	DW	0
-	DB	0
-	DW	0
-	DB	0
-	DW	0
-	DB	0
-	DW	0
-	DB	0
-	DB	0
-	DB	0
-	DW	0
-	DB	0
-	DW	0
-	DB	0
-	DW	0
-	DB	0
-	DW	0
-	DB	0
-	DS	21
 	DB	0
 	DB	0
 	DB	0
@@ -349,6 +324,34 @@ _Ship:
 	DS	21
 	DB	0
 	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DW	0
+	DB	0
+	DW	0
+	DB	0
+	DW	0
+	DB	0
+	DW	0
+	DB	0
+	DB	0
+	DB	0
+	DW	0
+	DB	0
+	DW	0
+	DB	0
+	DW	0
+	DB	0
+	DW	0
+	DB	0
+	DS	21
+_select:
+	DW	0
+	DB	0
+	DW	6
 	DB	0
 ;    1	//--------------------------------------
 ;    2	// Program Name: Star Trek Multplayer
@@ -383,33 +386,37 @@ _Ship:
 ;   31	#include "classes/ships.h"
 ;   32	#include "classes/coords.h"
 ;   33	#include "classes/tech.h"
-;   34	#include "statscreens.h"
-;   35	#include "gfx/trekgui.h"
-;   36	/* Put your function prototypes here */
-;   37	void DrawFrame(unsigned char screen);
-;   38	
-;   39	ship_t Ship = {0};
-	SEGMENT CODE
+;   34	#include "classes/screens.h"
+;   35	#include "statscreens.h"
+;   36	#include "gfx/trekgui.h"
+;   37	/* Put your function prototypes here */
+;   38	#define setbits(bits, mask) (bits|mask)
+;   39	#define resbits(bits, mask) (bits^mask)
 ;   40	
-;   41	void main(void) {
+;   41	ship_t Ship = {0};
+;   42	selected_t select = {0, SYS_MAX};
+	SEGMENT CODE
+;   43	
+;   44	void main(void) {
 _main:
-	LD	HL,-84
+	LD	HL,-76
 	CALL	__frameset
-;   42	    unsigned char screen = 0;
+;   45	    uint16_t screen = 0;
+	LD	(IX+-2),0
 	LD	(IX+-1),0
-;   43	    bool loopgame = true;
-	LD	(IX+-19),1
-;   44	    unsigned int i;
-;   45	    ti_var_t appvar;
-;   46	    gfx_rletsprite_t* gfx_sprites = malloc(trekgui_uncompressed_size);
-	LD	BC,36859
+;   46	    bool loopgame = true;
+	LD	(IX+-20),1
+;   47	    unsigned int i;
+;   48	    ti_var_t appvar;
+;   49	    gfx_rletsprite_t* gfx_sprites = malloc(trekgui_uncompressed_size);
+	LD	BC,36963
 	PUSH	BC
 	CALL	_malloc
 	POP	BC
 	LD	(IX+-27),HL
-;   47	    gfx_Begin();
+;   50	    gfx_Begin();
 	CALL	_gfx_Begin
-;   48	    srandom(rtc_Time());
+;   51	    srandom(rtc_Time());
 	LD	A,(15925319)
 	LD	C,A
 	LD	B,0
@@ -419,9 +426,9 @@ _main:
 	CALL	_srandom
 	POP	BC
 	POP	BC
-;   49	    ti_CloseAll();
+;   52	    ti_CloseAll();
 	CALL	_ti_CloseAll
-;   50	    if(!(appvar = ti_Open("trekgui", "r"))) return;
+;   53	    if(!(appvar = ti_Open("trekgui", "r"))) return;
 	LD	BC,L__0
 	PUSH	BC
 	LD	BC,L__1
@@ -429,11 +436,11 @@ _main:
 	CALL	_ti_Open
 	POP	BC
 	POP	BC
-	LD	(IX+-20),A
+	LD	(IX+-21),A
 	OR	A,A
-	JR	Z,L_83
-;   51	    zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
-	LD	C,(IX+-20)
+	JR	Z,L_89
+;   54	    zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
+	LD	C,(IX+-21)
 	LD	B,0
 	PUSH	BC
 	CALL	_ti_GetDataPtr
@@ -444,576 +451,648 @@ _main:
 	CALL	_zx7_Decompress
 	POP	BC
 	POP	BC
-;   52	    trekgui_init(gfx_sprites);
+;   55	    trekgui_init(gfx_sprites);
 	LD	BC,(IX+-27)
 	PUSH	BC
 	CALL	_trekgui_init
 	POP	BC
-;   53	    ti_CloseAll();
+;   56	    ti_CloseAll();
 	CALL	_ti_CloseAll
-;   54	    int_Disable();
+;   57	    int_Disable();
 di
-;   55	    gfx_SetDefaultPalette(gfx_8bpp);
+;   58	    gfx_SetDefaultPalette(gfx_8bpp);
 	LD	BC,39
 	PUSH	BC
 	CALL	_gfx_SetDefaultPalette
 	POP	BC
-;   56	    gfx_SetDrawBuffer();
+;   59	    gfx_SetDrawBuffer();
 	LD	BC,1
 	PUSH	BC
 	CALL	_gfx_SetDraw
 	POP	BC
-;   57	    gfx_SetTextTransparentColor(1);
+;   60	    gfx_SetTextTransparentColor(1);
 	LD	BC,1
 	PUSH	BC
 	CALL	_gfx_SetTextTransparentColor
 	POP	BC
-;   58	    gfx_SetTextBGColor(1);
+;   61	    gfx_SetTextBGColor(1);
 	LD	BC,1
 	PUSH	BC
 	CALL	_gfx_SetTextBGColor
 	POP	BC
-;   59	    module_SetHealthMax(&Ship.hull, 1000);
+;   62	    module_SetHealthMax(&Ship.hull.health, 1000);
 	LD	BC,1000
 	PUSH	BC
-	LD	BC,_Ship
+	LD	BC,_Ship+684
 	PUSH	BC
 	CALL	_module_SetHealthMax
 	POP	BC
 	POP	BC
-;   60	    for(i = 0; i < SYS_MAX; i++){
+;   63	    for(i = 0; i < SYS_MAX; i++){
 	LD	BC,0
-	LD	(IX+-4),BC
+	LD	(IX+-5),BC
 	JR	L_5
 L_3:
-;   61	       // Ship.system[i].techclass = MC_SYSTEM;
-;   62	        Ship.system[i].assigned = true;
-	LD	BC,_Ship+6
-	LD	(IX+-18),BC
-	LD	(IX+-63),BC
-	LD	HL,(IX+-4)
+;   64	       // Ship.system[i].techclass = MC_SYSTEM;
+;   65	        Ship.system[i].assigned = true;
+	LD	BC,_Ship+15
+	LD	(IX+-19),BC
+	LD	(IX+-64),BC
+	LD	HL,(IX+-5)
 	LD	A,54
 	CALL	__imul_b
 	LD	BC,HL
 	LD	DE,BC
-	LD	HL,(IX+-18)
+	LD	HL,(IX+-19)
 	ADD	HL,DE
-	LD	(IX+-60),HL
-	LD	DE,(IX+-60)
-	LD	(IX+-57),DE
-	LD	IY,(IX+-60)
+	LD	(IX+-61),HL
+	LD	DE,(IX+-61)
+	LD	(IX+-58),DE
+	LD	IY,(IX+-61)
 	LD	(IY+1),1
-;   63	        Ship.system[i].online = true;
+;   66	        Ship.system[i].online = true;
 	LD	(IY+4),1
-;   64	        Ship.system[i].techtype = i;
-	LD	HL,(IX+-18)
+;   67	        Ship.system[i].techtype = i;
+	LD	HL,(IX+-19)
 	LD	DE,BC
 	ADD	HL,DE
 	LD	IY,HL
-	LD	A,(IX+-4)
+	LD	A,(IX+-5)
 	LD	(IY+3),A
-;   65	        module_SetHealthMax(&Ship.system[i].health, 50);
+;   68	        module_SetHealthMax(&Ship.system[i].health, 50);
 	LD	DE,50
 	PUSH	DE
-	LD	HL,(IX+-18)
+	LD	HL,(IX+-19)
 	ADD	HL,BC
 	LD	IY,HL
 	PEA	IY+21
 	CALL	_module_SetHealthMax
 	POP	BC
 	POP	BC
-;   66	        module_SetPowerMax(&Ship.system[i].power);
-	LD	HL,(IX+-4)
+;   69	        module_SetPowerMax(&Ship.system[i].power);
+	LD	HL,(IX+-5)
 	LD	A,54
 	CALL	__imul_b
-	LD	BC,(IX+-18)
+	LD	BC,(IX+-19)
 	ADD	HL,BC
 	LD	IY,HL
 	PEA	IY+6
 	CALL	_module_SetPowerMax
 	POP	BC
-	LD	BC,(IX+-4)
+	LD	BC,(IX+-5)
 	INC	BC
-	LD	(IX+-4),BC
-;   67	    }
+	LD	(IX+-5),BC
+;   70	    }
 L_5:
-	LD	BC,7
-	LD	HL,(IX+-4)
+	LD	BC,6
+	LD	HL,(IX+-5)
 	OR	A,A
 	SBC	HL,BC
 	JR	C,L_3
-;   68	    for(i = 0; i < 2; i++){
+;   71	    for(i = 0; i < 2; i++){
 	LD	BC,0
-	LD	(IX+-4),BC
+	LD	(IX+-5),BC
 	JR	L_9
 L_7:
-;   69	      //  Ship.shield[i].techclass = MC_TACTICAL;
-;   70	        Ship.system[i].unlocked = true;
-	LD	BC,_Ship+6
-	LD	(IX+-81),BC
-	LD	HL,(IX+-4)
+;   72	      //  Ship.shield[i].techclass = MC_TACTICAL;
+;   73	        Ship.tactical[i].unlocked = true;
+	LD	BC,_Ship+339
+	LD	(IX+-9),BC
+	LD	(IX+-73),BC
+	LD	HL,(IX+-5)
 	LD	A,54
 	CALL	__imul_b
 	LD	BC,HL
 	LD	DE,BC
-	LD	HL,(IX+-81)
+	LD	HL,(IX+-9)
 	ADD	HL,DE
-	LD	(IX+-78),HL
-	LD	DE,(IX+-78)
-	LD	(IX+-75),DE
-	LD	IY,(IX+-78)
+	LD	(IX+-70),HL
+	LD	DE,(IX+-70)
+	LD	(IX+-67),DE
+	LD	IY,(IX+-70)
 	LD	A,1
 	LD	(IY+0),A
-;   71	        Ship.system[i].assigned = true;
+;   74	        Ship.tactical[i].assigned = true;
 	LD	(IY+1),A
-;   72	        Ship.tactical[i].online = true;
-	LD	DE,_Ship+384
-	LD	(IX+-15),DE
-	LD	(IX+-72),DE
-	LD	HL,(IX+-15)
+;   75	        Ship.tactical[i].online = true;
+	LD	HL,(IX+-9)
 	LD	DE,BC
 	ADD	HL,DE
-	LD	(IX+-69),HL
-	LD	DE,(IX+-69)
-	LD	(IX+-66),DE
-	LD	IY,(IX+-69)
+	LD	IY,HL
 	LD	(IY+4),1
-;   73	        Ship.tactical[i].techtype = SHIELD;
-	LD	(IY+3),7
-;   74	        module_SetHealthMax(&Ship.tactical[i].health, 50);
+;   76	        Ship.tactical[i].techtype = SHIELD;
+	LD	HL,(IX+-9)
+	LD	DE,BC
+	ADD	HL,DE
+	LD	IY,HL
+	LD	(IY+3),6
+;   77	        module_SetHealthMax(&Ship.tactical[i].health, 50);
 	LD	DE,50
 	PUSH	DE
-	LD	HL,(IX+-15)
+	LD	HL,(IX+-9)
 	ADD	HL,BC
 	LD	IY,HL
 	PEA	IY+21
 	CALL	_module_SetHealthMax
 	POP	BC
 	POP	BC
-;   75	        module_SetPowerMax(&Ship.tactical[i].power);
-	LD	BC,(IX+-15)
-	LD	(IX+-54),BC
-	LD	HL,(IX+-4)
+;   78	        module_SetPowerMax(&Ship.tactical[i].power);
+	LD	BC,(IX+-9)
+	LD	(IX+-55),BC
+	LD	HL,(IX+-5)
 	LD	A,54
 	CALL	__imul_b
-	LD	BC,(IX+-15)
+	LD	BC,(IX+-9)
 	ADD	HL,BC
 	LD	IY,HL
 	PEA	IY+6
 	CALL	_module_SetPowerMax
 	POP	BC
-;   76	        Ship.tactical[i].data.shields.resistance = 10;
-	LD	HL,(IX+-4)
-	LD	DE,(IX+-15)
+;   79	        Ship.tactical[i].data.shields.resistance = 10;
+	LD	HL,(IX+-5)
+	LD	DE,(IX+-9)
 	LD	BC,10
 	LD	A,54
 	CALL	__imul_b
 	ADD	HL,DE
 	LD	IY,HL
 	LD	(IY+27),BC
-	LD	BC,(IX+-4)
+	LD	BC,(IX+-5)
 	INC	BC
-	LD	(IX+-4),BC
-;   77	    }
+	LD	(IX+-5),BC
+;   80	    }
 L_9:
 	LD	BC,2
-	LD	HL,(IX+-4)
+	LD	HL,(IX+-5)
 	OR	A,A
 	SBC	HL,BC
 	JR	C,L_7
-;   78	    do {
-L_79:
-;   79	        unsigned char key = os_GetCSC();
+;   81	    do {
+L_85:
+;   82	        unsigned char key = os_GetCSC();
 	CALL	_os_GetCSC
-	LD	(IX+-5),A
-;   80	        DrawFrame(screen);
-	LD	C,(IX+-1)
-	LD	B,0
+	LD	(IX+-6),A
+;   83	        Screen_RenderUI(screen, &Ship, &select);
+	LD	BC,_select
 	PUSH	BC
-	CALL	_DrawFrame
+	LD	BC,_Ship
+	PUSH	BC
+	LD	BC,(IX+-2)
+	CALL	__stoiu
+	PUSH	HL
+	CALL	_Screen_RenderUI
 	POP	BC
-;   81	        if(key == sk_Clear) loopgame = false;
-	LD	A,(IX+-5)
+	POP	BC
+	POP	BC
+;   84	        if(key == sk_Clear){
+	LD	A,(IX+-6)
 	CP	A,15
-	JR	NZ,L_17
-	LD	(IX+-19),0
-L_17:
-;   82	        if(key == sk_Yequ) screen = (screen == 1) ? 0 : 1;
-	LD	A,(IX+-5)
+	JR	NZ,L_19
+;   85	            if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
+	LD	BC,(IX+-2)
+	LD.LIS	HL,255
+	OR	A,A
+	SBC.SIS	HL,BC
+	JR	NC,L_12
+	LD.LIS	BC,65280
+	LD	HL,(IX+-2)
+	CALL	__sxor
+	LD	(IX+-2),L
+	LD	(IX+-1),H
+;   86	            else loopgame = false;
+	JR	L_19
+L_12:
+	LD	(IX+-20),0
+;   87	        }
+L_19:
+;   88	        if(key == sk_Yequ)
+	LD	A,(IX+-6)
 	CP	A,53
-	JR	NZ,L_23
-	LD	A,(IX+-1)
-	CP	A,1
-	JR	NZ,L_14
+	JR	NZ,L_25
+;   89	            screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
+	LD.LIS	BC,1
+	LD	HL,(IX+-2)
+	OR	A,A
+	SBC.SIS	HL,BC
+	JR	NZ,L_16
 	LD	BC,0
-	LD	(IX+-45),BC
-	JR	L_15
-L_14:
+	LD	(IX+-49),BC
+	JR	L_17
+L_16:
 	LD	BC,1
-	LD	(IX+-45),BC
-L_15:
-	LD	A,(IX+-45)
-	LD	(IX+-1),A
-L_23:
-;   83	        if(key == sk_Window) screen = (screen == 2) ? 0 : 2;
-	LD	A,(IX+-5)
+	LD	(IX+-49),BC
+L_17:
+	LD	HL,(IX+-49)
+	LD	(IX+-2),L
+	LD	(IX+-1),H
+L_25:
+;   90	        if(key == sk_Window)
+	LD	A,(IX+-6)
 	CP	A,52
-	JR	NZ,L_29
-	LD	A,(IX+-1)
-	CP	A,2
-	JR	NZ,L_20
+	JR	NZ,L_31
+;   91	            screen = (screen == SCRN_TACT) ? SCRN_OFF : SCRN_TACT;
+	LD.LIS	BC,2
+	LD	HL,(IX+-2)
+	OR	A,A
+	SBC.SIS	HL,BC
+	JR	NZ,L_22
 	LD	BC,0
-	LD	(IX+-30),BC
-	JR	L_21
-L_20:
+	LD	(IX+-34),BC
+	JR	L_23
+L_22:
 	LD	BC,2
-	LD	(IX+-30),BC
-L_21:
-	LD	A,(IX+-30)
-	LD	(IX+-1),A
-L_29:
-;   84	        if(key == sk_Zoom) screen = (screen == 3) ? 0 : 3;
-	LD	A,(IX+-5)
+	LD	(IX+-34),BC
+L_23:
+	LD	HL,(IX+-34)
+	LD	(IX+-2),L
+	LD	(IX+-1),H
+L_31:
+;   92	        if(key == sk_Zoom)
+	LD	A,(IX+-6)
 	CP	A,51
-	JR	NZ,L_35
-	LD	A,(IX+-1)
-	CP	A,3
-	JR	NZ,L_26
+	JR	NZ,L_37
+;   93	            screen = (screen == SCRN_MAINS) ? SCRN_OFF : SCRN_MAINS;
+	LD.LIS	BC,3
+	LD	HL,(IX+-2)
+	OR	A,A
+	SBC.SIS	HL,BC
+	JR	NZ,L_28
 	LD	BC,0
-	LD	(IX+-36),BC
-	JR	L_27
-L_26:
+	LD	(IX+-40),BC
+	JR	L_29
+L_28:
 	LD	BC,3
-	LD	(IX+-36),BC
-L_27:
-	LD	A,(IX+-36)
-	LD	(IX+-1),A
-L_35:
-;   85	        if(key == sk_Trace) screen = (screen == 4) ? 0 : 4;
-	LD	A,(IX+-5)
+	LD	(IX+-40),BC
+L_29:
+	LD	HL,(IX+-40)
+	LD	(IX+-2),L
+	LD	(IX+-1),H
+L_37:
+;   94	        if(key == sk_Trace)
+	LD	A,(IX+-6)
 	CP	A,50
-	JR	NZ,L_41
-	LD	A,(IX+-1)
-	CP	A,4
-	JR	NZ,L_32
+	JR	NZ,L_43
+;   95	            screen = (screen == SCRN_TRANSPORT) ? SCRN_OFF : SCRN_TRANSPORT;
+	LD.LIS	BC,4
+	LD	HL,(IX+-2)
+	OR	A,A
+	SBC.SIS	HL,BC
+	JR	NZ,L_34
 	LD	BC,0
-	LD	(IX+-39),BC
-	JR	L_33
-L_32:
+	LD	(IX+-43),BC
+	JR	L_35
+L_34:
 	LD	BC,4
-	LD	(IX+-39),BC
-L_33:
-	LD	A,(IX+-39)
-	LD	(IX+-1),A
-L_41:
-;   86	        if(key == sk_Graph) screen = (screen == 5) ? 0 : 5;
-	LD	A,(IX+-5)
+	LD	(IX+-43),BC
+L_35:
+	LD	HL,(IX+-43)
+	LD	(IX+-2),L
+	LD	(IX+-1),H
+L_43:
+;   96	        if(key == sk_Graph)
+	LD	A,(IX+-6)
 	CP	A,49
-	JR	NZ,L_50
-	LD	A,(IX+-1)
-	CP	A,5
-	JR	NZ,L_38
+	JR	NZ,L_47
+;   97	            screen = (screen == SCRN_CARGO) ? SCRN_OFF : SCRN_CARGO;
+	LD.LIS	BC,5
+	LD	HL,(IX+-2)
+	OR	A,A
+	SBC.SIS	HL,BC
+	JR	NZ,L_40
 	LD	BC,0
-	LD	(IX+-42),BC
-	JR	L_39
-L_38:
+	LD	(IX+-46),BC
+	JR	L_41
+L_40:
 	LD	BC,5
-	LD	(IX+-42),BC
-L_39:
-	LD	A,(IX+-42)
-	LD	(IX+-1),A
-L_50:
-;   87	        if(key == sk_Square){
-	LD	A,(IX+-5)
+	LD	(IX+-46),BC
+L_41:
+	LD	HL,(IX+-46)
+	LD	(IX+-2),L
+	LD	(IX+-1),H
+L_47:
+;   98	        if(key == sk_Enter){
+	LD	A,(IX+-6)
+	CP	A,9
+	JR	NZ,L_56
+;   99	            if((screen == SCRN_MAINS) || (screen == SCRN_TACT))
+	LD.LIS	BC,3
+	LD	HL,(IX+-2)
+	OR	A,A
+	SBC.SIS	HL,BC
+	JR	Z,L_45
+	LD.LIS	BC,2
+	LD	HL,(IX+-2)
+	OR	A,A
+	SBC.SIS	HL,BC
+	JR	NZ,L_56
+L_45:
+;  100	                screen = setbits(screen, SCRN_INFO);
+	LD.LIS	BC,65280
+	LD	HL,(IX+-2)
+	CALL	__sor
+	LD	(IX+-2),L
+	LD	(IX+-1),H
+;  101	        }
+L_56:
+;  102	        if(key == sk_Square){
+	LD	A,(IX+-6)
 	CP	A,45
-	JR	NZ,L_64
-;   88	            char i;
-;   89	            char modnum = randInt(0, SYS_MAX - 1);
+	JR	NZ,L_70
+;  103	            char i;
+;  104	            char modnum = randInt(0, SYS_MAX - 1);
 	CALL	_random
-	LD	BC,7
+	LD	BC,6
 	CALL	__iremu
-	LD	(IX+-21),L
-;   90	            char randnum = randInt(5, 10);
+	LD	(IX+-28),L
+;  105	            char randnum = randInt(5, 10);
 	CALL	_random
 	LD	BC,6
 	CALL	__iremu
 	LD	IY,HL
 	LEA	HL,IY+5
-	LD	(IX+-9),L
-;   91	            for(i = 0; i < TACT_MAX; i++){
-	LD	(IX+-8),0
-	JR	L_47
-L_45:
-;   92	                module_t *shield = &Ship.tactical[i];
-	LD	A,(IX+-8)
+	LD	(IX+-12),L
+;  106	            for(i = 0; i < TACT_MAX; i++){
+	LD	(IX+-13),0
+	JR	L_53
+L_51:
+;  107	                module_t *shield = &Ship.tactical[i];
+	LD	A,(IX+-13)
 	SEXT	HL
-	LD	L,(IX+-8)
+	LD	L,(IX+-13)
 	LD	A,54
 	CALL	__imul_b
-	LD	BC,_Ship+384
+	LD	BC,_Ship+339
 	ADD	HL,BC
-	LD	(IX+-12),HL
-;   93	                if((shield->techtype == SHIELD) && shield->online){
-	LD	IY,(IX+-12)
+	LD	(IX+-16),HL
+;  108	                if((shield->techtype == SHIELD) && shield->online){
+	LD	IY,(IX+-16)
 	LD	A,(IY+3)
-	CP	A,7
-	JR	NZ,L_46
-	LD	IY,(IX+-12)
+	CP	A,6
+	JR	NZ,L_52
+	LD	IY,(IX+-16)
 	LD	A,(IY+4)
 	OR	A,A
-	JR	Z,L_46
-;   94	                    int health = health_GetHealthPercent(&shield->health);
-	LD	IY,(IX+-12)
+	JR	Z,L_52
+;  109	                    int health = health_GetHealthPercent(&shield->health);
+	LD	IY,(IX+-16)
 	LEA	BC,IY+21
-	LD	(IX+-84),BC
+	LD	(IX+-76),BC
 	PEA	IY+21
 	CALL	_health_GetHealthPercent
 	POP	BC
-	LD	(IX+-51),HL
-;   95	                    int drv = shield->data.shields.resistance;
-	LD	IY,(IX+-12)
+	LD	(IX+-52),HL
+;  110	                    int drv = shield->data.shields.resistance;
+	LD	IY,(IX+-16)
 	LD	BC,(IY+27)
 	LD	(IX+-24),BC
-;   96	                    drv = health * drv / 100;
-	LD	HL,(IX+-51)
+;  111	                    drv = health * drv / 100;
+	LD	HL,(IX+-52)
 	CALL	__imuls
 	LD	BC,100
 	CALL	__idivs
 	LD	(IX+-24),HL
-;   97	                    health_DamageModule(&shield->health, -(randnum));
-	LD	A,(IX+-9)
+;  112	                    health_DamageModule(&shield->health, -(randnum));
+	LD	A,(IX+-12)
 	SEXT	HL
-	LD	L,(IX+-9)
+	LD	L,(IX+-12)
 	CALL	__ineg
 	PUSH	HL
 	PEA	IY+21
 	CALL	_health_DamageModule
 	POP	BC
 	POP	BC
-;   98	                    randnum -= drv;
+;  113	                    randnum -= drv;
 	LD	B,(IX+-24)
-	LD	A,(IX+-9)
+	LD	A,(IX+-12)
 	SUB	A,B
-	LD	(IX+-9),A
-;   99	                }
-;  100	            }
-L_46:
-	INC	(IX+-8)
-L_47:
-	LD	A,(IX+-8)
+	LD	(IX+-12),A
+;  114	                }
+;  115	            }
+L_52:
+	INC	(IX+-13)
+L_53:
+	LD	A,(IX+-13)
 	CP	A,6
-	JP	M,L_45
-;  101	            health_DamageModule(&Ship.hull, -(randnum));
-	LD	A,(IX+-9)
+	JP	M,L_51
+;  116	            health_DamageModule(&Ship.hull.health, -(randnum));
+	LD	A,(IX+-12)
 	SEXT	HL
-	LD	L,(IX+-9)
+	LD	L,(IX+-12)
 	CALL	__ineg
 	PUSH	HL
-	LD	BC,_Ship
+	LD	BC,_Ship+684
 	PUSH	BC
 	CALL	_health_DamageModule
 	POP	BC
 	POP	BC
-;  102	            health_DamageModule(&Ship.system[modnum].health, -(randnum));
-	LD	A,(IX+-9)
+;  117	            health_DamageModule(&Ship.system[modnum].health, -(randnum));
+	LD	A,(IX+-12)
 	SEXT	HL
-	LD	L,(IX+-9)
+	LD	L,(IX+-12)
 	CALL	__ineg
 	PUSH	HL
-	LD	A,(IX+-21)
+	LD	A,(IX+-28)
 	SEXT	HL
-	LD	L,(IX+-21)
+	LD	L,(IX+-28)
 	LD	A,54
 	CALL	__imul_b
-	LD	BC,_Ship+6
+	LD	BC,_Ship+15
 	ADD	HL,BC
 	LD	IY,HL
 	PEA	IY+21
 	CALL	_health_DamageModule
 	POP	BC
 	POP	BC
-;  103	        }
-L_64:
-;  104	        if(key == sk_Down) {
-	LD	A,(IX+-5)
+;  118	        }
+L_70:
+;  119	        if(key == sk_Down) {
+	LD	A,(IX+-6)
 	CP	A,1
-	JR	NZ,L_78
-;  105	            char i;
-;  106	            switch(screen){
-	LD	A,(IX+-1)
-	UEXT	HL
-	LD	L,A
+	JR	NZ,L_84
+;  120	            char i;
+;  121	            switch(screen){
+	LD	BC,(IX+-2)
+	CALL	__stoiu
 	CALL	__case8
-L__21:
+L__25:
 	DW	2
 	DB	1
-	DW24	L_51	
+	DW24	L_57	
 
 	DB	3
-	DW24	L_59	
-
-	DW24	L_78	
-
-;  107	                case 1:
-L_51:
-;  108	                    for(i = Ship.def_selected + 1; i < (TACT_MAX - 1); i++){
-	LD	A,(_Ship+709)
-	INC	A
-	LD	(IX+-6),A
-	JR	L_57
-L_55:
-;  109	                        int type = Ship.tactical[i].techtype;
-	LD	A,(IX+-6)
-	SEXT	HL
-	LD	L,(IX+-6)
-	LD	A,54
-	CALL	__imul_b
-	LD	BC,_Ship+384
-	ADD	HL,BC
-	LD	IY,HL
-	LD	A,(IY+3)
-	UEXT	HL
-	LD	L,A
-	LD	(IX+-48),HL
-;  110	                        if( type == SHIELD || type == ARMOR ){
-	OR	A,A
-	LD	BC,7
-	SBC	HL,BC
-	JR	Z,L_54
-	LD	BC,8
-	LD	HL,(IX+-48)
-	OR	A,A
-	SBC	HL,BC
-	JR	NZ,L_56
-L_54:
-;  111	                            Ship.def_selected = i;
-	LD	A,(IX+-6)
-	LD	(_Ship+709),A
-;  112	                            break;
-	JR	L_78
-;  113	                        }
-;  114	                    }
-L_56:
-	INC	(IX+-6)
-L_57:
-	LD	A,(IX+-6)
-	CP	A,5
-	CALL	__setflag
-	JP	M,L_55
-;  115	                    break;
-	JR	L_78
-;  116	                case 3:
-L_59:
-;  117	                    if(Ship.sys_selected < (SYS_MAX - 1)) Ship.sys_selected++;
-	LD	A,(_Ship+708)
-	CP	A,6
-	JR	NC,L_78
-	LD	A,(_Ship+708)
-	INC	A
-	LD	(_Ship+708),A
-;  118	                    break;
-;  119	            }
-;  120	        }
-L_78:
-;  121	        if(key == sk_Up){
-	LD	A,(IX+-5)
-	CP	A,4
-	JR	NZ,L_80
-;  122	            char i;
-;  123	            switch(screen){
-	LD	A,(IX+-1)
-	UEXT	HL
-	LD	L,A
-	CALL	__case8
-L__27:
-	DW	2
-	DB	1
 	DW24	L_65	
 
-	DB	3
-	DW24	L_73	
+	DW24	L_84	
 
-	DW24	L_80	
-
-;  124	                case 1:
-L_65:
-;  125	                    for(i = Ship.def_selected - 1; i >= 0; i--){
-	LD	A,(_Ship+709)
-	DEC	A
-	LD	(IX+-7),A
-	JR	L_71
-L_69:
-;  126	                        int type = Ship.tactical[i].techtype;
-	LD	A,(IX+-7)
+;  122	                case 1:
+L_57:
+;  123	                    for(i = select.tactical + 1; i < (TACT_MAX - 1); i++){
+	LD	A,(_select+3)
+	INC	A
+	LD	(IX+-10),A
+	JR	L_63
+L_61:
+;  124	                        int type = Ship.tactical[i].techtype;
+	LD	A,(IX+-10)
 	SEXT	HL
-	LD	L,(IX+-7)
+	LD	L,(IX+-10)
 	LD	A,54
 	CALL	__imul_b
-	LD	BC,_Ship+384
+	LD	BC,_Ship+339
 	ADD	HL,BC
 	LD	IY,HL
 	LD	A,(IY+3)
 	UEXT	HL
 	LD	L,A
-	LD	(IX+-33),HL
-;  127	                        if( type == SHIELD || type == ARMOR ){
+	LD	(IX+-31),HL
+;  125	                        if( type == SHIELD || type == ARMOR ){
 	OR	A,A
+	LD	BC,6
+	SBC	HL,BC
+	JR	Z,L_60
 	LD	BC,7
-	SBC	HL,BC
-	JR	Z,L_68
-	LD	BC,8
-	LD	HL,(IX+-33)
+	LD	HL,(IX+-31)
 	OR	A,A
 	SBC	HL,BC
-	JR	NZ,L_70
-L_68:
-;  128	                            Ship.def_selected = i;
-	LD	A,(IX+-7)
-	LD	(_Ship+709),A
-;  129	                            break;
-	JR	L_80
-;  130	                        }
-;  131	                    }
-L_70:
-	DEC	(IX+-7)
+	JR	NZ,L_62
+L_60:
+;  126	                            select.tactical = i;
+	LD	A,(IX+-10)
+	SEXT	HL
+	LD	L,(IX+-10)
+	LD	(_select+3),HL
+;  127	                            break;
+	JR	L_84
+;  128	                        }
+;  129	                    }
+L_62:
+	INC	(IX+-10)
+L_63:
+	LD	A,(IX+-10)
+	CP	A,5
+	CALL	__setflag
+	JP	M,L_61
+;  130	                    break;
+	JR	L_84
+;  131	                case 3:
+L_65:
+;  132	                    if(select.mains < (SYS_MAX - 1)) select.mains++;
+	LD	BC,5
+	LD	HL,(_select)
+	OR	A,A
+	SBC	HL,BC
+	CALL	__setflag
+	JP	P,L_84
+	LD	BC,(_select)
+	INC	BC
+	LD	(_select),BC
+;  133	                    break;
+;  134	            }
+;  135	        }
+L_84:
+;  136	        if(key == sk_Up){
+	LD	A,(IX+-6)
+	CP	A,4
+	JR	NZ,L_86
+;  137	            char i;
+;  138	            switch(screen){
+	LD	BC,(IX+-2)
+	CALL	__stoiu
+	CALL	__case8
+L__31:
+	DW	2
+	DB	1
+	DW24	L_71	
+
+	DB	3
+	DW24	L_79	
+
+	DW24	L_86	
+
+;  139	                case 1:
 L_71:
-	LD	A,(IX+-7)
-	OR	A,A
-	JP	P,L_69
-;  132	                    break;
-	JR	L_80
-;  133	                case 3:
-L_73:
-;  134	                    if(Ship.sys_selected > 0) Ship.sys_selected--;
-	XOR	A,A
-	LD	HL,_Ship+708
-	CP	A,(HL)
-	JR	NC,L_80
-	LD	A,(_Ship+708)
+;  140	                    for(i = select.tactical - 1; i >= 0; i--){
+	LD	A,(_select+3)
 	DEC	A
-	LD	(_Ship+708),A
-;  135	                    break;
-;  136	            }
-;  137	        }
-;  138	            
-;  139	    } while(loopgame == true);
-L_80:
-	LD	A,(IX+-19)
+	LD	(IX+-11),A
+	JR	L_77
+L_75:
+;  141	                        int type = Ship.tactical[i].techtype;
+	LD	A,(IX+-11)
+	SEXT	HL
+	LD	L,(IX+-11)
+	LD	A,54
+	CALL	__imul_b
+	LD	BC,_Ship+339
+	ADD	HL,BC
+	LD	IY,HL
+	LD	A,(IY+3)
+	UEXT	HL
+	LD	L,A
+	LD	(IX+-37),HL
+;  142	                        if( type == SHIELD || type == ARMOR ){
+	OR	A,A
+	LD	BC,6
+	SBC	HL,BC
+	JR	Z,L_74
+	LD	BC,7
+	LD	HL,(IX+-37)
+	OR	A,A
+	SBC	HL,BC
+	JR	NZ,L_76
+L_74:
+;  143	                            select.tactical = i;
+	LD	A,(IX+-11)
+	SEXT	HL
+	LD	L,(IX+-11)
+	LD	(_select+3),HL
+;  144	                            break;
+	JR	L_86
+;  145	                        }
+;  146	                    }
+L_76:
+	DEC	(IX+-11)
+L_77:
+	LD	A,(IX+-11)
+	OR	A,A
+	JP	P,L_75
+;  147	                    break;
+	JR	L_86
+;  148	                case 3:
+L_79:
+;  149	                    if(select.mains > 0) select.mains--;
+	LD	BC,(_select)
+	OR	A,A
+	SBC	HL,HL
+	OR	A,A
+	SBC	HL,BC
+	CALL	__setflag
+	JP	P,L_86
+	LD	BC,(_select)
+	DEC	BC
+	LD	(_select),BC
+;  150	                    break;
+;  151	            }
+;  152	        }
+;  153	            
+;  154	    } while(loopgame == true);
+L_86:
+	LD	A,(IX+-20)
 	CP	A,1
-	JR	Z,L_79
-;  140	    free(gfx_sprites);
+	JR	Z,L_85
+;  155	    free(gfx_sprites);
 	LD	BC,(IX+-27)
 	PUSH	BC
 	CALL	_free
 	POP	BC
-;  141	    gfx_End();
+;  156	    gfx_End();
 	CALL	_gfx_End
-;  142	    int_Enable();
+;  157	    int_Enable();
 ei
-;  143	    pgrm_CleanUp();
-;  144	    return;
-;  145	}
-L_83:
+;  158	    pgrm_CleanUp();
+;  159	    return;
+;  160	}
+L_89:
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -1026,10 +1105,11 @@ L_83:
 ;_health_DamageModule                IMPORT  -----   function
 ;_health_GetHealthPercent            IMPORT  -----   function
 ;_random                             IMPORT  -----   function
-;_DrawFrame                          IMPORT  -----   function
+;_select                             STATIC      6   variable
+;_Screen_RenderUI                    IMPORT  -----   function
 ;_os_GetCSC                          IMPORT  -----   function
 ;_module_SetPowerMax                 IMPORT  -----   function
-;_Ship                               STATIC    711   variable
+;_Ship                               STATIC    717   variable
 ;_module_SetHealthMax                IMPORT  -----   function
 ;_gfx_SetTextBGColor                 IMPORT  -----   function
 ;_gfx_SetTextTransparentColor        IMPORT  -----   function
@@ -1043,33 +1123,33 @@ L_83:
 ;_srandom                            IMPORT  -----   function
 ;_gfx_Begin                          IMPORT  -----   function
 ;_malloc                             IMPORT  -----   function
-;G_2                                  IX-54      3   variable
-;health                               IX-51      3   variable
-;type                                 IX-48      3   variable
-;temp12                               IX-45      3   variable
-;temp36                               IX-42      3   variable
-;temp30                               IX-39      3   variable
-;temp24                               IX-36      3   variable
-;type                                 IX-33      3   variable
-;temp18                               IX-30      3   variable
+;G_2                                  IX-55      3   variable
+;health                               IX-52      3   variable
+;temp14                               IX-49      3   variable
+;temp38                               IX-46      3   variable
+;temp32                               IX-43      3   variable
+;temp26                               IX-40      3   variable
+;type                                 IX-37      3   variable
+;temp20                               IX-34      3   variable
+;type                                 IX-31      3   variable
+;modnum                               IX-28      1   variable
 ;gfx_sprites                          IX-27      3   variable
 ;drv                                  IX-24      3   variable
-;modnum                               IX-21      1   variable
-;appvar                               IX-20      1   variable
-;loopgame                             IX-19      1   variable
-;G_0                                  IX-18      3   variable
-;G_1                                  IX-15      3   variable
-;shield                               IX-12      3   variable
-;randnum                               IX-9      1   variable
-;i                                     IX-8      1   variable
-;i                                     IX-7      1   variable
-;i                                     IX-6      1   variable
-;key                                   IX-5      1   variable
-;i                                     IX-4      3   variable
-;screen                                IX-1      1   variable
+;appvar                               IX-21      1   variable
+;loopgame                             IX-20      1   variable
+;G_0                                  IX-19      3   variable
+;shield                               IX-16      3   variable
+;i                                    IX-13      1   variable
+;randnum                              IX-12      1   variable
+;i                                    IX-11      1   variable
+;i                                    IX-10      1   variable
+;G_1                                   IX-9      3   variable
+;key                                   IX-6      1   variable
+;i                                     IX-5      3   variable
+;screen                                IX-2      2   variable
 
 
-; Stack Frame Size: 90 (bytes)
+; Stack Frame Size: 82 (bytes)
 ;       Spill Code: 0 (instruction)
 
 
@@ -1080,130 +1160,8 @@ L__0:
 L__1:
 	DB	"trekgui"
 	DB	0
-	SEGMENT CODE
-;  146	
-;  147	void DrawFrame(unsigned char screen){
-_DrawFrame:
-	LD	HL,-3
-	CALL	__frameset
-;  148	    Screen_Background(screen);
-	LD	C,(IX+6)
-	LD	B,0
-	PUSH	BC
-	CALL	_Screen_Background
-	POP	BC
-;  149	    gfx_SetTextFGColor(255);
-	LD	BC,255
-	PUSH	BC
-	CALL	_gfx_SetTextFGColor
-	POP	BC
-;  150	    switch(screen){
-	LD	A,(IX+6)
-	UEXT	HL
-	LD	L,A
-	CALL	__seqcase
-L__34:
-	DW	5
-	DW	0
-	DB	0
-	DW24	L_89	
-
-	DW24	L_85	
-
-	DW24	L_89	
-
-	DW24	L_87	
-
-	DW24	L_89	
-
-	DW24	L_89	
-
-;  151	        case 0:
-;  152	            // GUI
-;  153	            break;
-;  154	        case 1:
-L_85:
-;  155	            Screen_UIDefenseStats(&Ship.tactical[0], &Ship.tactical[Ship.def_selected], &Ship.hull);
-	LD	BC,_Ship+384
-	LD	(IX+-3),BC
-	LD	A,(_Ship+709)
-	UEXT	HL
-	LD	L,A
-	LD	A,54
-	LD	BC,_Ship
-	PUSH	BC
-	LD	BC,(IX+-3)
-	CALL	__imul_b
-	ADD	HL,BC
-	PUSH	HL
-	LD	BC,(IX+-3)
-	PUSH	BC
-	CALL	_Screen_UIDefenseStats
-	POP	BC
-	POP	BC
-	POP	BC
-;  156	            break;
-	JR	L_89
-;  157	        case 2:
-;  158	            
-;  159	            break;
-;  160	        case 3:
-L_87:
-;  161	            Screen_UISystemStats(&Ship.system[0], SYS_MAX, Ship.sys_selected);
-	LD	A,(_Ship+708)
-	LD	C,A
-	LD	B,0
-	PUSH	BC
-	LD	BC,7
-	PUSH	BC
-	LD	BC,_Ship+6
-	PUSH	BC
-	CALL	_Screen_UISystemStats
-	POP	BC
-	POP	BC
-	POP	BC
-;  162	            break;
-;  163	        case 4:
-;  164	            //Screen_UIRepairSys(&Ship.system[0], SYS_MAX + TACT_MAX);
-;  165	            break;
-;  166	    }
-L_89:
-;  167	    gfx_BlitBuffer();
-	LD	BC,1
-	PUSH	BC
-	CALL	_gfx_Blit
-	POP	BC
-;  168	    gfx_SetTextFGColor(0);
-	LD	BC,0
-	PUSH	BC
-	CALL	_gfx_SetTextFGColor
-	POP	BC
-;  169	    return;
-;  170	}
-	LD	SP,IX
-	POP	IX
-	RET	
-
-
-;**************************** _DrawFrame ***************************
-;Name                         Addr/Register   Size   Type
-;_gfx_Blit                           IMPORT  -----   function
-;_Screen_UISystemStats               IMPORT  -----   function
-;_Screen_UIDefenseStats              IMPORT  -----   function
-;_Ship                               STATIC    711   variable
-;_gfx_SetTextFGColor                 IMPORT  -----   function
-;_Screen_Background                  IMPORT  -----   function
-;screen                                IX+6      1   parameter
-
-
-; Stack Frame Size: 12 (bytes)
-;       Spill Code: 0 (instruction)
-
-
 	XREF _trekgui_init:ROM
-	XREF _Screen_Background:ROM
-	XREF _Screen_UIDefenseStats:ROM
-	XREF _Screen_UISystemStats:ROM
+	XREF _Screen_RenderUI:ROM
 	XREF _module_SetPowerMax:ROM
 	XREF _module_SetHealthMax:ROM
 	XREF _health_DamageModule:ROM
@@ -1211,8 +1169,6 @@ L_89:
 	XREF _zx7_Decompress:ROM
 	XREF _gfx_SetTextTransparentColor:ROM
 	XREF _gfx_SetTextBGColor:ROM
-	XREF _gfx_SetTextFGColor:ROM
-	XREF _gfx_Blit:ROM
 	XREF _gfx_SetDraw:ROM
 	XREF _gfx_SetDefaultPalette:ROM
 	XREF _gfx_End:ROM
@@ -1228,13 +1184,15 @@ L_89:
 	XREF __idivs:ROM
 	XREF __imuls:ROM
 	XREF __ineg:ROM
+	XREF __sor:ROM
 	XREF __iremu:ROM
+	XREF __sxor:ROM
+	XREF __stoiu:ROM
 	XREF __frameset:ROM
 	XREF __setflag:ROM
 	XREF __case8:ROM
-	XREF __seqcase:ROM
 	XREF __imul_b:ROM
-	XDEF _DrawFrame
 	XDEF _main
+	XDEF _select
 	XDEF _Ship
 	END

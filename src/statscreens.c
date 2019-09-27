@@ -3,8 +3,10 @@
 #include "classes/ships.h"
 #include "statscreens.h"
 #include "gfx/trekgui.h"
+#include "classes/screens.h"
 #include <graphx.h>
 #include <compression.h>
+#include "gfx-engine/gui.h"
 
 char mains_title[] = "[MAIN SYS CONTROL]";
 char shields_title[] = "[DEFENSE CONTROL]";
@@ -21,13 +23,40 @@ int num_GetLength(int number){
     return 1 + (number >= 10) + (number >= 100);
 }
 
-void Screen_UISystemStats(module_t* system, unsigned char count, unsigned char selected){
+void Screen_RenderUI(uint24_t screen, ship_t* Ship, selected_t* select){
+    Screen_Background(screen);
+    gfx_SetTextFGColor(255);
+    switch(screen & 0xff){
+        case SCRN_OFF:
+            break;
+        case SCRN_SENS:
+            break;
+        case SCRN_TACT:
+            Screen_UITacticalStats(&Ship->tactical, select->tactical);
+            break;
+        case SCRN_MAINS:
+            Screen_UISystemStats(&Ship->system, select->mains);
+            break;
+        case SCRN_TRANSPORT:
+            break;
+        case SCRN_CARGO:
+            break;
+    }
+    if(screen > 0xff) {
+        gfx_PrintStringXY("Info Window Here", 60, 100);
+    }
+    gfx_BlitBuffer();
+    gfx_SetTextFGColor(0);
+    return;
+}
+
+void Screen_UISystemStats(module_t* systems, uint24_t selected){
     unsigned char i, cur_y;
     int cur_x;
     gfx_PrintStringXY(mains_title, text_GetCenterX(mains_title), viewer_y);
-    for(i = 0; i < count; i++){
+    for(i = 0; i < SYS_MAX; i++){
         // loop module health display
-        module_t* module = &system[i];
+        module_t* module = &systems[i];
         cur_y = i * 15 + viewer_y + 17;
         cur_x = viewer_x;
         if(selected == i) {
@@ -44,36 +73,8 @@ void Screen_UISystemStats(module_t* system, unsigned char count, unsigned char s
                         pow_res = power_GetBatteryPercent(&module->power);
             gfx_PrintString(mainsys_strings[module->techtype]);
             cur_x += 75;
-            cur_x = Stats_DrawHealthBar(health, 50, cur_x, cur_y, 255, 255, icon_health);
-            cur_x += 5;
-            if(module->online) {
-                gfx_RLETSprite((gfx_rletsprite_t*)trekgui[9 + source], cur_x, cur_y - 2);
-                if(source < 2){
-                    unsigned int draw = power_GetPowerDraw(&module->power);
-                    cur_x += 11;
-                    gfx_RLETSprite(icon_powerdraw, cur_x, cur_y - 2);
-                    cur_x += 13;
-                    gfx_Rectangle(cur_x, cur_y - 2, 25, 11);
-                    gfx_SetTextXY(cur_x + 5, cur_y);
-                    gfx_PrintUInt(draw, num_GetLength(draw));
-                    cur_x += 30;
-                    cur_x = Stats_DrawHealthBar(pow_res, 20, cur_x, cur_y, 255, 55, NULL);
-                    gfx_FillRectangle(cur_x + 2, cur_y, 2, 7);
-                    cur_x += 5;
-                }
-                else {
-                    
-                }
-                gfx_RLETSprite(icon_powerspend, cur_x, cur_y - 2);
-                cur_x += 13;
-                gfx_Rectangle(cur_x, cur_y - 2, 25, 11);
-                gfx_SetTextXY(cur_x + 5, cur_y);
-                gfx_PrintUInt(spend, num_GetLength(spend));
-            }
-            else {
-                gfx_RLETSprite(icon_offline, cur_x, cur_y - 2);
-                gfx_PrintStringXY("offline", cur_x + 15, cur_y);
-            }
+            stats_DrawHealthBar(health, 50, cur_x, cur_y, 255, 255);
+           
             
             //gfx_SetTextXY(viewer_x + 100, (i + 1) * 10 + viewer_y + 5);
             //gfx_PrintUInt(health, 3);
@@ -82,48 +83,50 @@ void Screen_UISystemStats(module_t* system, unsigned char count, unsigned char s
     return;
 }
 
-void Screen_UIDefenseStats(module_t* tactical, module_t* selected, health_t* hull){
+void Screen_UITacticalStats(module_t* tactical, uint24_t selected){
     unsigned char i, cur_y = viewer_y + 20;
     int cur_x = viewer_x;
-    int shields_combined = 0, shields_active = 0;
+    uint24_t shield_health = 0, shield_resist = 0, shield_num = 0;
+    bool shields_active = false;
     gfx_PrintStringXY(shields_title, text_GetCenterX(shields_title), viewer_y);
     for(i = 0; i < TACT_MAX; i++){
-        module_t* shield = &tactical[i];
-        if(shield->techtype == SHIELD){
-            int resist = shield->data.shields.resistance;
-            int health = health_GetHealthPercent(&shield->health);
-            int freq = shield->data.shields.frequency;
-            int temp_y = 22 * i + viewer_y + 20;
-            int temp_x = cur_x + 110;
-            if(selected == shield) {
+        int temp_y = 22 * i + viewer_y + 20;
+        int temp_x = cur_x + 110;
+        module_t* module = &tactical[i];
+        if(module->assigned){
+            if(module->techtype == SHIELD){
+                if(module->online){
+                    shields_active = true;
+                    shield_health += health_GetHealthPercent(&module->health);
+                    shield_resist *= module->data.shields.resistance;
+                    shield_num++;
+                }
+            }
+            if(selected == i) {
                 gfx_SetColor(230);
                 gfx_FillRectangle(temp_x, temp_y, 10, 20);
             }
             temp_x += 10;
             gfx_SetColor(31);
-            if(!shield->online) gfx_SetColor(160);
+            if(!module->online) gfx_SetColor(160);
             gfx_FillRectangle(temp_x, temp_y, 140, 20);
             gfx_SetColor(33);
             gfx_FillRectangle(temp_x + 2, temp_y + 2, 136, 16);
             temp_x += 5; temp_y += 6;
-            Stats_DrawHealthBar(health, 80, temp_x, temp_y, 255, 255, icon_shieldstrength);
-            if(shield->online){
-                shields_combined += health;
-                shields_active++;
+            stats_DrawHealthBar(health_GetHealthPercent(&module->health), 80, temp_x, temp_y, 255, 255);
             }
         }
-    }
-    if(shields_active) {
-        gfx_rletsprite_t* shield_icon = icon_shieldsstable;
-        shields_combined /= shields_active;
-        if(shields_combined <= 50) shield_icon = icon_shieldscollapse;
-        if(shields_combined <= 25) shield_icon = icon_shieldsfail;
-        gfx_RLETSprite(shield_icon, cur_x, cur_y);
-        cur_y += shield_icon->height + 10;
-        Stats_DrawHealthBar(shields_combined, 75, cur_x, cur_y, 30, 255, icon_shieldstrength);
-        cur_y += 15; cur_x = viewer_x;
-    }
-    Stats_DrawHealthBar(health_GetHealthPercent(hull), 75, cur_x, cur_y, 255, 255, NULL);
+        if(shields_active) {
+            gfx_rletsprite_t* shield_icon = icon_shieldsstable;
+            shield_health /= shield_num;
+            if(shield_health <= 50) shield_icon = icon_shieldscollapse;
+            if(shield_health <= 25) shield_icon = icon_shieldsfail;
+            gfx_RLETSprite(shield_icon, cur_x, cur_y);
+            cur_y += shield_icon->height + 10;
+            stats_DrawHealthBar(shield_health, 75, cur_x, cur_y, 30, 255);
+            cur_y += 15; cur_x = viewer_x;
+        }
+        stats_DrawHealthBar(health_GetHealthPercent(&tactical[TACT_MAX].health), 75, cur_x, cur_y, 255, 255);
 }
 
 
@@ -138,21 +141,7 @@ void Screen_UIDefenseStats(module_t* tactical, module_t* selected, health_t* hul
 
 
 
-int Stats_DrawHealthBar(unsigned int percent, unsigned int length, int x, int y, unsigned char border_color, unsigned char bar_color, gfx_rletsprite_t* icon){
-    if(icon != NULL) {
-        gfx_RLETSprite(icon, x, y - 2);
-        x += 15;
-    }
-    gfx_SetColor(border_color);
-    gfx_Rectangle(x, y-1, length, 9);
-    length -= 2;
-    gfx_SetColor(bar_color);
-    if(percent <= 50) gfx_SetColor(229);
-    if(percent <= 25) gfx_SetColor(192);
-    gfx_FillRectangle(x + 1, y, percent * length / 100, 7);
-    gfx_SetColor(255);
-    return x + length;
-}
+
 
 
 

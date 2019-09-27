@@ -2,21 +2,21 @@ Segment  Base   Top    High   Length
 -------- ------ ------ ------ -------
 icon     D1A882 D1A99F           11Dh
 launcher D1A99F D1A9F7            58h
-libs     D1A9F7 D1AA68            71h
-startup  D1AA68 D1AAA7            3Fh
-cleanup  D1AAA7 D1AABB            14h
-exit     D1AABB D1AAC1             6h
-code     D1AAC1 D1BDBF          12FEh
-data     D1BDBF D1C17A           3BBh
-strsect  D1C17A D1C1AC            32h
-text     D1C1AC D1C1AC             0h
+libs     D1A9F7 D1AA64            6Dh
+startup  D1AA64 D1AAA3            3Fh
+cleanup  D1AAA3 D1AAB7            14h
+exit     D1AAB7 D1AABD             6h
+code     D1AABD D1BC97          11DAh
+data     D1BC97 D1C05E           3C7h
+strsect  D1C05E D1C099            3Bh
+text     D1C099 D1C099             0h
 bss      D031F6 D031FC D13FD6      6h
 header   D1A87F D1A882             3h
 
 Label                          Value
 ----------------------------   ------
-_os_DisableHomeTextBuffer    = D1AAC1
-_os_EnableHomeTextBuffer     = D1AAD3
+_os_DisableHomeTextBuffer    = D1AABD
+_os_EnableHomeTextBuffer     = D1AACF
 _boot_GetBootMajorVer        = 000080
 _boot_GetHardwareVer         = 000084
 _boot_GetBootMinorVer        = 00008C
@@ -130,11 +130,11 @@ _asm_DisableAPD              = 021134
 _asm_EnableAPD               = 021138
 _asm_DrawStatusBar           = 021A3C
 _asm_ArcChk                  = 022040
-_srandom                     = D1AAE5
-__setstate                   = D1AAEC
-_random                      = D1AAFC
-__state                      = D1BDBF
-_zx7_Decompress              = D1AB53
+_srandom                     = D1AAE1
+__setstate                   = D1AAE8
+_random                      = D1AAF8
+__state                      = D1BC97
+_zx7_Decompress              = D1AB4F
 __seqcase                    = 000210
 __idvrmu                     = 000140
 __idvrmu                     = 000144
@@ -142,59 +142,63 @@ __imul_b                     = 000158
 __imul_b                     = 000150
 __idivs                      = 00013C
 _strlen                      = 0000D4
-__frameset                   = D1ABBF
+__frameset                   = D1ABBB
 __ishru_b                    = 000184
 __ishru_b                    = 000188
-__s_sbrk                     = D1ABCD
-__frameset0                  = D1ABED
+__stoiu                      = 000264
+__s_sbrk                     = D1ABC9
+__frameset0                  = D1ABE9
+__sxor                       = 000268
 __iremu                      = 000170
-__icmpzero                   = D1ABF8
+__icmpzero                   = D1ABF4
+__sor                        = 000234
 __ineg                       = 000160
 __setflag                    = 000218
 __imuls                      = 000154
 __case8                      = 000124
-_malloc                      = D1AC2E
+_malloc                      = D1AC2A
 __alloc_base                 = D031F6
-_free                        = D1ACD6
+_free                        = D1ACD2
 __findlibload                = D1A99F
 __program_icon               = D1A887
 __program_description        = D1A989
-__ccleanup                   = D1AAA7
+__ccleanup                   = D1AAA3
 _errno                       = D008DC
 _init                        = D1A882
-_exit                        = D1AABD
-__exit                       = D1AA96
-__exitsp                     = D1AA96
-__errsp                      = D1AA96
-_module_SetPowerMax          = D1AF87
-_module_SetHealthMax         = D1AF6F
-_module_SetOnlineState       = D1AF2F
-_module_GetOnlineState       = D1AF20
-_health_DamageModule         = D1AECA
-_health_GetHealthPercent     = D1AEAE
-_power_GetPowerDraw          = D1AE9F
-_power_ChangeSpend           = D1AE3C
-_power_GetPowerSpend         = D1AE2D
-_power_GetDrawSource         = D1AE1E
-_power_SetDrawSource         = D1AE0C
-_power_GetSpendPercent       = D1ADF0
-_power_GetBatteryPercent     = D1ADD4
-_trekgui_init                = D1AF9D
-_trekgui                     = D1BDF4
-_DrawFrame                   = D1B4E1
-_main                        = D1AFF1
-_Ship                        = D1BE21
-_Screen_Background           = D1BC40
-_Stats_DrawHealthBar         = D1BB70
-_Screen_UIDefenseStats       = D1B91D
-_Screen_UISystemStats        = D1B5E6
-_num_GetLength               = D1B59F
-_text_GetCenterX             = D1B57E
-_mainsys_strings             = D1C134
-_version                     = D1C124
-_tact_title                  = D1C10D
-_shields_title               = D1C0FB
-_mains_title                 = D1C0E8
+_exit                        = D1AAB9
+__exit                       = D1AA92
+__exitsp                     = D1AA92
+__errsp                      = D1AA92
+_module_SetPowerMax          = D1AF83
+_module_SetHealthMax         = D1AF6B
+_module_SetOnlineState       = D1AF2B
+_module_GetOnlineState       = D1AF1C
+_health_DamageModule         = D1AEC6
+_health_GetHealthPercent     = D1AEAA
+_power_GetPowerDraw          = D1AE9B
+_power_ChangeSpend           = D1AE38
+_power_GetPowerSpend         = D1AE29
+_power_GetDrawSource         = D1AE1A
+_power_SetDrawSource         = D1AE08
+_power_GetSpendPercent       = D1ADEC
+_power_GetBatteryPercent     = D1ADD0
+_trekgui_init                = D1AF99
+_trekgui                     = D1BCCC
+_stats_DrawHealthBar         = D1AFEB
+_main                        = D1B0B9
+_select                      = D1BFC6
+_Ship                        = D1BCF9
+_Screen_Background           = D1BB1C
+_Screen_UITacticalStats      = D1B8B2
+_Screen_UISystemStats        = D1B767
+_Screen_RenderUI             = D1B6C1
+_num_GetLength               = D1B67A
+_text_GetCenterX             = D1B659
+_mainsys_strings             = D1C018
+_version                     = D1C008
+_tact_title                  = D1BFF1
+_shields_title               = D1BFDF
+_mains_title                 = D1BFCC
 _ti_CloseAll                 = D1AA0B
 _ti_Open                     = D1AA0F
 _ti_GetDataPtr               = D1AA13
@@ -204,15 +208,14 @@ _gfx_SetColor                = D1AA28
 _gfx_SetDefaultPalette       = D1AA2C
 _gfx_SetDraw                 = D1AA30
 _gfx_Blit                    = D1AA34
-_gfx_PrintUInt               = D1AA38
-_gfx_PrintString             = D1AA3C
-_gfx_PrintStringXY           = D1AA40
-_gfx_SetTextXY               = D1AA44
-_gfx_SetTextBGColor          = D1AA48
-_gfx_SetTextFGColor          = D1AA4C
-_gfx_SetTextTransparentColor = D1AA50
-_gfx_GetStringWidth          = D1AA54
-_gfx_Rectangle               = D1AA58
-_gfx_FillRectangle           = D1AA5C
-_gfx_ZeroScreen              = D1AA60
-_gfx_RLETSprite              = D1AA64
+_gfx_PrintString             = D1AA38
+_gfx_PrintStringXY           = D1AA3C
+_gfx_SetTextXY               = D1AA40
+_gfx_SetTextBGColor          = D1AA44
+_gfx_SetTextFGColor          = D1AA48
+_gfx_SetTextTransparentColor = D1AA4C
+_gfx_GetStringWidth          = D1AA50
+_gfx_Rectangle               = D1AA54
+_gfx_FillRectangle           = D1AA58
+_gfx_ZeroScreen              = D1AA5C
+_gfx_RLETSprite              = D1AA60
