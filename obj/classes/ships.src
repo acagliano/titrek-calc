@@ -1,17 +1,748 @@
 ; Zilog eZ80 ANSI C Compiler Release 3.4
-; -optsize -noreduceopt -nomodsect -peephole -globalopt
+; -debug -optsize -noreduceopt -nomodsect -peephole -globalopt
 ; -localcse -const=ROM 
 	FILE	"SRC\CLASSES\SHIPS.C"
 	.assume ADL=1
+.DEBUG "C"
 	SEGMENT CODE
+.BEGREC "NONAME0",12
+.DEFINE "x"
+.VALUE 0
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "y"
+.VALUE 4
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "z"
+.VALUE 8
+.CLASS 8
+.TYPE 5
+.ENDEF
+.ENDREC "NONAME0"
+.BEGREC "NONAME1",12
+.DEFINE "x"
+.VALUE 0
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "y"
+.VALUE 4
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "z"
+.VALUE 8
+.CLASS 8
+.TYPE 5
+.ENDEF
+.ENDREC "NONAME1"
+.BEGREC "NONAME2",3
+.DEFINE "protection"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME2"
+.BEGREC "NONAME3",6
+.DEFINE "protection"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "weight"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME3"
+.BEGREC "NONAME4",3
+.DEFINE "powerout"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME4"
+.BEGREC "NONAME5",3
+.DEFINE "maxspeed"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME5"
+.BEGREC "NONAME6",9
+.DEFINE "targetxz"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "targetxy"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "maxrange"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME6"
+.BEGREC "NONAME7",12
+.DEFINE "firingspeed"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "reloadtime"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "shielddamage"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "normaldamage"
+.VALUE 9
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME7"
+.BEGREC "NONAME8",15
+.DEFINE "powerdrain"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "module"
+.VALUE 3
+.CLASS 8
+.TAG "Module"
+.TYPE 8
+.ENDEF
+.ENDREC "NONAME8"
+.BEGREC "Module",12
+.DEFINE "weapon_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME7"
+.TYPE 8
+.ENDEF
+.DEFINE "sensor_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME6"
+.TYPE 8
+.ENDEF
+.DEFINE "integrity_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME3"
+.TYPE 8
+.ENDEF
+.DEFINE "shield_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME2"
+.TYPE 8
+.ENDEF
+.DEFINE "generator_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME4"
+.TYPE 8
+.ENDEF
+.DEFINE "engine_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME5"
+.TYPE 8
+.ENDEF
+.ENDREC "Module"
+.BEGREC "NONAME9",27
+.DEFINE "techclass"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "techtype"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "techid"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "powerdrain"
+.VALUE 9
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "techinfo"
+.VALUE 12
+.CLASS 8
+.TAG "techinfo"
+.TYPE 8
+.ENDEF
+.ENDREC "NONAME9"
+.BEGREC "techinfo",15
+.DEFINE "module_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME8"
+.TYPE 8
+.ENDEF
+.DEFINE "weapon_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME7"
+.TYPE 8
+.ENDEF
+.ENDREC "techinfo"
+.BEGREC "NONAME10",6
+.DEFINE "quot"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "rem"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME10"
+.BEGREC "NONAME11",8
+.DEFINE "quot"
+.VALUE 0
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "rem"
+.VALUE 4
+.CLASS 8
+.TYPE 5
+.ENDEF
+.ENDREC "NONAME11"
+.BEGREC "header",6
+.DEFINE "s"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME12"
+.TYPE 8
+.ENDEF
+.DEFINE "x"
+.VALUE 0
+.CLASS 11
+.TYPE 2
+.ENDEF
+.ENDREC "header"
+.BEGREC "NONAME12",6
+.DEFINE "ptr"
+.VALUE 0
+.CLASS 8
+.TAG "header"
+.TYPE 40
+.ENDEF
+.DEFINE "size"
+.VALUE 3
+.CLASS 8
+.TYPE 14
+.ENDEF
+.ENDREC "NONAME12"
+.BEGREC "NONAME13",3
+.DEFINE "width"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "height"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "data"
+.VALUE 2
+.CLASS 8
+.DIM 1
+.TYPE 108
+.ENDEF
+.ENDREC "NONAME13"
+.BEGREC "NONAME14",3
+.DEFINE "width"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "height"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "data"
+.VALUE 2
+.CLASS 8
+.DIM 1
+.TYPE 108
+.ENDEF
+.ENDREC "NONAME14"
+.BEGREC "NONAME15",6
+.DEFINE "x"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "y"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME15"
+.BEGREC "NONAME16",12
+.DEFINE "xmin"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "ymin"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "xmax"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "ymax"
+.VALUE 9
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME16"
+.BEGREC "NONAME17",18
+.DEFINE "map"
+.VALUE 0
+.CLASS 8
+.TYPE 44
+.ENDEF
+.DEFINE "tiles"
+.VALUE 3
+.CLASS 8
+.TAG "NONAME13"
+.TYPE 296
+.ENDEF
+.DEFINE "tile_height"
+.VALUE 6
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "tile_width"
+.VALUE 7
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "draw_height"
+.VALUE 8
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "draw_width"
+.VALUE 9
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "type_width"
+.VALUE 10
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "type_height"
+.VALUE 11
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "height"
+.VALUE 12
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "width"
+.VALUE 13
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "y_loc"
+.VALUE 14
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "x_loc"
+.VALUE 15
+.CLASS 8
+.TYPE 14
+.ENDEF
+.ENDREC "NONAME17"
+.BEGREC "NONAME18",1
+.DEFINE "drv"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.ENDREC "NONAME18"
+.BEGREC "NONAME19",3
+.DEFINE "occupancy"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME19"
+.BEGREC "NONAME20",3
+.DEFINE "output"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME20"
+.BEGREC "NONAME21",3
+.DEFINE "maxspeed"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME21"
+.BEGREC "NONAME22",3
+.DEFINE "maxrange"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME22"
+.BEGREC "NONAME23",6
+.DEFINE "maxrange"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "maxtargets"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME23"
+.BEGREC "NONAME24",4
+.DEFINE "maxrange"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "maxtargets"
+.VALUE 3
+.CLASS 8
+.TYPE 2
+.ENDEF
+.ENDREC "NONAME24"
+.BEGREC "NONAME25",27
+.DEFINE "resistance"
+.VALUE 0
+.CLASS 8
+.TYPE 14
+.ENDEF
+.DEFINE "frequency"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "maxhealth"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "shieldhealth"
+.VALUE 9
+.CLASS 8
+.DIM 6
+.TYPE 100
+.ENDEF
+.ENDREC "NONAME25"
+.BEGREC "NONAME26",9
+.DEFINE "yield"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "range"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "speed"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME26"
+.BEGREC "NONAME27",13
+.DEFINE "equipped"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "compatible"
+.VALUE 3
+.CLASS 8
+.DIM 10
+.TYPE 108
+.ENDEF
+.ENDREC "NONAME27"
+.BEGREC "NONAME28",15
+.DEFINE "priority"
+.VALUE 0
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "capacity"
+.VALUE 1
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "current"
+.VALUE 4
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "spend"
+.VALUE 7
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "base"
+.VALUE 10
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "alwaysUse"
+.VALUE 13
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "drawFrom"
+.VALUE 14
+.CLASS 8
+.TYPE 2
+.ENDEF
+.ENDREC "NONAME28"
+.BEGREC "NONAME29",6
+.DEFINE "max"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "current"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME29"
+.BEGREC "Data_t",27
+.DEFINE "mod_transport"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME23"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_integ"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME18"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_lifesupport"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME19"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_core"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME20"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_engine"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME21"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_navsens"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME22"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_shields"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME25"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_torpedoes"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME27"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_phasers"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME26"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_targsens"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME24"
+.TYPE 8
+.ENDEF
+.ENDREC "Data_t"
+.BEGREC "NONAME30",54
+.DEFINE "unlocked"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "assigned"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "techid"
+.VALUE 2
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "techtype"
+.VALUE 3
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "online"
+.VALUE 4
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "typelocked"
+.VALUE 5
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "power"
+.VALUE 6
+.CLASS 8
+.TAG "NONAME28"
+.TYPE 8
+.ENDEF
+.DEFINE "health"
+.VALUE 21
+.CLASS 8
+.TAG "NONAME29"
+.TYPE 8
+.ENDEF
+.DEFINE "data"
+.VALUE 27
+.CLASS 8
+.TAG "Data_t"
+.TYPE 8
+.ENDEF
+.ENDREC "NONAME30"
+.BEGREC "NONAME31",717
+.DEFINE "coords"
+.VALUE 0
+.CLASS 8
+.TAG "NONAME0"
+.TYPE 8
+.ENDEF
+.DEFINE "crew"
+.VALUE 12
+.CLASS 8
+.TYPE 14
+.ENDEF
+.DEFINE "system"
+.VALUE 15
+.CLASS 8
+.DIM 6
+.TAG "NONAME30"
+.TYPE 104
+.ENDEF
+.DEFINE "tactical"
+.VALUE 339
+.CLASS 8
+.DIM 6
+.TAG "NONAME30"
+.TYPE 104
+.ENDEF
+.DEFINE "hull"
+.VALUE 663
+.CLASS 8
+.TAG "NONAME30"
+.TYPE 8
+.ENDEF
+.ENDREC "NONAME31"
+.BEGREC "NONAME32",6
+.DEFINE "mains"
+.VALUE 0
+.CLASS 8
+.TYPE 14
+.ENDEF
+.DEFINE "tactical"
+.VALUE 3
+.CLASS 8
+.TYPE 14
+.ENDEF
+.ENDREC "NONAME32"
 ;    1	#include <stddef.h>
 ;    2	#include "ships.h"
 ;    3	
 ;    4	// POWER FUNCTIONS
 ;    5	signed int power_GetBatteryPercent(power_t* power){
 _power_GetBatteryPercent:
-	CALL	__frameset0
+.DEFINE "_power_GetBatteryPercent"
+
+.VALUE _power_GetBatteryPercent
+
+.CLASS 2
+
+.TYPE 68
+
+.ENDEF
+
+.BEGFUNC "power_GetBatteryPercent",5,"_power_GetBatteryPercent"
+
+.LINE 5
+
+.DEFINE "power"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME28"
+
+.TYPE 40
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;    6	    return power->current * 100 / power->capacity;
+.LINE 6
+
 	LD	IY,(IX+6)
 	LD	HL,(IY+4)
 	LD	A,100
@@ -19,6 +750,8 @@ _power_GetBatteryPercent:
 	LD	BC,(IY+1)
 	CALL	__idivs
 ;    7	}
+.LINE 7
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -33,11 +766,42 @@ _power_GetBatteryPercent:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "power_GetBatteryPercent",7,"_power_GetBatteryPercent"
 ;    8	
 ;    9	signed int power_GetSpendPercent(power_t* power){
 _power_GetSpendPercent:
-	CALL	__frameset0
+.DEFINE "_power_GetSpendPercent"
+
+.VALUE _power_GetSpendPercent
+
+.CLASS 2
+
+.TYPE 68
+
+.ENDEF
+
+.BEGFUNC "power_GetSpendPercent",9,"_power_GetSpendPercent"
+
+.LINE 9
+
+.DEFINE "power"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME28"
+
+.TYPE 40
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;   10	    return power->spend * 100 / power->base;
+.LINE 10
+
 	LD	IY,(IX+6)
 	LD	HL,(IY+7)
 	LD	A,100
@@ -45,6 +809,8 @@ _power_GetSpendPercent:
 	LD	BC,(IY+10)
 	CALL	__idivs
 ;   11	}
+.LINE 11
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -59,15 +825,58 @@ _power_GetSpendPercent:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "power_GetSpendPercent",11,"_power_GetSpendPercent"
 ;   12	
 ;   13	void power_SetDrawSource(power_t* power, char source){
 _power_SetDrawSource:
-	CALL	__frameset0
+.DEFINE "_power_SetDrawSource"
+
+.VALUE _power_SetDrawSource
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "power_SetDrawSource",13,"_power_SetDrawSource"
+
+.LINE 13
+
+.DEFINE "power"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME28"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "source"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 2
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;   14	    power->drawFrom = source;
+.LINE 14
+
 	LD	A,(IX+9)
 	LD	IY,(IX+6)
 	LD	(IY+14),A
 ;   15	}
+.LINE 15
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -83,14 +892,47 @@ _power_SetDrawSource:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "power_SetDrawSource",15,"_power_SetDrawSource"
 ;   16	
 ;   17	char power_GetDrawSource(power_t* power){
 _power_GetDrawSource:
-	CALL	__frameset0
+.DEFINE "_power_GetDrawSource"
+
+.VALUE _power_GetDrawSource
+
+.CLASS 2
+
+.TYPE 66
+
+.ENDEF
+
+.BEGFUNC "power_GetDrawSource",17,"_power_GetDrawSource"
+
+.LINE 17
+
+.DEFINE "power"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME28"
+
+.TYPE 40
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;   18	    return power->drawFrom;
+.LINE 18
+
 	LD	IY,(IX+6)
 	LD	A,(IY+14)
 ;   19	}
+.LINE 19
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -105,14 +947,47 @@ _power_GetDrawSource:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "power_GetDrawSource",19,"_power_GetDrawSource"
 ;   20	
 ;   21	signed int power_GetPowerSpend(power_t* power){
 _power_GetPowerSpend:
-	CALL	__frameset0
+.DEFINE "_power_GetPowerSpend"
+
+.VALUE _power_GetPowerSpend
+
+.CLASS 2
+
+.TYPE 68
+
+.ENDEF
+
+.BEGFUNC "power_GetPowerSpend",21,"_power_GetPowerSpend"
+
+.LINE 21
+
+.DEFINE "power"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME28"
+
+.TYPE 40
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;   22	    return power->spend;
+.LINE 22
+
 	LD	IY,(IX+6)
 	LD	HL,(IY+7)
 ;   23	}
+.LINE 23
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -127,16 +1002,60 @@ _power_GetPowerSpend:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "power_GetPowerSpend",23,"_power_GetPowerSpend"
 ;   24	
 ;   25	void power_ChangeSpend(power_t* power, char amount){
 _power_ChangeSpend:
-	LD	HL,-6
-	CALL	__frameset
+.DEFINE "_power_ChangeSpend"
+
+.VALUE _power_ChangeSpend
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "power_ChangeSpend",25,"_power_ChangeSpend"
+
+.LINE 25
+
+.DEFINE "power"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME28"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "amount"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 2
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+	PUSH	BC
 ;   26	    if(amount == POWER_INC)
+.LINE 26
+
 	LD	A,(IX+9)
 	CP	A,1
 	JR	NZ,L_11
 ;   27	        if(power->spend < (2 * power->base)) power->spend++;
+.LINE 27
+
 	LD	IY,(IX+6)
 	LD	BC,(IY+7)
 	LD	(IX+-3),BC
@@ -154,10 +1073,14 @@ _power_ChangeSpend:
 	LD	(IY+7),BC
 L_11:
 ;   28	    if(amount == POWER_DEC)
+.LINE 28
+
 	LD	A,(IX+9)
 	CP	A,-1
 	JR	NZ,L_12
 ;   29	        if(power->spend > 0) power->spend--;
+.LINE 29
+
 	LD	IY,(IX+6)
 	LD	BC,(IY+7)
 	LD	(IX+-6),BC
@@ -173,6 +1096,8 @@ L_11:
 	LD	(IY+7),BC
 ;   30	}
 L_12:
+.LINE 30
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -190,14 +1115,47 @@ L_12:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "power_ChangeSpend",30,"_power_ChangeSpend"
 ;   31	
 ;   32	signed int power_GetPowerDraw(power_t* power){
 _power_GetPowerDraw:
-	CALL	__frameset0
+.DEFINE "_power_GetPowerDraw"
+
+.VALUE _power_GetPowerDraw
+
+.CLASS 2
+
+.TYPE 68
+
+.ENDEF
+
+.BEGFUNC "power_GetPowerDraw",32,"_power_GetPowerDraw"
+
+.LINE 32
+
+.DEFINE "power"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME28"
+
+.TYPE 40
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;   33	    return power->base;
+.LINE 33
+
 	LD	IY,(IX+6)
 	LD	HL,(IY+10)
 ;   34	}
+.LINE 34
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -212,12 +1170,43 @@ _power_GetPowerDraw:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "power_GetPowerDraw",34,"_power_GetPowerDraw"
 ;   35	
 ;   36	// HEALTH FUNCTIONS
 ;   37	signed int health_GetHealthPercent(health_t* health){
 _health_GetHealthPercent:
-	CALL	__frameset0
+.DEFINE "_health_GetHealthPercent"
+
+.VALUE _health_GetHealthPercent
+
+.CLASS 2
+
+.TYPE 68
+
+.ENDEF
+
+.BEGFUNC "health_GetHealthPercent",37,"_health_GetHealthPercent"
+
+.LINE 37
+
+.DEFINE "health"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME29"
+
+.TYPE 40
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;   38	    return health->current * 100 / health->max;
+.LINE 38
+
 	LD	IY,(IX+6)
 	LD	HL,(IY+3)
 	LD	A,100
@@ -225,6 +1214,8 @@ _health_GetHealthPercent:
 	LD	BC,(IY+0)
 	CALL	__idivs
 ;   39	}
+.LINE 39
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -239,18 +1230,61 @@ _health_GetHealthPercent:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "health_GetHealthPercent",39,"_health_GetHealthPercent"
 ;   40	
 ;   41	void health_DamageModule(health_t* health, int amount){
 _health_DamageModule:
-	LD	HL,-3
-	CALL	__frameset
+.DEFINE "_health_DamageModule"
+
+.VALUE _health_DamageModule
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "health_DamageModule",41,"_health_DamageModule"
+
+.LINE 41
+
+.DEFINE "health"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME29"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "amount"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 4
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
 ;   42	    health->current += amount;
+.LINE 42
+
 	LD	BC,(IX+9)
 	LD	IY,(IX+6)
 	LD	HL,(IY+3)
 	ADD	HL,BC
 	LD	(IY+3),HL
 ;   43	    if(health->current < 0) health->current = 0;
+.LINE 43
+
 	LD	HL,(IY+3)
 	CALL	__icmpzero
 	CALL	__setflag
@@ -260,6 +1294,8 @@ _health_DamageModule:
 	LD	(IY+3),BC
 L_17:
 ;   44	    if(health->current > health->max) health->current = health->max;
+.LINE 44
+
 	LD	IY,(IX+6)
 	LD	BC,(IY+0)
 	LD	(IX+-3),BC
@@ -274,6 +1310,8 @@ L_17:
 	LD	(IY+3),BC
 ;   45	}
 L_18:
+.LINE 45
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -290,16 +1328,49 @@ L_18:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "health_DamageModule",45,"_health_DamageModule"
 ;   46	
 ;   47	
 ;   48	// MODULE FUNCTIONS
 ;   49	char module_GetOnlineState(module_t* module){
 _module_GetOnlineState:
-	CALL	__frameset0
+.DEFINE "_module_GetOnlineState"
+
+.VALUE _module_GetOnlineState
+
+.CLASS 2
+
+.TYPE 66
+
+.ENDEF
+
+.BEGFUNC "module_GetOnlineState",49,"_module_GetOnlineState"
+
+.LINE 49
+
+.DEFINE "module"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME30"
+
+.TYPE 40
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;   50	    return module->online;
+.LINE 50
+
 	LD	IY,(IX+6)
 	LD	A,(IY+4)
 ;   51	}
+.LINE 51
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -314,15 +1385,58 @@ _module_GetOnlineState:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "module_GetOnlineState",51,"_module_GetOnlineState"
 ;   52	
 ;   53	char module_SetOnlineState(module_t* module, char state){
 _module_SetOnlineState:
-	CALL	__frameset0
+.DEFINE "_module_SetOnlineState"
+
+.VALUE _module_SetOnlineState
+
+.CLASS 2
+
+.TYPE 66
+
+.ENDEF
+
+.BEGFUNC "module_SetOnlineState",53,"_module_SetOnlineState"
+
+.LINE 53
+
+.DEFINE "module"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME30"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "state"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 2
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;   54	    if(state){
+.LINE 54
+
 	LD	A,(IX+9)
 	OR	A,A
 	JR	Z,L_25
 ;   55	        if(module->power.current == 0) return SETSTATE_NOPOWER;
+.LINE 55
+
 	LD	IY,(IX+6)
 	LD	HL,(IY+10)
 	CALL	__icmpzero
@@ -331,6 +1445,8 @@ _module_SetOnlineState:
 	JR	L_26
 L_23:
 ;   56	        if(state == 1 && module->health.current == 0) return SETSTATE_NOHEALTH;
+.LINE 56
+
 	LD	A,(IX+9)
 	CP	A,1
 	JR	NZ,L_25
@@ -342,14 +1458,22 @@ L_23:
 	JR	L_26
 ;   57	    }
 L_25:
+.LINE 57
+
 ;   58	    module->online = state;
+.LINE 58
+
 	LD	A,(IX+9)
 	LD	IY,(IX+6)
 	LD	(IY+4),A
 ;   59	    return SETSTATE_SUCCESS;
+.LINE 59
+
 	XOR	A,A
 ;   60	}
 L_26:
+.LINE 60
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -365,21 +1489,66 @@ L_26:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "module_SetOnlineState",60,"_module_SetOnlineState"
 ;   61	
 ;   62	
 ;   63	
 ;   64	
 ;   65	void module_SetHealthMax(health_t* health, int max){
 _module_SetHealthMax:
-	CALL	__frameset0
+.DEFINE "_module_SetHealthMax"
+
+.VALUE _module_SetHealthMax
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "module_SetHealthMax",65,"_module_SetHealthMax"
+
+.LINE 65
+
+.DEFINE "health"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME29"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "max"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 4
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;   66	    health->current = max;
+.LINE 66
+
 	LD	BC,(IX+9)
 	LD	IY,(IX+6)
 	LD	(IY+3),BC
 ;   67	    health->max = max;
+.LINE 67
+
 	LD	BC,(IX+9)
 	LD	(IY+0),BC
 ;   68	}
+.LINE 68
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -395,17 +1564,52 @@ _module_SetHealthMax:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "module_SetHealthMax",68,"_module_SetHealthMax"
 ;   69	
 ;   70	void module_SetPowerMax(power_t* power){
 _module_SetPowerMax:
-	CALL	__frameset0
+.DEFINE "_module_SetPowerMax"
+
+.VALUE _module_SetPowerMax
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "module_SetPowerMax",70,"_module_SetPowerMax"
+
+.LINE 70
+
+.DEFINE "power"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME28"
+
+.TYPE 40
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
 ;   71	    power->capacity = 100;
+.LINE 71
+
 	LD	BC,100
 	LD	IY,(IX+6)
 	LD	(IY+1),BC
 ;   72	    power->current = 100;
+.LINE 72
+
 	LD	(IY+4),BC
 ;   73	}
+.LINE 73
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -420,9 +1624,8 @@ _module_SetPowerMax:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "module_SetPowerMax",73,"_module_SetPowerMax"
 	XREF __idivs:ROM
-	XREF __frameset0:ROM
-	XREF __frameset:ROM
 	XREF __setflag:ROM
 	XREF __icmpzero:ROM
 	XREF __imul_b:ROM

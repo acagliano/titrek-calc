@@ -7,13 +7,26 @@
 #include <graphx.h>
 #include <compression.h>
 #include "gfx-engine/gui.h"
+#include "classes/modules.h"
+#include <debug.h>
 
 char mains_title[] = "[MAIN SYS CONTROL]";
 char shields_title[] = "[DEFENSE CONTROL]";
 char tact_title[] = "[TACTICAL SYS CONTROL]";
 char version[] = "v0.84 pre-alpha";
 
-char mainsys_strings[][10] = {"Integrity", "LifeSupp", "WarpCore", "WarpDrive", "Impulse", "NavSens", "Transport"};
+char moduledb[][15] = {
+    "LifeSupp",
+    "WarpCore",
+    "ImpulseDr",
+    "NavSensor",
+    "Transport",
+    "Shields",
+    "Armor",
+    "Phaser",
+    "Torpedo",
+    "TargSensor"
+};
 
 int text_GetCenterX(char* string){
     return (LCD_WIDTH - gfx_GetStringWidth(string)) / 2;
@@ -66,18 +79,15 @@ void Screen_UISystemStats(module_t* systems, uint24_t selected){
         gfx_SetColor(255);
         gfx_SetTextXY(cur_x, cur_y);
         if(module->assigned){
-            signed int health = health_GetHealthPercent(&module->health),
-                        spend = power_GetPowerSpend(&module->power),
-                        spendpercent = power_GetSpendPercent(&module->power),
-                        source = power_GetDrawSource(&module->power),
-                        pow_res = power_GetBatteryPercent(&module->power);
-            gfx_PrintString(mainsys_strings[module->techtype]);
-            cur_x += 75;
-            stats_DrawHealthBar(health, 50, cur_x, cur_y, 255, 255);
-           
-            
-            //gfx_SetTextXY(viewer_x + 100, (i + 1) * 10 + viewer_y + 5);
-            //gfx_PrintUInt(health, 3);
+            uint8_t techtype = module->techtype;
+            gfx_rletsprite_t *icon = ((gfx_rletsprite_t*)trekgui[MODICONS + techtype]);
+            dbg_sprintf(dbgout, "%u\n", techtype);
+            dbg_sprintf(dbgout, "%u\n", MODICONS);
+            dbg_sprintf(dbgout, "%u\n", icon);
+            dbg_Debugger();
+
+            gfx_RLETSprite(icon, cur_x, cur_y);
+            gfx_PrintStringXY(moduledb[techtype], cur_x + 20, cur_y);
         }
     }
     return;
@@ -98,7 +108,7 @@ void Screen_UITacticalStats(module_t* tactical, uint24_t selected){
                 if(module->online){
                     shields_active = true;
                     shield_health += health_GetHealthPercent(&module->health);
-                    shield_resist *= module->data.shields.resistance;
+                    shield_resist *= module->data.mod_shields.resistance;
                     shield_num++;
                 }
             }

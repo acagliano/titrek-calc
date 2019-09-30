@@ -1,8 +1,920 @@
 ; Zilog eZ80 ANSI C Compiler Release 3.4
-; -optsize -noreduceopt -nomodsect -peephole -globalopt
+; -debug -optsize -noreduceopt -nomodsect -peephole -globalopt
 ; -localcse -const=ROM 
 	FILE	"SRC\STATSCREENS.C"
 	.assume ADL=1
+.DEBUG "C"
+	SEGMENT CODE
+.BEGREC "NONAME0",9
+.DEFINE "sign"
+.VALUE 0
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "exp"
+.VALUE 1
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "mant"
+.VALUE 2
+.CLASS 8
+.DIM 7
+.TYPE 108
+.ENDEF
+.ENDREC "NONAME0"
+.BEGREC "NONAME1",18
+.DEFINE "real"
+.VALUE 0
+.CLASS 8
+.TAG "NONAME0"
+.TYPE 8
+.ENDEF
+.DEFINE "imag"
+.VALUE 9
+.CLASS 8
+.TAG "NONAME0"
+.TYPE 8
+.ENDEF
+.ENDREC "NONAME1"
+.BEGREC "NONAME2",11
+.DEFINE "dim"
+.VALUE 0
+.CLASS 8
+.TYPE 13
+.ENDEF
+.DEFINE "items"
+.VALUE 2
+.CLASS 8
+.DIM 1
+.TAG "NONAME0"
+.TYPE 104
+.ENDEF
+.ENDREC "NONAME2"
+.BEGREC "NONAME3",20
+.DEFINE "dim"
+.VALUE 0
+.CLASS 8
+.TYPE 13
+.ENDEF
+.DEFINE "items"
+.VALUE 2
+.CLASS 8
+.DIM 1
+.TAG "NONAME1"
+.TYPE 104
+.ENDEF
+.ENDREC "NONAME3"
+.BEGREC "NONAME4",11
+.DEFINE "cols"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "rows"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "items"
+.VALUE 2
+.CLASS 8
+.DIM 1
+.TAG "NONAME0"
+.TYPE 104
+.ENDEF
+.ENDREC "NONAME4"
+.BEGREC "NONAME5",3
+.DEFINE "len"
+.VALUE 0
+.CLASS 8
+.TYPE 13
+.ENDEF
+.DEFINE "data"
+.VALUE 2
+.CLASS 8
+.DIM 1
+.TYPE 98
+.ENDEF
+.ENDREC "NONAME5"
+.BEGREC "NONAME6",3
+.DEFINE "len"
+.VALUE 0
+.CLASS 8
+.TYPE 13
+.ENDEF
+.DEFINE "data"
+.VALUE 2
+.CLASS 8
+.DIM 1
+.TYPE 98
+.ENDEF
+.ENDREC "NONAME6"
+.BEGREC "NONAME7",3
+.DEFINE "size"
+.VALUE 0
+.CLASS 8
+.TYPE 13
+.ENDEF
+.DEFINE "data"
+.VALUE 2
+.CLASS 8
+.DIM 1
+.TYPE 108
+.ENDEF
+.ENDREC "NONAME7"
+.BEGREC "NONAME8",12
+.DEFINE "x"
+.VALUE 0
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "y"
+.VALUE 4
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "z"
+.VALUE 8
+.CLASS 8
+.TYPE 5
+.ENDEF
+.ENDREC "NONAME8"
+.BEGREC "NONAME9",12
+.DEFINE "x"
+.VALUE 0
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "y"
+.VALUE 4
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "z"
+.VALUE 8
+.CLASS 8
+.TYPE 5
+.ENDEF
+.ENDREC "NONAME9"
+.BEGREC "NONAME10",3
+.DEFINE "protection"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME10"
+.BEGREC "NONAME11",6
+.DEFINE "protection"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "weight"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME11"
+.BEGREC "NONAME12",3
+.DEFINE "powerout"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME12"
+.BEGREC "NONAME13",3
+.DEFINE "maxspeed"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME13"
+.BEGREC "NONAME14",9
+.DEFINE "targetxz"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "targetxy"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "maxrange"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME14"
+.BEGREC "NONAME15",12
+.DEFINE "firingspeed"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "reloadtime"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "shielddamage"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "normaldamage"
+.VALUE 9
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME15"
+.BEGREC "NONAME16",15
+.DEFINE "powerdrain"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "module"
+.VALUE 3
+.CLASS 8
+.TAG "Module"
+.TYPE 8
+.ENDEF
+.ENDREC "NONAME16"
+.BEGREC "Module",12
+.DEFINE "weapon_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME15"
+.TYPE 8
+.ENDEF
+.DEFINE "sensor_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME14"
+.TYPE 8
+.ENDEF
+.DEFINE "integrity_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME11"
+.TYPE 8
+.ENDEF
+.DEFINE "shield_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME10"
+.TYPE 8
+.ENDEF
+.DEFINE "generator_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME12"
+.TYPE 8
+.ENDEF
+.DEFINE "engine_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME13"
+.TYPE 8
+.ENDEF
+.ENDREC "Module"
+.BEGREC "NONAME17",27
+.DEFINE "techclass"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "techtype"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "techid"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "powerdrain"
+.VALUE 9
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "techinfo"
+.VALUE 12
+.CLASS 8
+.TAG "techinfo"
+.TYPE 8
+.ENDEF
+.ENDREC "NONAME17"
+.BEGREC "techinfo",15
+.DEFINE "module_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME16"
+.TYPE 8
+.ENDEF
+.DEFINE "weapon_stats"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME15"
+.TYPE 8
+.ENDEF
+.ENDREC "techinfo"
+.BEGREC "NONAME18",6
+.DEFINE "quot"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "rem"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME18"
+.BEGREC "NONAME19",8
+.DEFINE "quot"
+.VALUE 0
+.CLASS 8
+.TYPE 5
+.ENDEF
+.DEFINE "rem"
+.VALUE 4
+.CLASS 8
+.TYPE 5
+.ENDEF
+.ENDREC "NONAME19"
+.BEGREC "header",6
+.DEFINE "s"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME20"
+.TYPE 8
+.ENDEF
+.DEFINE "x"
+.VALUE 0
+.CLASS 11
+.TYPE 2
+.ENDEF
+.ENDREC "header"
+.BEGREC "NONAME20",6
+.DEFINE "ptr"
+.VALUE 0
+.CLASS 8
+.TAG "header"
+.TYPE 40
+.ENDEF
+.DEFINE "size"
+.VALUE 3
+.CLASS 8
+.TYPE 14
+.ENDEF
+.ENDREC "NONAME20"
+.BEGREC "NONAME21",3
+.DEFINE "width"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "height"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "data"
+.VALUE 2
+.CLASS 8
+.DIM 1
+.TYPE 108
+.ENDEF
+.ENDREC "NONAME21"
+.BEGREC "NONAME22",3
+.DEFINE "width"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "height"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "data"
+.VALUE 2
+.CLASS 8
+.DIM 1
+.TYPE 108
+.ENDEF
+.ENDREC "NONAME22"
+.BEGREC "NONAME23",6
+.DEFINE "x"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "y"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME23"
+.BEGREC "NONAME24",12
+.DEFINE "xmin"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "ymin"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "xmax"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "ymax"
+.VALUE 9
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME24"
+.BEGREC "NONAME25",18
+.DEFINE "map"
+.VALUE 0
+.CLASS 8
+.TYPE 44
+.ENDEF
+.DEFINE "tiles"
+.VALUE 3
+.CLASS 8
+.TAG "NONAME21"
+.TYPE 296
+.ENDEF
+.DEFINE "tile_height"
+.VALUE 6
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "tile_width"
+.VALUE 7
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "draw_height"
+.VALUE 8
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "draw_width"
+.VALUE 9
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "type_width"
+.VALUE 10
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "type_height"
+.VALUE 11
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "height"
+.VALUE 12
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "width"
+.VALUE 13
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "y_loc"
+.VALUE 14
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "x_loc"
+.VALUE 15
+.CLASS 8
+.TYPE 14
+.ENDEF
+.ENDREC "NONAME25"
+.BEGREC "NONAME26",1
+.DEFINE "drv"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.ENDREC "NONAME26"
+.BEGREC "NONAME27",3
+.DEFINE "occupancy"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME27"
+.BEGREC "NONAME28",3
+.DEFINE "output"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME28"
+.BEGREC "NONAME29",3
+.DEFINE "maxspeed"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME29"
+.BEGREC "NONAME30",3
+.DEFINE "maxrange"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME30"
+.BEGREC "NONAME31",6
+.DEFINE "maxrange"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "maxtargets"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME31"
+.BEGREC "NONAME32",4
+.DEFINE "maxrange"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "maxtargets"
+.VALUE 3
+.CLASS 8
+.TYPE 2
+.ENDEF
+.ENDREC "NONAME32"
+.BEGREC "NONAME33",27
+.DEFINE "resistance"
+.VALUE 0
+.CLASS 8
+.TYPE 14
+.ENDEF
+.DEFINE "frequency"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "maxhealth"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "shieldhealth"
+.VALUE 9
+.CLASS 8
+.DIM 6
+.TYPE 100
+.ENDEF
+.ENDREC "NONAME33"
+.BEGREC "NONAME34",9
+.DEFINE "yield"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "range"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "speed"
+.VALUE 6
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME34"
+.BEGREC "NONAME35",13
+.DEFINE "equipped"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "compatible"
+.VALUE 3
+.CLASS 8
+.DIM 10
+.TYPE 108
+.ENDEF
+.ENDREC "NONAME35"
+.BEGREC "NONAME36",15
+.DEFINE "priority"
+.VALUE 0
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "capacity"
+.VALUE 1
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "current"
+.VALUE 4
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "spend"
+.VALUE 7
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "base"
+.VALUE 10
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "alwaysUse"
+.VALUE 13
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "drawFrom"
+.VALUE 14
+.CLASS 8
+.TYPE 2
+.ENDEF
+.ENDREC "NONAME36"
+.BEGREC "NONAME37",6
+.DEFINE "max"
+.VALUE 0
+.CLASS 8
+.TYPE 4
+.ENDEF
+.DEFINE "current"
+.VALUE 3
+.CLASS 8
+.TYPE 4
+.ENDEF
+.ENDREC "NONAME37"
+.BEGREC "Data_t",27
+.DEFINE "mod_transport"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME31"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_integ"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME26"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_lifesupport"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME27"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_core"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME28"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_engine"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME29"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_navsens"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME30"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_shields"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME33"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_torpedoes"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME35"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_phasers"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME34"
+.TYPE 8
+.ENDEF
+.DEFINE "mod_targsens"
+.VALUE 0
+.CLASS 11
+.TAG "NONAME32"
+.TYPE 8
+.ENDEF
+.ENDREC "Data_t"
+.BEGREC "NONAME38",54
+.DEFINE "unlocked"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "assigned"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "techid"
+.VALUE 2
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "techtype"
+.VALUE 3
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "online"
+.VALUE 4
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "typelocked"
+.VALUE 5
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "power"
+.VALUE 6
+.CLASS 8
+.TAG "NONAME36"
+.TYPE 8
+.ENDEF
+.DEFINE "health"
+.VALUE 21
+.CLASS 8
+.TAG "NONAME37"
+.TYPE 8
+.ENDEF
+.DEFINE "data"
+.VALUE 27
+.CLASS 8
+.TAG "Data_t"
+.TYPE 8
+.ENDEF
+.ENDREC "NONAME38"
+.BEGREC "NONAME39",717
+.DEFINE "coords"
+.VALUE 0
+.CLASS 8
+.TAG "NONAME8"
+.TYPE 8
+.ENDEF
+.DEFINE "crew"
+.VALUE 12
+.CLASS 8
+.TYPE 14
+.ENDEF
+.DEFINE "system"
+.VALUE 15
+.CLASS 8
+.DIM 6
+.TAG "NONAME38"
+.TYPE 104
+.ENDEF
+.DEFINE "tactical"
+.VALUE 339
+.CLASS 8
+.DIM 6
+.TAG "NONAME38"
+.TYPE 104
+.ENDEF
+.DEFINE "hull"
+.VALUE 663
+.CLASS 8
+.TAG "NONAME38"
+.TYPE 8
+.ENDEF
+.ENDREC "NONAME39"
+.BEGREC "NONAME40",6
+.DEFINE "mains"
+.VALUE 0
+.CLASS 8
+.TYPE 14
+.ENDEF
+.DEFINE "tactical"
+.VALUE 3
+.CLASS 8
+.TYPE 14
+.ENDEF
+.ENDREC "NONAME40"
+.BEGREC "fmt_type",19
+.DEFINE "status"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "flags"
+.VALUE 1
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "size"
+.VALUE 2
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "chr"
+.VALUE 3
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "type"
+.VALUE 4
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "field_width"
+.VALUE 5
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "precision"
+.VALUE 6
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "set_begin"
+.VALUE 7
+.CLASS 8
+.TYPE 34
+.ENDEF
+.DEFINE "set_end"
+.VALUE 10
+.CLASS 8
+.TYPE 34
+.ENDEF
+.DEFINE "pad_whole"
+.VALUE 13
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "pad_pre_fract"
+.VALUE 14
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "pad_post_fract"
+.VALUE 15
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "pad_at"
+.VALUE 16
+.CLASS 8
+.TYPE 34
+.ENDEF
+.ENDREC "fmt_type"
+.BEGREC "flt_info",12
+.DEFINE "flags"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.DEFINE "exp"
+.VALUE 1
+.CLASS 8
+.TYPE 2
+.ENDEF
+.DEFINE "digits"
+.VALUE 2
+.CLASS 8
+.DIM 10
+.TYPE 108
+.ENDEF
+.ENDREC "flt_info"
+.BEGREC "__stdio_file",1
+.DEFINE "slot"
+.VALUE 0
+.CLASS 8
+.TYPE 12
+.ENDEF
+.ENDREC "__stdio_file"
 	SEGMENT DATA
 _mains_title:
 	DB	91
@@ -24,6 +936,13 @@ _mains_title:
 	DB	76
 	DB	93
 	DB	0
+.DEFINE "mains_title"
+.ALIAS "_mains_title"
+.CLASS 69
+.VALUE _mains_title
+.DIM 19
+.TYPE 98
+.ENDEF
 _shields_title:
 	DB	91
 	DB	68
@@ -43,6 +962,13 @@ _shields_title:
 	DB	76
 	DB	93
 	DB	0
+.DEFINE "shields_title"
+.ALIAS "_shields_title"
+.CLASS 69
+.VALUE _shields_title
+.DIM 18
+.TYPE 98
+.ENDEF
 _tact_title:
 	DB	91
 	DB	84
@@ -67,6 +993,13 @@ _tact_title:
 	DB	76
 	DB	93
 	DB	0
+.DEFINE "tact_title"
+.ALIAS "_tact_title"
+.CLASS 69
+.VALUE _tact_title
+.DIM 23
+.TYPE 98
+.ENDEF
 _version:
 	DB	118
 	DB	48
@@ -84,17 +1017,14 @@ _version:
 	DB	104
 	DB	97
 	DB	0
-_mainsys_strings:
-	DB	73
-	DB	110
-	DB	116
-	DB	101
-	DB	103
-	DB	114
-	DB	105
-	DB	116
-	DB	121
-	DB	0
+.DEFINE "version"
+.ALIAS "_version"
+.CLASS 69
+.VALUE _version
+.DIM 16
+.TYPE 98
+.ENDEF
+_moduledb:
 	DB	76
 	DB	105
 	DB	102
@@ -103,6 +1033,11 @@ _mainsys_strings:
 	DB	117
 	DB	112
 	DB	112
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
 	DB	0
 	DB	0
 	DB	87
@@ -115,15 +1050,10 @@ _mainsys_strings:
 	DB	101
 	DB	0
 	DB	0
-	DB	87
-	DB	97
-	DB	114
-	DB	112
-	DB	68
-	DB	114
-	DB	105
-	DB	118
-	DB	101
+	DB	0
+	DB	0
+	DB	0
+	DB	0
 	DB	0
 	DB	73
 	DB	109
@@ -132,6 +1062,11 @@ _mainsys_strings:
 	DB	108
 	DB	115
 	DB	101
+	DB	68
+	DB	114
+	DB	0
+	DB	0
+	DB	0
 	DB	0
 	DB	0
 	DB	0
@@ -142,6 +1077,11 @@ _mainsys_strings:
 	DB	101
 	DB	110
 	DB	115
+	DB	111
+	DB	114
+	DB	0
+	DB	0
+	DB	0
 	DB	0
 	DB	0
 	DB	0
@@ -155,6 +1095,94 @@ _mainsys_strings:
 	DB	114
 	DB	116
 	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	83
+	DB	104
+	DB	105
+	DB	101
+	DB	108
+	DB	100
+	DB	115
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	65
+	DB	114
+	DB	109
+	DB	111
+	DB	114
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	80
+	DB	104
+	DB	97
+	DB	115
+	DB	101
+	DB	114
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	84
+	DB	111
+	DB	114
+	DB	112
+	DB	101
+	DB	100
+	DB	111
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	84
+	DB	97
+	DB	114
+	DB	103
+	DB	83
+	DB	101
+	DB	110
+	DB	115
+	DB	111
+	DB	114
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+	DB	0
+.DEFINE "moduledb"
+.ALIAS "_moduledb"
+.CLASS 69
+.VALUE _moduledb
+.DIM 10
+.DIM 15
+.TYPE 866
+.ENDEF
 ;    1	#include <tice.h>
 ;    2	#include <string.h>
 ;    3	#include "classes/ships.h"
@@ -164,19 +1192,60 @@ _mainsys_strings:
 ;    7	#include <graphx.h>
 ;    8	#include <compression.h>
 ;    9	#include "gfx-engine/gui.h"
-;   10	
-;   11	char mains_title[] = "[MAIN SYS CONTROL]";
-;   12	char shields_title[] = "[DEFENSE CONTROL]";
-;   13	char tact_title[] = "[TACTICAL SYS CONTROL]";
-;   14	char version[] = "v0.84 pre-alpha";
-;   15	
-;   16	char mainsys_strings[][10] = {"Integrity", "LifeSupp", "WarpCore", "WarpDrive", "Impulse", "NavSens", "Transport"};
-	SEGMENT CODE
+;   10	#include "classes/modules.h"
+;   11	#include <debug.h>
+;   12	
+;   13	char mains_title[] = "[MAIN SYS CONTROL]";
+;   14	char shields_title[] = "[DEFENSE CONTROL]";
+;   15	char tact_title[] = "[TACTICAL SYS CONTROL]";
+;   16	char version[] = "v0.84 pre-alpha";
 ;   17	
-;   18	int text_GetCenterX(char* string){
+;   18	char moduledb[][15] = {
+	SEGMENT CODE
+;   19	    "LifeSupp",
+;   20	    "WarpCore",
+;   21	    "ImpulseDr",
+;   22	    "NavSensor",
+;   23	    "Transport",
+;   24	    "Shields",
+;   25	    "Armor",
+;   26	    "Phaser",
+;   27	    "Torpedo",
+;   28	    "TargSensor"
+;   29	};
+;   30	
+;   31	int text_GetCenterX(char* string){
 _text_GetCenterX:
-	CALL	__frameset0
-;   19	    return (LCD_WIDTH - gfx_GetStringWidth(string)) / 2;
+.DEFINE "_text_GetCenterX"
+
+.VALUE _text_GetCenterX
+
+.CLASS 2
+
+.TYPE 68
+
+.ENDEF
+
+.BEGFUNC "text_GetCenterX",31,"_text_GetCenterX"
+
+.LINE 31
+
+.DEFINE "string"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 34
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;   32	    return (LCD_WIDTH - gfx_GetStringWidth(string)) / 2;
+.LINE 32
+
 	LD	BC,(IX+6)
 	PUSH	BC
 	CALL	_gfx_GetStringWidth
@@ -187,7 +1256,9 @@ _text_GetCenterX:
 	SBC	HL,BC
 	LD	A,1
 	CALL	__ishru_b
-;   20	}
+;   33	}
+.LINE 33
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -203,11 +1274,40 @@ _text_GetCenterX:
 ;       Spill Code: 0 (instruction)
 
 
-;   21	
-;   22	int num_GetLength(int number){
+.ENDFUNC "text_GetCenterX",33,"_text_GetCenterX"
+;   34	
+;   35	int num_GetLength(int number){
 _num_GetLength:
-	CALL	__frameset0
-;   23	    return 1 + (number >= 10) + (number >= 100);
+.DEFINE "_num_GetLength"
+
+.VALUE _num_GetLength
+
+.CLASS 2
+
+.TYPE 68
+
+.ENDEF
+
+.BEGFUNC "num_GetLength",35,"_num_GetLength"
+
+.LINE 35
+
+.DEFINE "number"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 4
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;   36	    return 1 + (number >= 10) + (number >= 100);
+.LINE 36
+
 	LD	BC,10
 	LD	HL,(IX+6)
 	OR	A,A
@@ -224,9 +1324,9 @@ L__3:
 	LD	L,B
 	INC	HL
 	LD	DE,HL
+	LD	BC,100
 	LD	HL,(IX+6)
 	OR	A,A
-	LD	BC,100
 	SBC	HL,BC
 	CALL	__setflag
 	JP	M,L__5
@@ -239,7 +1339,9 @@ L__6:
 	SEXT	HL
 	LD	L,B
 	ADD	HL,DE
-;   24	}
+;   37	}
+.LINE 37
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -254,26 +1356,84 @@ L__6:
 ;       Spill Code: 0 (instruction)
 
 
-;   25	
-;   26	void Screen_RenderUI(uint24_t screen, ship_t* Ship, selected_t* select){
+.ENDFUNC "num_GetLength",37,"_num_GetLength"
+;   38	
+;   39	void Screen_RenderUI(uint24_t screen, ship_t* Ship, selected_t* select){
 _Screen_RenderUI:
-	CALL	__frameset0
-;   27	    Screen_Background(screen);
+.DEFINE "_Screen_RenderUI"
+
+.VALUE _Screen_RenderUI
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "Screen_RenderUI",39,"_Screen_RenderUI"
+
+.LINE 39
+
+.DEFINE "screen"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 14
+
+.ENDEF
+
+.DEFINE "Ship"
+
+.CLASS 65
+
+.VALUE 9
+
+.TAG "NONAME39"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "select"
+
+.CLASS 65
+
+.VALUE 12
+
+.TAG "NONAME40"
+
+.TYPE 40
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+;   40	    Screen_Background(screen);
+.LINE 40
+
 	LD	C,(IX+6)
 	LD	B,0
 	PUSH	BC
 	CALL	_Screen_Background
 	POP	BC
-;   28	    gfx_SetTextFGColor(255);
+;   41	    gfx_SetTextFGColor(255);
+.LINE 41
+
 	LD	BC,255
 	PUSH	BC
 	CALL	_gfx_SetTextFGColor
 	POP	BC
-;   29	    switch(screen & 0xff){
+;   42	    switch(screen & 0xff){
+.LINE 42
+
 	LD	A,(IX+6)
 	UEXT	HL
 	LD	L,A
-	CALL	__seqcase
+	CALL	__seqcaseD
+	JP	(HL)
 L__8:
 	DW	6
 	DW	0
@@ -292,29 +1452,39 @@ L__8:
 
 	DW24	L_9	
 
-;   30	        case SCRN_OFF:
-;   31	            break;
-;   32	        case SCRN_SENS:
-;   33	            break;
-;   34	        case SCRN_TACT:
+;   43	        case SCRN_OFF:
+;   44	            break;
+;   45	        case SCRN_SENS:
+;   46	            break;
+;   47	        case SCRN_TACT:
 L_4:
-;   35	            Screen_UITacticalStats(&Ship->tactical, select->tactical);
+.LINE 47
+
+;   48	            Screen_UITacticalStats(&Ship->tactical, select->tactical);
+.LINE 48
+
 	LD	IY,(IX+12)
 	LD	BC,(IY+3)
 	PUSH	BC
-	LD	BC,(IX+9)
 	LD	HL,339
+	LD	BC,(IX+9)
 	ADD	HL,BC
 	LD	BC,HL
 	PUSH	BC
 	CALL	_Screen_UITacticalStats
 	POP	BC
 	POP	BC
-;   36	            break;
+;   49	            break;
+.LINE 49
+
 	JR	L_9
-;   37	        case SCRN_MAINS:
+;   50	        case SCRN_MAINS:
 L_5:
-;   38	            Screen_UISystemStats(&Ship->system, select->mains);
+.LINE 50
+
+;   51	            Screen_UISystemStats(&Ship->system, select->mains);
+.LINE 51
+
 	LD	IY,(IX+12)
 	LD	BC,(IY+0)
 	PUSH	BC
@@ -323,20 +1493,26 @@ L_5:
 	CALL	_Screen_UISystemStats
 	POP	BC
 	POP	BC
-;   39	            break;
-;   40	        case SCRN_TRANSPORT:
-;   41	            break;
-;   42	        case SCRN_CARGO:
-;   43	            break;
-;   44	    }
+;   52	            break;
+;   53	        case SCRN_TRANSPORT:
+;   54	            break;
+;   55	        case SCRN_CARGO:
+;   56	            break;
+;   57	    }
 L_9:
-;   45	    if(screen > 0xff) {
+.LINE 57
+
+;   58	    if(screen > 0xff) {
+.LINE 58
+
 	LD	BC,(IX+6)
 	LD	HL,255
 	OR	A,A
 	SBC	HL,BC
 	JR	NC,L_10
-;   46	        gfx_PrintStringXY("Info Window Here", 60, 100);
+;   59	        gfx_PrintStringXY("Info Window Here", 60, 100);
+.LINE 59
+
 	LD	BC,100
 	PUSH	BC
 	LD	BC,60
@@ -347,20 +1523,28 @@ L_9:
 	POP	BC
 	POP	BC
 	POP	BC
-;   47	    }
+;   60	    }
 L_10:
-;   48	    gfx_BlitBuffer();
+.LINE 60
+
+;   61	    gfx_BlitBuffer();
+.LINE 61
+
 	LD	BC,1
 	PUSH	BC
 	CALL	_gfx_Blit
 	POP	BC
-;   49	    gfx_SetTextFGColor(0);
+;   62	    gfx_SetTextFGColor(0);
+.LINE 62
+
 	LD	BC,0
 	PUSH	BC
 	CALL	_gfx_SetTextFGColor
 	POP	BC
-;   50	    return;
-;   51	}
+;   63	    return;
+;   64	}
+.LINE 64
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -383,19 +1567,116 @@ L_10:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "Screen_RenderUI",64,"_Screen_RenderUI"
 	SEGMENT STRSECT
 L__10:
 	DB	"Info Window Here"
 	DB	0
 	SEGMENT CODE
-;   52	
-;   53	void Screen_UISystemStats(module_t* systems, uint24_t selected){
+;   65	
+;   66	void Screen_UISystemStats(module_t* systems, uint24_t selected){
 _Screen_UISystemStats:
-	LD	HL,-23
-	CALL	__frameset
-;   54	    unsigned char i, cur_y;
-;   55	    int cur_x;
-;   56	    gfx_PrintStringXY(mains_title, text_GetCenterX(mains_title), viewer_y);
+.DEFINE "_Screen_UISystemStats"
+
+.VALUE _Screen_UISystemStats
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "Screen_UISystemStats",66,"_Screen_UISystemStats"
+
+.LINE 66
+
+.DEFINE "systems"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME38"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "selected"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 14
+
+.ENDEF
+
+.DEFINE "i"
+
+.CLASS 65
+
+.VALUE -1
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "cur_y"
+
+.CLASS 65
+
+.VALUE -2
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "techtype"
+
+.CLASS 65
+
+.VALUE -3
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "module"
+
+.CLASS 65
+
+.VALUE -6
+
+.TAG "NONAME38"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "icon"
+
+.CLASS 65
+
+.VALUE -9
+
+.TAG "NONAME22"
+
+.TYPE 40
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+	PUSH	BC
+	PUSH	BC
+;   67	    unsigned char i, cur_y;
+;   68	    int cur_x;
+;   69	    gfx_PrintStringXY(mains_title, text_GetCenterX(mains_title), viewer_y);
+.LINE 69
+
 	LD	BC,20
 	PUSH	BC
 	LD	BC,_mains_title
@@ -409,12 +1690,16 @@ _Screen_UISystemStats:
 	POP	BC
 	POP	BC
 	POP	BC
-;   57	    for(i = 0; i < SYS_MAX; i++){
+;   70	    for(i = 0; i < SYS_MAX; i++){
+.LINE 70
+
 	LD	(IX+-1),0
 	JR	L_18
 L_16:
-;   58	        // loop module health display
-;   59	        module_t* module = &systems[i];
+;   71	        // loop module health display
+;   72	        module_t* module = &systems[i];
+.LINE 72
+
 	LD	A,(IX+-1)
 	UEXT	HL
 	LD	L,A
@@ -422,16 +1707,20 @@ L_16:
 	CALL	__imul_b
 	LD	BC,(IX+6)
 	ADD	HL,BC
-	LD	(IX+-5),HL
-;   60	        cur_y = i * 15 + viewer_y + 17;
+	LD	(IX+-6),HL
+;   73	        cur_y = i * 15 + viewer_y + 17;
+.LINE 73
+
 	LD	B,15
 	LD	C,(IX+-1)
 	MLT	BC
 	LD	A,C
 	ADD	A,37
 	LD	(IX+-2),A
-;   61	        cur_x = viewer_x;
-;   62	        if(selected == i) {
+;   74	        cur_x = viewer_x;
+;   75	        if(selected == i) {
+.LINE 75
+
 	LD	A,(IX+-1)
 	UEXT	HL
 	LD	L,A
@@ -440,12 +1729,16 @@ L_16:
 	OR	A,A
 	SBC	HL,BC
 	JR	NZ,L_14
-;   63	            gfx_SetColor(231);
+;   76	            gfx_SetColor(231);
+.LINE 76
+
 	LD	BC,231
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;   64	            gfx_FillRectangle(cur_x - 6, cur_y - 3, 5, 13);
+;   77	            gfx_FillRectangle(cur_x - 6, cur_y - 3, 5, 13);
+.LINE 77
+
 	LD	BC,13
 	PUSH	BC
 	LD	BC,5
@@ -464,14 +1757,20 @@ L_16:
 	POP	BC
 	POP	BC
 	POP	BC
-;   65	        }
+;   78	        }
 L_14:
-;   66	        gfx_SetColor(255);
+.LINE 78
+
+;   79	        gfx_SetColor(255);
+.LINE 79
+
 	LD	BC,255
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;   67	        gfx_SetTextXY(cur_x, cur_y);
+;   80	        gfx_SetTextXY(cur_x, cur_y);
+.LINE 80
+
 	LD	A,(IX+-2)
 	UEXT	HL
 	LD	L,A
@@ -481,93 +1780,129 @@ L_14:
 	CALL	_gfx_SetTextXY
 	POP	BC
 	POP	BC
-;   68	        if(module->assigned){
-	LD	IY,(IX+-5)
+;   81	        if(module->assigned){
+.LINE 81
+
+	LD	IY,(IX+-6)
 	LD	A,(IY+1)
 	OR	A,A
 	JR	Z,L_17
-;   69	            signed int health = health_GetHealthPercent(&module->health),
-	LD	IY,(IX+-5)
-	PEA	IY+21
-	CALL	_health_GetHealthPercent
-	POP	BC
-	LD	(IX+-8),HL
-;   70	                        spend = power_GetPowerSpend(&module->power),
-	LD	IY,(IX+-5)
-	LEA	BC,IY+6
-	LD	(IX+-23),BC
-	PUSH	BC
-	CALL	_power_GetPowerSpend
-	POP	BC
-	LD	(IX+-11),HL
-;   71	                        spendpercent = power_GetSpendPercent(&module->power),
-	LD	BC,(IX+-23)
-	PUSH	BC
-	CALL	_power_GetSpendPercent
-	POP	BC
-	LD	(IX+-14),HL
-;   72	                        source = power_GetDrawSource(&module->power),
-	LD	BC,(IX+-23)
-	PUSH	BC
-	CALL	_power_GetDrawSource
-	POP	BC
-	LD	B,A
-	SEXT	HL
-	LD	L,B
-	LD	(IX+-17),HL
-;   73	                        pow_res = power_GetBatteryPercent(&module->power);
-	LD	BC,(IX+-23)
-	PUSH	BC
-	CALL	_power_GetBatteryPercent
-	POP	BC
-	LD	(IX+-20),HL
-;   74	            gfx_PrintString(mainsys_strings[module->techtype]);
-	LD	IY,(IX+-5)
+;   82	            uint8_t techtype = module->techtype;
+.LINE 82
+
+	LD	IY,(IX+-6)
 	LD	A,(IY+3)
+	LD	(IX+-3),A
+;   83	            gfx_rletsprite_t *icon = ((gfx_rletsprite_t*)trekgui[MODICONS + techtype]);
+.LINE 83
+
 	UEXT	HL
 	LD	L,A
-	LD	A,10
-	CALL	__imul_b
-	LD	BC,_mainsys_strings
+	LD	IY,HL
+	LEA	HL,IY+14
+	LD	BC,HL
+	ADD	HL,HL
 	ADD	HL,BC
+	LD	BC,_trekgui
+	ADD	HL,BC
+	LD	BC,(HL)
+	LD	(IX+-9),BC
+;   84	            dbg_sprintf(dbgout, "%u\n", techtype);
+.LINE 84
+
+	LD	A,(IX+-3)
+	UEXT	HL
+	LD	L,A
 	PUSH	HL
-	CALL	_gfx_PrintString
+	LD	BC,L__14
+	PUSH	BC
+	LD	BC,16449536
+	PUSH	BC
+	CALL	_sprintf
 	POP	BC
-;   75	            cur_x += 75;
-;   76	            stats_DrawHealthBar(health, 50, cur_x, cur_y, 255, 255);
-	LD	BC,255
+	POP	BC
+	POP	BC
+;   85	            dbg_sprintf(dbgout, "%u\n", MODICONS);
+.LINE 85
+
+	LD	BC,14
 	PUSH	BC
+	LD	BC,L__15
 	PUSH	BC
-	LD	C,(IX+-2)
-	LD	B,0
+	LD	BC,16449536
 	PUSH	BC
-	LD	BC,105
+	CALL	_sprintf
+	POP	BC
+	POP	BC
+	POP	BC
+;   86	            dbg_sprintf(dbgout, "%u\n", icon);
+.LINE 86
+
+	LD	BC,(IX+-9)
 	PUSH	BC
+	LD	BC,L__16
+	PUSH	BC
+	LD	BC,16449536
+	PUSH	BC
+	CALL	_sprintf
+	POP	BC
+	POP	BC
+	POP	BC
+;   87	            dbg_Debugger();
+.LINE 87
+
+	CALL	_dbg_Debugger
+;   88	
+;   89	            gfx_RLETSprite(icon, cur_x, cur_y);
+.LINE 89
+
+	LD	A,(IX+-2)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
+	LD	BC,30
+	PUSH	BC
+	LD	BC,(IX+-9)
+	PUSH	BC
+	CALL	_gfx_RLETSprite
+	POP	BC
+	POP	BC
+	POP	BC
+;   90	            gfx_PrintStringXY(moduledb[techtype], cur_x + 20, cur_y);
+.LINE 90
+
+	LD	A,(IX+-2)
+	UEXT	HL
+	LD	L,A
+	PUSH	HL
 	LD	BC,50
 	PUSH	BC
-	LD	BC,(IX+-8)
-	PUSH	BC
-	CALL	_stats_DrawHealthBar
+	LD	A,(IX+-3)
+	UEXT	HL
+	LD	L,A
+	LD	A,15
+	CALL	__imul_b
+	LD	BC,_moduledb
+	ADD	HL,BC
+	PUSH	HL
+	CALL	_gfx_PrintStringXY
 	POP	BC
 	POP	BC
 	POP	BC
-	POP	BC
-	POP	BC
-	POP	BC
-;   77	           
-;   78	            
-;   79	            //gfx_SetTextXY(viewer_x + 100, (i + 1) * 10 + viewer_y + 5);
-;   80	            //gfx_PrintUInt(health, 3);
-;   81	        }
-;   82	    }
+;   91	        }
+;   92	    }
 L_17:
+.LINE 92
+
 	INC	(IX+-1)
 L_18:
 	LD	A,(IX+-1)
 	CP	A,6
 	JR	C,L_16
-;   83	    return;
-;   84	}
+;   93	    return;
+;   94	}
+.LINE 94
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -575,53 +1910,212 @@ L_18:
 
 ;**************************** _Screen_UISystemStats ***************************
 ;Name                         Addr/Register   Size   Type
-;_stats_DrawHealthBar                IMPORT  -----   function
-;_mainsys_strings                    STATIC     70   variable
-;_gfx_PrintString                    IMPORT  -----   function
-;_power_GetBatteryPercent            IMPORT  -----   function
-;_power_GetDrawSource                IMPORT  -----   function
-;_power_GetSpendPercent              IMPORT  -----   function
-;_power_GetPowerSpend                IMPORT  -----   function
-;_health_GetHealthPercent            IMPORT  -----   function
+;_moduledb                           STATIC    150   variable
+;_gfx_RLETSprite                     IMPORT  -----   function
+;_dbg_Debugger                       IMPORT  -----   function
+;_sprintf                            IMPORT  -----   function
+;_trekgui                            IMPORT     75   variable
 ;_gfx_SetTextXY                      IMPORT  -----   function
 ;_gfx_FillRectangle                  IMPORT  -----   function
 ;_gfx_SetColor                       IMPORT  -----   function
 ;_mains_title                        STATIC     19   variable
 ;_gfx_PrintStringXY                  IMPORT  -----   function
-;pow_res                              IX-20      3   variable
-;source                               IX-17      3   variable
-;spendpercent                         IX-14      3   variable
-;spend                                IX-11      3   variable
-;health                                IX-8      3   variable
-;module                                IX-5      3   variable
+;icon                                  IX-9      3   variable
+;module                                IX-6      3   variable
+;techtype                              IX-3      1   variable
 ;cur_y                                 IX-2      1   variable
 ;i                                     IX-1      1   variable
 ;selected                              IX+9      3   parameter
 ;systems                               IX+6      3   parameter
 
 
-; Stack Frame Size: 35 (bytes)
+; Stack Frame Size: 21 (bytes)
 ;       Spill Code: 0 (instruction)
 
 
-;   85	
-;   86	void Screen_UITacticalStats(module_t* tactical, uint24_t selected){
+.ENDFUNC "Screen_UISystemStats",94,"_Screen_UISystemStats"
+	SEGMENT STRSECT
+L__14:
+	DB	"%u"
+	DB	10,0
+L__15:
+	DB	"%u"
+	DB	10,0
+L__16:
+	DB	"%u"
+	DB	10,0
+	SEGMENT CODE
+;   95	
+;   96	void Screen_UITacticalStats(module_t* tactical, uint24_t selected){
 _Screen_UITacticalStats:
-	LD	HL,-24
-	CALL	__frameset
-;   87	    unsigned char i, cur_y = viewer_y + 20;
+.DEFINE "_Screen_UITacticalStats"
+
+.VALUE _Screen_UITacticalStats
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "Screen_UITacticalStats",96,"_Screen_UITacticalStats"
+
+.LINE 96
+
+.DEFINE "tactical"
+
+.CLASS 65
+
+.VALUE 6
+
+.TAG "NONAME38"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "selected"
+
+.CLASS 65
+
+.VALUE 9
+
+.TYPE 14
+
+.ENDEF
+
+.DEFINE "i"
+
+.CLASS 65
+
+.VALUE -1
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "module"
+
+.CLASS 65
+
+.VALUE -4
+
+.TAG "NONAME38"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "cur_y"
+
+.CLASS 65
+
+.VALUE -5
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "shield_health"
+
+.CLASS 65
+
+.VALUE -8
+
+.TYPE 14
+
+.ENDEF
+
+.DEFINE "temp_y"
+
+.CLASS 65
+
+.VALUE -11
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "shield_icon"
+
+.CLASS 65
+
+.VALUE -14
+
+.TAG "NONAME22"
+
+.TYPE 40
+
+.ENDEF
+
+.DEFINE "shield_num"
+
+.CLASS 65
+
+.VALUE -17
+
+.TYPE 14
+
+.ENDEF
+
+.DEFINE "shields_active"
+
+.CLASS 65
+
+.VALUE -18
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "cur_x"
+
+.CLASS 65
+
+.VALUE -21
+
+.TYPE 4
+
+.ENDEF
+
+.DEFINE "shield_resist"
+
+.CLASS 65
+
+.VALUE -24
+
+.TYPE 14
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	LEA	HL,IX+-24
+	LD	SP,HL
+;   97	    unsigned char i, cur_y = viewer_y + 20;
+.LINE 97
+
 	LD	(IX+-5),40
-;   88	    int cur_x = viewer_x;
+;   98	    int cur_x = viewer_x;
+.LINE 98
+
 	LD	BC,30
 	LD	(IX+-21),BC
-;   89	    uint24_t shield_health = 0, shield_resist = 0, shield_num = 0;
+;   99	    uint24_t shield_health = 0, shield_resist = 0, shield_num = 0;
+.LINE 99
+
 	LD	BC,0
 	LD	(IX+-8),BC
 	LD	(IX+-24),BC
 	LD	(IX+-17),BC
-;   90	    bool shields_active = false;
+;  100	    bool shields_active = false;
+.LINE 100
+
 	LD	(IX+-18),0
-;   91	    gfx_PrintStringXY(shields_title, text_GetCenterX(shields_title), viewer_y);
+;  101	    gfx_PrintStringXY(shields_title, text_GetCenterX(shields_title), viewer_y);
+.LINE 101
+
 	LD	BC,20
 	PUSH	BC
 	LD	BC,_shields_title
@@ -635,11 +2129,15 @@ _Screen_UITacticalStats:
 	POP	BC
 	POP	BC
 	POP	BC
-;   92	    for(i = 0; i < TACT_MAX; i++){
+;  102	    for(i = 0; i < TACT_MAX; i++){
+.LINE 102
+
 	LD	(IX+-1),0
 	JR	L_33
 L_31:
-;   93	        int temp_y = 22 * i + viewer_y + 20;
+;  103	        int temp_y = 22 * i + viewer_y + 20;
+.LINE 103
+
 	LD	A,(IX+-1)
 	UEXT	HL
 	LD	L,A
@@ -648,8 +2146,10 @@ L_31:
 	LD	IY,HL
 	LEA	BC,IY+40
 	LD	(IX+-11),BC
-;   94	        int temp_x = cur_x + 110;
-;   95	        module_t* module = &tactical[i];
+;  104	        int temp_x = cur_x + 110;
+;  105	        module_t* module = &tactical[i];
+.LINE 105
+
 	LD	A,(IX+-1)
 	UEXT	HL
 	LD	L,A
@@ -658,24 +2158,34 @@ L_31:
 	LD	BC,(IX+6)
 	ADD	HL,BC
 	LD	(IX+-4),HL
-;   96	        if(module->assigned){
+;  106	        if(module->assigned){
+.LINE 106
+
 	LD	IY,(IX+-4)
 	LD	A,(IY+1)
 	OR	A,A
 	JR	Z,L_32
-;   97	            if(module->techtype == SHIELD){
+;  107	            if(module->techtype == SHIELD){
+.LINE 107
+
 	LD	IY,(IX+-4)
 	LD	A,(IY+3)
 	CP	A,6
 	JR	NZ,L_26
-;   98	                if(module->online){
+;  108	                if(module->online){
+.LINE 108
+
 	LD	IY,(IX+-4)
 	LD	A,(IY+4)
 	OR	A,A
 	JR	Z,L_26
-;   99	                    shields_active = true;
+;  109	                    shields_active = true;
+.LINE 109
+
 	LD	(IX+-18),1
-;  100	                    shield_health += health_GetHealthPercent(&module->health);
+;  110	                    shield_health += health_GetHealthPercent(&module->health);
+.LINE 110
+
 	LD	IY,(IX+-4)
 	PEA	IY+21
 	CALL	_health_GetHealthPercent
@@ -683,20 +2193,28 @@ L_31:
 	LD	BC,(IX+-8)
 	ADD	HL,BC
 	LD	(IX+-8),HL
-;  101	                    shield_resist *= module->data.shields.resistance;
+;  111	                    shield_resist *= module->data.mod_shields.resistance;
+.LINE 111
+
 	LD	IY,(IX+-4)
 	LD	HL,(IY+27)
 	LD	BC,(IX+-24)
 	CALL	__imulu
 	LD	(IX+-24),HL
-;  102	                    shield_num++;
+;  112	                    shield_num++;
+.LINE 112
+
 	LD	BC,(IX+-17)
 	INC	BC
 	LD	(IX+-17),BC
-;  103	                }
-;  104	            }
+;  113	                }
+;  114	            }
 L_26:
-;  105	            if(selected == i) {
+.LINE 114
+
+;  115	            if(selected == i) {
+.LINE 115
+
 	LD	A,(IX+-1)
 	UEXT	HL
 	LD	L,A
@@ -705,12 +2223,16 @@ L_26:
 	OR	A,A
 	SBC	HL,BC
 	JR	NZ,L_27
-;  106	                gfx_SetColor(230);
+;  116	                gfx_SetColor(230);
+.LINE 116
+
 	LD	BC,230
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;  107	                gfx_FillRectangle(temp_x, temp_y, 10, 20);
+;  117	                gfx_FillRectangle(temp_x, temp_y, 10, 20);
+.LINE 117
+
 	LD	BC,20
 	PUSH	BC
 	LD	BC,10
@@ -724,15 +2246,21 @@ L_26:
 	POP	BC
 	POP	BC
 	POP	BC
-;  108	            }
+;  118	            }
 L_27:
-;  109	            temp_x += 10;
-;  110	            gfx_SetColor(31);
+.LINE 118
+
+;  119	            temp_x += 10;
+;  120	            gfx_SetColor(31);
+.LINE 120
+
 	LD	BC,31
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;  111	            if(!module->online) gfx_SetColor(160);
+;  121	            if(!module->online) gfx_SetColor(160);
+.LINE 121
+
 	LD	IY,(IX+-4)
 	LD	A,(IY+4)
 	OR	A,A
@@ -742,7 +2270,9 @@ L_27:
 	CALL	_gfx_SetColor
 	POP	BC
 L_29:
-;  112	            gfx_FillRectangle(temp_x, temp_y, 140, 20);
+;  122	            gfx_FillRectangle(temp_x, temp_y, 140, 20);
+.LINE 122
+
 	LD	BC,20
 	PUSH	BC
 	LD	BC,140
@@ -756,12 +2286,16 @@ L_29:
 	POP	BC
 	POP	BC
 	POP	BC
-;  113	            gfx_SetColor(33);
+;  123	            gfx_SetColor(33);
+.LINE 123
+
 	LD	BC,33
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;  114	            gfx_FillRectangle(temp_x + 2, temp_y + 2, 136, 16);
+;  124	            gfx_FillRectangle(temp_x + 2, temp_y + 2, 136, 16);
+.LINE 124
+
 	LD	BC,16
 	PUSH	BC
 	LD	BC,136
@@ -776,11 +2310,15 @@ L_29:
 	POP	BC
 	POP	BC
 	POP	BC
-;  115	            temp_x += 5; temp_y += 6;
+;  125	            temp_x += 5; temp_y += 6;
+.LINE 125
+
 	LD	IY,(IX+-11)
 	LEA	BC,IY+6
 	LD	(IX+-11),BC
-;  116	            stats_DrawHealthBar(health_GetHealthPercent(&module->health), 80, temp_x, temp_y, 255, 255);
+;  126	            stats_DrawHealthBar(health_GetHealthPercent(&module->health), 80, temp_x, temp_y, 255, 255);
+.LINE 126
+
 	LD	BC,255
 	PUSH	BC
 	PUSH	BC
@@ -803,28 +2341,38 @@ L_29:
 	POP	BC
 	POP	BC
 	POP	BC
-;  117	            }
-;  118	        }
+;  127	            }
+;  128	        }
 L_32:
+.LINE 128
+
 	INC	(IX+-1)
 L_33:
 	LD	A,(IX+-1)
 	CP	A,6
 	JR	C,L_31
-;  119	        if(shields_active) {
+;  129	        if(shields_active) {
+.LINE 129
+
 	LD	A,(IX+-18)
 	OR	A,A
 	JR	Z,L_40
-;  120	            gfx_rletsprite_t* shield_icon = icon_shieldsstable;
+;  130	            gfx_rletsprite_t* shield_icon = icon_shieldsstable;
+.LINE 130
+
 	LD	HL,_trekgui+6
 	LD	BC,(HL)
 	LD	(IX+-14),BC
-;  121	            shield_health /= shield_num;
+;  131	            shield_health /= shield_num;
+.LINE 131
+
 	LD	HL,(IX+-8)
 	LD	BC,(IX+-17)
 	CALL	__idivu
 	LD	(IX+-8),HL
-;  122	            if(shield_health <= 50) shield_icon = icon_shieldscollapse;
+;  132	            if(shield_health <= 50) shield_icon = icon_shieldscollapse;
+.LINE 132
+
 	LD	BC,HL
 	LD	HL,50
 	OR	A,A
@@ -834,7 +2382,9 @@ L_33:
 	LD	BC,(HL)
 	LD	(IX+-14),BC
 L_36:
-;  123	            if(shield_health <= 25) shield_icon = icon_shieldsfail;
+;  133	            if(shield_health <= 25) shield_icon = icon_shieldsfail;
+.LINE 133
+
 	LD	BC,(IX+-8)
 	LD	HL,25
 	OR	A,A
@@ -844,7 +2394,9 @@ L_36:
 	LD	BC,(HL)
 	LD	(IX+-14),BC
 L_37:
-;  124	            gfx_RLETSprite(shield_icon, cur_x, cur_y);
+;  134	            gfx_RLETSprite(shield_icon, cur_x, cur_y);
+.LINE 134
+
 	LD	BC,40
 	PUSH	BC
 	LD	BC,30
@@ -855,12 +2407,16 @@ L_37:
 	POP	BC
 	POP	BC
 	POP	BC
-;  125	            cur_y += shield_icon->height + 10;
+;  135	            cur_y += shield_icon->height + 10;
+.LINE 135
+
 	LD	IY,(IX+-14)
 	LD	A,(IY+1)
 	ADD	A,50
 	LD	(IX+-5),A
-;  126	            stats_DrawHealthBar(shield_health, 75, cur_x, cur_y, 30, 255);
+;  136	            stats_DrawHealthBar(shield_health, 75, cur_x, cur_y, 30, 255);
+.LINE 136
+
 	LD	BC,255
 	PUSH	BC
 	LD	BC,30
@@ -881,15 +2437,21 @@ L_37:
 	POP	BC
 	POP	BC
 	POP	BC
-;  127	            cur_y += 15; cur_x = viewer_x;
+;  137	            cur_y += 15; cur_x = viewer_x;
+.LINE 137
+
 	LD	A,(IX+-5)
 	ADD	A,15
 	LD	(IX+-5),A
 	LD	BC,30
 	LD	(IX+-21),BC
-;  128	        }
+;  138	        }
 L_40:
-;  129	        stats_DrawHealthBar(health_GetHealthPercent(&tactical[TACT_MAX].health), 75, cur_x, cur_y, 255, 255);
+.LINE 138
+
+;  139	        stats_DrawHealthBar(health_GetHealthPercent(&tactical[TACT_MAX].health), 75, cur_x, cur_y, 255, 255);
+.LINE 139
+
 	LD	BC,255
 	PUSH	BC
 	PUSH	BC
@@ -900,8 +2462,8 @@ L_40:
 	PUSH	BC
 	LD	BC,75
 	PUSH	BC
-	LD	HL,(IX+6)
 	LD	BC,324
+	LD	HL,(IX+6)
 	ADD	HL,BC
 	LD	IY,HL
 	PEA	IY+21
@@ -915,7 +2477,9 @@ L_40:
 	POP	BC
 	POP	BC
 	POP	BC
-;  130	}
+;  140	}
+.LINE 140
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -924,7 +2488,7 @@ L_40:
 ;**************************** _Screen_UITacticalStats ***************************
 ;Name                         Addr/Register   Size   Type
 ;_gfx_RLETSprite                     IMPORT  -----   function
-;_trekgui                            IMPORT     45   variable
+;_trekgui                            IMPORT     75   variable
 ;_stats_DrawHealthBar                IMPORT  -----   function
 ;_gfx_FillRectangle                  IMPORT  -----   function
 ;_gfx_SetColor                       IMPORT  -----   function
@@ -949,16 +2513,7 @@ L_40:
 ;       Spill Code: 0 (instruction)
 
 
-;  131	
-;  132	
-;  133	
-;  134	
-;  135	
-;  136	
-;  137	
-;  138	
-;  139	
-;  140	
+.ENDFUNC "Screen_UITacticalStats",140,"_Screen_UITacticalStats"
 ;  141	
 ;  142	
 ;  143	
@@ -966,19 +2521,71 @@ L_40:
 ;  145	
 ;  146	
 ;  147	
-;  148	void Screen_Background(unsigned char active) {
+;  148	
+;  149	
+;  150	
+;  151	
+;  152	
+;  153	
+;  154	
+;  155	
+;  156	
+;  157	
+;  158	void Screen_Background(unsigned char active) {
 _Screen_Background:
-	LD	HL,-3
-	CALL	__frameset
-;  149	    int i;
-;  150	    gfx_SetTextFGColor(255);
+.DEFINE "_Screen_Background"
+
+.VALUE _Screen_Background
+
+.CLASS 2
+
+.TYPE 65
+
+.ENDEF
+
+.BEGFUNC "Screen_Background",158,"_Screen_Background"
+
+.LINE 158
+
+.DEFINE "active"
+
+.CLASS 65
+
+.VALUE 6
+
+.TYPE 12
+
+.ENDEF
+
+.DEFINE "i"
+
+.CLASS 65
+
+.VALUE -3
+
+.TYPE 4
+
+.ENDEF
+
+	PUSH	IX
+	LD	IX,0
+	ADD	IX,SP
+	PUSH	BC
+;  159	    int i;
+;  160	    gfx_SetTextFGColor(255);
+.LINE 160
+
 	LD	BC,255
 	PUSH	BC
 	CALL	_gfx_SetTextFGColor
 	POP	BC
-;  151	    gfx_ZeroScreen();
+;  161	    gfx_ZeroScreen();
+.LINE 161
+
 	CALL	_gfx_ZeroScreen
-;  152	    gfx_RLETSprite(shipinterior_left, 0, 0);
+;  162	    gfx_RLETSprite(shipinterior_left, 0, 0);
+.LINE 162
+
 	LD	BC,0
 	PUSH	BC
 	PUSH	BC
@@ -988,29 +2595,37 @@ _Screen_Background:
 	POP	BC
 	POP	BC
 	POP	BC
-;  153	    gfx_RLETSprite(shipinterior_right, 160, 0);
+;  163	    gfx_RLETSprite(shipinterior_right, 160, 0);
+.LINE 163
+
 	LD	BC,0
 	PUSH	BC
-	LD	HL,_trekgui+3
 	LD	BC,160
 	PUSH	BC
+	LD	HL,_trekgui+3
 	LD	BC,(HL)
 	PUSH	BC
 	CALL	_gfx_RLETSprite
 	POP	BC
 	POP	BC
 	POP	BC
-;  154	    for(i = 0; i < 320; i++){
+;  164	    for(i = 0; i < 320; i++){
+.LINE 164
+
 	LD	BC,0
 	LD	(IX+-3),BC
 	JR	L_45
 L_43:
-;  155	        gfx_SetColor(0);
+;  165	        gfx_SetColor(0);
+.LINE 165
+
 	LD	BC,0
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;  156	        gfx_Rectangle(i * 64, 216, 64, 20);
+;  166	        gfx_Rectangle(i * 64, 216, 64, 20);
+.LINE 166
+
 	LD	BC,20
 	PUSH	BC
 	LD	BC,64
@@ -1033,19 +2648,25 @@ L_43:
 	LD	BC,(IX+-3)
 	INC	BC
 	LD	(IX+-3),BC
-;  157	    }
+;  167	    }
 L_45:
+.LINE 167
+
 	LD	BC,320
 	LD	HL,(IX+-3)
 	OR	A,A
 	SBC	HL,BC
 	JP	M,L_43
-;  158	    gfx_SetColor(116);
+;  168	    gfx_SetColor(116);
+.LINE 168
+
 	LD	BC,116
 	PUSH	BC
 	CALL	_gfx_SetColor
 	POP	BC
-;  159	    if(active) gfx_FillRectangle(--active*64+1, 217, 62, 18);
+;  169	    if(active) gfx_FillRectangle(--active*64+1, 217, 62, 18);
+.LINE 169
+
 	LD	A,(IX+6)
 	OR	A,A
 	JR	Z,L_48
@@ -1073,43 +2694,12 @@ L_45:
 	POP	BC
 	POP	BC
 L_48:
-;  160	    gfx_PrintStringXY("Defense", 4, lcars_texty);
+;  170	    gfx_PrintStringXY("Defense", 4, lcars_texty);
+.LINE 170
+
 	LD	BC,223
 	PUSH	BC
 	LD	BC,4
-	PUSH	BC
-	LD	BC,L__28
-	PUSH	BC
-	CALL	_gfx_PrintStringXY
-	POP	BC
-	POP	BC
-	POP	BC
-;  161	    gfx_PrintStringXY("Tact", 80, lcars_texty);
-	LD	BC,223
-	PUSH	BC
-	LD	BC,80
-	PUSH	BC
-	LD	BC,L__29
-	PUSH	BC
-	CALL	_gfx_PrintStringXY
-	POP	BC
-	POP	BC
-	POP	BC
-;  162	    gfx_PrintStringXY("Mains", 140, lcars_texty);
-	LD	BC,223
-	PUSH	BC
-	LD	BC,140
-	PUSH	BC
-	LD	BC,L__30
-	PUSH	BC
-	CALL	_gfx_PrintStringXY
-	POP	BC
-	POP	BC
-	POP	BC
-;  163	    gfx_PrintStringXY("Repair", 200, lcars_texty);
-	LD	BC,223
-	PUSH	BC
-	LD	BC,200
 	PUSH	BC
 	LD	BC,L__31
 	PUSH	BC
@@ -1117,10 +2707,12 @@ L_48:
 	POP	BC
 	POP	BC
 	POP	BC
-;  164	    gfx_PrintStringXY("Cargo", 268, lcars_texty);
+;  171	    gfx_PrintStringXY("Tact", 80, lcars_texty);
+.LINE 171
+
 	LD	BC,223
 	PUSH	BC
-	LD	BC,268
+	LD	BC,80
 	PUSH	BC
 	LD	BC,L__32
 	PUSH	BC
@@ -1128,12 +2720,55 @@ L_48:
 	POP	BC
 	POP	BC
 	POP	BC
-;  165	    gfx_SetTextFGColor(148);
+;  172	    gfx_PrintStringXY("Mains", 140, lcars_texty);
+.LINE 172
+
+	LD	BC,223
+	PUSH	BC
+	LD	BC,140
+	PUSH	BC
+	LD	BC,L__33
+	PUSH	BC
+	CALL	_gfx_PrintStringXY
+	POP	BC
+	POP	BC
+	POP	BC
+;  173	    gfx_PrintStringXY("Repair", 200, lcars_texty);
+.LINE 173
+
+	LD	BC,223
+	PUSH	BC
+	LD	BC,200
+	PUSH	BC
+	LD	BC,L__34
+	PUSH	BC
+	CALL	_gfx_PrintStringXY
+	POP	BC
+	POP	BC
+	POP	BC
+;  174	    gfx_PrintStringXY("Cargo", 268, lcars_texty);
+.LINE 174
+
+	LD	BC,223
+	PUSH	BC
+	LD	BC,268
+	PUSH	BC
+	LD	BC,L__35
+	PUSH	BC
+	CALL	_gfx_PrintStringXY
+	POP	BC
+	POP	BC
+	POP	BC
+;  175	    gfx_SetTextFGColor(148);
+.LINE 175
+
 	LD	BC,148
 	PUSH	BC
 	CALL	_gfx_SetTextFGColor
 	POP	BC
-;  166	    gfx_PrintStringXY(version, 160 - (7 * strlen(version) / 2), 0);
+;  176	    gfx_PrintStringXY(version, 160 - (7 * strlen(version) / 2), 0);
+.LINE 176
+
 	LD	BC,0
 	PUSH	BC
 	LD	BC,_version
@@ -1155,12 +2790,16 @@ L_48:
 	POP	BC
 	POP	BC
 	POP	BC
-;  167	    gfx_SetTextFGColor(0);
+;  177	    gfx_SetTextFGColor(0);
+.LINE 177
+
 	LD	BC,0
 	PUSH	BC
 	CALL	_gfx_SetTextFGColor
 	POP	BC
-;  168	}
+;  178	}
+.LINE 178
+
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -1174,7 +2813,7 @@ L_48:
 ;_gfx_FillRectangle                  IMPORT  -----   function
 ;_gfx_Rectangle                      IMPORT  -----   function
 ;_gfx_SetColor                       IMPORT  -----   function
-;_trekgui                            IMPORT     45   variable
+;_trekgui                            IMPORT     75   variable
 ;_gfx_RLETSprite                     IMPORT  -----   function
 ;_gfx_ZeroScreen                     IMPORT  -----   function
 ;_gfx_SetTextFGColor                 IMPORT  -----   function
@@ -1186,35 +2825,33 @@ L_48:
 ;       Spill Code: 0 (instruction)
 
 
+.ENDFUNC "Screen_Background",178,"_Screen_Background"
 	SEGMENT STRSECT
-L__28:
+L__31:
 	DB	"Defense"
 	DB	0
-L__29:
+L__32:
 	DB	"Tact"
 	DB	0
-L__30:
+L__33:
 	DB	"Mains"
 	DB	0
-L__31:
+L__34:
 	DB	"Repair"
 	DB	0
-L__32:
+L__35:
 	DB	"Cargo"
 	DB	0
+	XREF _dbg_Debugger:ROM
+	XREF _sprintf:ROM
 	XREF _stats_DrawHealthBar:ROM
 	XREF _trekgui:ROM
 	XREF _health_GetHealthPercent:ROM
-	XREF _power_GetDrawSource:ROM
-	XREF _power_GetPowerSpend:ROM
-	XREF _power_GetSpendPercent:ROM
-	XREF _power_GetBatteryPercent:ROM
 	XREF _gfx_RLETSprite:ROM
 	XREF _gfx_GetStringWidth:ROM
 	XREF _gfx_SetTextFGColor:ROM
 	XREF _gfx_SetTextXY:ROM
 	XREF _gfx_PrintStringXY:ROM
-	XREF _gfx_PrintString:ROM
 	XREF _gfx_Blit:ROM
 	XREF _gfx_FillRectangle:ROM
 	XREF _gfx_Rectangle:ROM
@@ -1223,10 +2860,8 @@ L__32:
 	XREF _strlen:ROM
 	XREF __idivu:ROM
 	XREF __imulu:ROM
-	XREF __frameset0:ROM
-	XREF __frameset:ROM
 	XREF __setflag:ROM
-	XREF __seqcase:ROM
+	XREF __seqcaseD:ROM
 	XREF __imul_b:ROM
 	XREF __ishru_b:ROM
 	XDEF _Screen_Background
@@ -1235,7 +2870,7 @@ L__32:
 	XDEF _Screen_RenderUI
 	XDEF _num_GetLength
 	XDEF _text_GetCenterX
-	XDEF _mainsys_strings
+	XDEF _moduledb
 	XDEF _version
 	XDEF _tact_title
 	XDEF _shields_title

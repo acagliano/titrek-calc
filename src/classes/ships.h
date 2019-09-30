@@ -99,18 +99,18 @@ void health_DamageModule(health_t* health, int amount);
 // Module Data Struct
 typedef union Data_t {
     // Core System Modules
-    trans_data_t transport;
-    integ_data_t integ;
-    lifesup_data_t lifesupport;
-    core_data_t core;
-    engine_data_t engine;
-    navsens_data_t navsens;
+    trans_data_t mod_transport;
+    integ_data_t mod_integ;
+    lifesup_data_t mod_lifesupport;
+    core_data_t mod_core;
+    engine_data_t mod_engine;
+    navsens_data_t mod_navsens;
     // Shield Modules
-    shield_data_t shields;
+    shield_data_t mod_shields;
     // Weapons Modules
-    torpedo_data_t torpedoes;
-    phaser_data_t phasers;
-    targsens_data_t targsens;
+    torpedo_data_t mod_torpedoes;
+    phaser_data_t mod_phasers;
+    targsens_data_t mod_targsens;
 } data_t;
 
 
@@ -151,8 +151,8 @@ typedef struct {
 // Core system defines
 
 typedef struct {
-    int mains;
-    int tactical;
+    uint24_t mains;
+    uint24_t tactical;
 } selected_t;
 
 void module_SetHealthMax(health_t* health, int max);

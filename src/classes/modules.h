@@ -6,6 +6,7 @@
 #include <graphx.h>
 
 // Organization for Sprites
+#define MODICONS 14     // define first module icon
 
 enum ModuleTypes {
     LIFESUP,
@@ -22,13 +23,6 @@ enum ModuleTypes {
     TARG_SENS
 };
 
-typedef struct {
-    uint24_t id;
-    gfx_rletsprite_t* sprite;
-    uint8_t name[16];
-} moduleindex_t;
-
-extern moduleindex_t moduledb[TARG_SENS];
 
 
 #endif

@@ -50,6 +50,7 @@ void main(void) {
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
+    if(!gfx_sprites) return;
     if(!(appvar = ti_Open("trekgui", "r"))) return;
     zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
     trekgui_init(gfx_sprites);
@@ -76,7 +77,7 @@ void main(void) {
         Ship.tactical[i].techtype = SHIELD;
         module_SetHealthMax(&Ship.tactical[i].health, 50);
         module_SetPowerMax(&Ship.tactical[i].power);
-        Ship.tactical[i].data.shields.resistance = 10;
+        Ship.tactical[i].data.mod_shields.resistance = 10;
     }
     do {
         unsigned char key = os_GetCSC();
@@ -107,7 +108,7 @@ void main(void) {
                 module_t *shield = &Ship.tactical[i];
                 if((shield->techtype == SHIELD) && shield->online){
                     int health = health_GetHealthPercent(&shield->health);
-                    int drv = shield->data.shields.resistance;
+                    int drv = shield->data.mod_shields.resistance;
                     drv = health * drv / 100;
                     health_DamageModule(&shield->health, -(randnum));
                     randnum -= drv;

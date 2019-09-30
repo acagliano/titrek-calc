@@ -26,8 +26,18 @@ using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-1:
+11:
+ lifesupport : converted!
+ core : converted!
+ warpdrive : converted!
+ engines : converted!
+ navsens : converted!
+ transporter : converted!
+ shields : converted!
  armor : converted!
+ phasers : converted!
+ torpedo : converted!
+ targsens : converted!
 
 exporting appvar: trekgui.8xv
  shipinterior_left
@@ -44,8 +54,18 @@ exporting appvar: trekgui.8xv
  icon_frequency
  icon_shieldstrength
  deflected
+ lifesupport
+ core
+ warpdrive
+ engines
+ navsens
+ transporter
+ shields
  armor
-compression: (36963 > 4656 bytes)
+ phasers
+ torpedo
+ targsens
+compression: (38298 > 5274 bytes)
 
 converted in 0 s
 
