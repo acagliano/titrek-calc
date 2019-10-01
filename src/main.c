@@ -54,6 +54,7 @@ void main(void) {
     if(!(appvar = ti_Open("trekgui", "r"))) return;
     zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
     trekgui_init(gfx_sprites);
+    gfx_InitModuleIcons();
     ti_CloseAll();
     int_Disable();
     gfx_SetDefaultPalette(gfx_8bpp);

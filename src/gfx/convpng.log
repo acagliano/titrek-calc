@@ -60,7 +60,18 @@ exporting appvar: trekgui.8xv
  mains_display
  icon_hullinteg
  icon_shieldinteg
-compression: (35078 > 5668 bytes)
+ lifesupport
+ core
+ warpdrive
+ engines
+ navsens
+ transporter
+ shields
+ armor
+ phasers
+ torpedo
+ targsens
+compression: (36609 > 6340 bytes)
 
 converted in 0 s
 

@@ -22,12 +22,23 @@ _trekgui:
 	DW24	34586
 	DW24	34836
 	DW24	34958
+	DW24	35078
+	DW24	35234
+	DW24	35342
+	DW24	35534
+	DW24	35666
+	DW24	35776
+	DW24	35874
+	DW24	36085
+	DW24	36311
+	DW24	36369
+	DW24	36473
 ;    1	// convpng v7.0
 ;    2	#include <stdint.h>
 ;    3	#include "trekgui.h"
 ;    4	
 ;    5	#include <fileioc.h>
-;    6	uint8_t *trekgui[17] = {
+;    6	uint8_t *trekgui[28] = {
 	SEGMENT CODE
 ;    7	 (uint8_t*)0,
 ;    8	 (uint8_t*)13150,
@@ -46,26 +57,37 @@ _trekgui:
 ;   21	 (uint8_t*)34586,
 ;   22	 (uint8_t*)34836,
 ;   23	 (uint8_t*)34958,
-;   24	};
-;   25	
-;   26	bool trekgui_init(void *decompressed_addr) {
+;   24	 (uint8_t*)35078,
+;   25	 (uint8_t*)35234,
+;   26	 (uint8_t*)35342,
+;   27	 (uint8_t*)35534,
+;   28	 (uint8_t*)35666,
+;   29	 (uint8_t*)35776,
+;   30	 (uint8_t*)35874,
+;   31	 (uint8_t*)36085,
+;   32	 (uint8_t*)36311,
+;   33	 (uint8_t*)36369,
+;   34	 (uint8_t*)36473,
+;   35	};
+;   36	
+;   37	bool trekgui_init(void *decompressed_addr) {
 _trekgui_init:
 	LD	HL,-9
 	CALL	__frameset
-;   27	    unsigned int data, i;
-;   28	
-;   29	    data = (unsigned int)decompressed_addr - (unsigned int)trekgui[0];
+;   38	    unsigned int data, i;
+;   39	
+;   40	    data = (unsigned int)decompressed_addr - (unsigned int)trekgui[0];
 	LD	BC,(_trekgui)
 	LD	HL,(IX+6)
 	OR	A,A
 	SBC	HL,BC
 	LD	(IX+-6),HL
-;   30	    for (i = 0; i < trekgui_num; i++) {
+;   41	    for (i = 0; i < trekgui_num; i++) {
 	LD	BC,0
 	LD	(IX+-3),BC
 	JR	L_3
 L_1:
-;   31	        trekgui[i] += data;
+;   42	        trekgui[i] += data;
 	LD	HL,(IX+-3)
 	LD	BC,HL
 	ADD	HL,HL
@@ -81,14 +103,15 @@ L_1:
 	LD	BC,(IX+-3)
 	INC	BC
 	LD	(IX+-3),BC
-;   32	    }
+;   43	    }
 L_3:
-	LD	BC,17
+	LD	BC,28
 	LD	HL,(IX+-3)
 	OR	A,A
 	SBC	HL,BC
 	JR	C,L_1
-;   33	}
+;   44	
+;   45	}
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -96,7 +119,7 @@ L_3:
 
 ;**************************** _trekgui_init ***************************
 ;Name                         Addr/Register   Size   Type
-;_trekgui                            STATIC     51   variable
+;_trekgui                            STATIC     84   variable
 ;data                                  IX-6      3   variable
 ;i                                     IX-3      3   variable
 ;decompressed_addr                     IX+6      3   parameter

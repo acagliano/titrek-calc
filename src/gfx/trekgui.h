@@ -6,9 +6,9 @@
 
 #include <stdbool.h>
 
-#define trekgui_num 17
+#define trekgui_num 28
 
-extern uint8_t *trekgui[17];
+extern uint8_t *trekgui[28];
 #define shipinterior_left_width 160
 #define shipinterior_left_height 240
 #define shipinterior_left ((gfx_rletsprite_t*)trekgui[0])
@@ -60,8 +60,41 @@ extern uint8_t *trekgui[17];
 #define icon_shieldinteg_width 10
 #define icon_shieldinteg_height 10
 #define icon_shieldinteg ((gfx_rletsprite_t*)trekgui[16])
+#define lifesupport_width 14
+#define lifesupport_height 14
+#define lifesupport ((gfx_rletsprite_t*)trekgui[17])
+#define core_width 14
+#define core_height 14
+#define core ((gfx_rletsprite_t*)trekgui[18])
+#define warpdrive_width 14
+#define warpdrive_height 14
+#define warpdrive ((gfx_rletsprite_t*)trekgui[19])
+#define engines_width 14
+#define engines_height 14
+#define engines ((gfx_rletsprite_t*)trekgui[20])
+#define navsens_width 14
+#define navsens_height 14
+#define navsens ((gfx_rletsprite_t*)trekgui[21])
+#define transporter_width 14
+#define transporter_height 14
+#define transporter ((gfx_rletsprite_t*)trekgui[22])
+#define shields_width 14
+#define shields_height 14
+#define shields ((gfx_rletsprite_t*)trekgui[23])
+#define armor_width 14
+#define armor_height 14
+#define armor ((gfx_rletsprite_t*)trekgui[24])
+#define phasers_width 14
+#define phasers_height 14
+#define phasers ((gfx_rletsprite_t*)trekgui[25])
+#define torpedo_width 14
+#define torpedo_height 14
+#define torpedo ((gfx_rletsprite_t*)trekgui[26])
+#define targsens_width 14
+#define targsens_height 14
+#define targsens ((gfx_rletsprite_t*)trekgui[27])
 bool trekgui_init(void *decompressed_addr);
-#define trekgui_uncompressed_size 35078
-#define trekgui_compressed_size 5668
+#define trekgui_uncompressed_size 36609
+#define trekgui_compressed_size 6340
 
 #endif

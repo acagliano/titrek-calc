@@ -6,10 +6,10 @@ libs     D1A9F7 D1AA60            69h
 startup  D1AA60 D1AA9F            3Fh
 cleanup  D1AA9F D1AAB3            14h
 exit     D1AAB3 D1AAB9             6h
-code     D1AAB9 D1BE31          1378h
-data     D1BE31 D1C836           A05h
-strsect  D1C836 D1C882            4Ch
-text     D1C882 D1C882             0h
+code     D1AAB9 D1BE90          13D7h
+data     D1BE90 D1C2BB           42Bh
+strsect  D1C2BB D1C307            4Ch
+text     D1C307 D1C307             0h
 bss      D031F6 D031FC D13FD6      6h
 header   D1A87F D1A882             3h
 
@@ -133,7 +133,7 @@ _asm_ArcChk                  = 022040
 _srandom                     = D1AADD
 __setstate                   = D1AAE4
 _random                      = D1AAF4
-__state                      = D1BE31
+__state                      = D1BE90
 _zx7_Decompress              = D1AB4B
 __seqcase                    = 000210
 __idvrmu                     = 000140
@@ -182,35 +182,25 @@ _power_GetDrawSource         = D1AE16
 _power_SetDrawSource         = D1AE04
 _power_GetSpendPercent       = D1ADE8
 _power_GetBatteryPercent     = D1ADCC
-_armor_data                  = D1BE66
-_core_data                   = D1BF48
-_engines_data                = D1BFB4
-_lifesupport_data            = D1C038
-_navsens_data                = D1C0D4
-_phasers_data                = D1C142
-_shields_data                = D1C17C
-_targsens_data               = D1C24F
-_torpedo_data                = D1C2D7
-_transporter_data            = D1C33F
 _trekgui_init                = D1AF95
-_trekgui                     = D1C3A1
-_warpdrive_data              = D1C3D4
+_trekgui                     = D1BEC5
+_gfx_InitModuleIcons         = D1B0B9
 _stats_DrawHealthBar         = D1AFE7
-_modicons                    = D1C494
-_main                        = D1B0B9
-_select                      = D1C782
-_Ship                        = D1C4B5
-_Screen_Background           = D1BCB6
-_module_RenderGeneral        = D1BA84
-_Screen_UITacticalStats      = D1B845
-_Screen_UISystemStats        = D1B768
-_Screen_RenderUI             = D1B6C2
-_num_GetLength               = D1B67B
-_text_GetCenterX             = D1B65A
-_moduledb                    = D1C7B2
-_version                     = D1C7A2
-_tact_title                  = D1C793
-_mains_title                 = D1C788
+_modicons                    = D1BF19
+_main                        = D1B114
+_select                      = D1C207
+_Ship                        = D1BF3A
+_Screen_Background           = D1BD15
+_module_RenderGeneral        = D1BAE3
+_Screen_UITacticalStats      = D1B8A4
+_Screen_UISystemStats        = D1B7C7
+_Screen_RenderUI             = D1B721
+_num_GetLength               = D1B6DA
+_text_GetCenterX             = D1B6B9
+_moduledb                    = D1C237
+_version                     = D1C227
+_tact_title                  = D1C218
+_mains_title                 = D1C20D
 _ti_CloseAll                 = D1AA0B
 _ti_Open                     = D1AA0F
 _ti_GetDataPtr               = D1AA13

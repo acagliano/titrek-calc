@@ -569,7 +569,7 @@ L_17:
 ;_gfx_SetColor                       IMPORT  -----   function
 ;_mains_title                        STATIC     11   variable
 ;_gfx_PrintStringXY                  IMPORT  -----   function
-;_trekgui                            IMPORT     51   variable
+;_trekgui                            IMPORT     84   variable
 ;_gfx_RLETSprite                     IMPORT  -----   function
 ;module                                IX-5      3   variable
 ;cur_y                                 IX-2      1   variable
@@ -886,7 +886,7 @@ L_35:
 ;_gfx_SetColor                       IMPORT  -----   function
 ;_tact_title                         STATIC     15   variable
 ;_gfx_PrintStringXY                  IMPORT  -----   function
-;_trekgui                            IMPORT     51   variable
+;_trekgui                            IMPORT     84   variable
 ;_gfx_RLETSprite                     IMPORT  -----   function
 ;shield_resist                        IX-24      3   variable
 ;temp_y                               IX-21      3   variable
@@ -1211,7 +1211,7 @@ L_54:
 ;_stats_DrawHealthBar                IMPORT  -----   function
 ;_moduledb                           STATIC    132   variable
 ;_gfx_PrintStringXY                  IMPORT  -----   function
-;_modicons                           IMPORT  unknown variable
+;_modicons                           IMPORT     33   variable
 ;_gfx_RLETSprite                     IMPORT  -----   function
 ;_gfx_FillRectangle                  IMPORT  -----   function
 ;_gfx_Rectangle                      IMPORT  -----   function
@@ -1459,7 +1459,7 @@ L_61:
 ;_gfx_FillRectangle                  IMPORT  -----   function
 ;_gfx_Rectangle                      IMPORT  -----   function
 ;_gfx_SetColor                       IMPORT  -----   function
-;_trekgui                            IMPORT     51   variable
+;_trekgui                            IMPORT     84   variable
 ;_gfx_RLETSprite                     IMPORT  -----   function
 ;_gfx_ZeroScreen                     IMPORT  -----   function
 ;_gfx_SetTextFGColor                 IMPORT  -----   function
