@@ -6,10 +6,10 @@ libs     D1A9F7 D1AA60            69h
 startup  D1AA60 D1AA9F            3Fh
 cleanup  D1AA9F D1AAB3            14h
 exit     D1AAB3 D1AAB9             6h
-code     D1AAB9 D1BD1C          1263h
-data     D1BD1C D1C151           435h
-strsect  D1C151 D1C198            47h
-text     D1C198 D1C198             0h
+code     D1AAB9 D1BE31          1378h
+data     D1BE31 D1C836           A05h
+strsect  D1C836 D1C882            4Ch
+text     D1C882 D1C882             0h
 bss      D031F6 D031FC D13FD6      6h
 header   D1A87F D1A882             3h
 
@@ -133,33 +133,32 @@ _asm_ArcChk                  = 022040
 _srandom                     = D1AADD
 __setstate                   = D1AAE4
 _random                      = D1AAF4
-__state                      = D1BD1C
+__state                      = D1BE31
 _zx7_Decompress              = D1AB4B
-_dbg_Debugger                = D1ABB7
+__seqcase                    = 000210
 __idvrmu                     = 000140
 __idvrmu                     = 000144
-__case8D                     = 000128
-_sprintf                     = 0000BC
 __imul_b                     = 000158
 __imul_b                     = 000150
 __idivs                      = 00013C
 _strlen                      = 0000D4
-__frameset                   = D1ABBD
+__frameset                   = D1ABB7
 __ishru_b                    = 000184
 __ishru_b                    = 000188
 __stoiu                      = 000264
-__s_sbrk                     = D1ABCB
+__s_sbrk                     = D1ABC5
+__frameset0                  = D1ABE5
 __sxor                       = 000268
 __iremu                      = 000170
-__icmpzero                   = D1ABEB
-__seqcaseD                   = 000214
+__icmpzero                   = D1ABF0
 __sor                        = 000234
 __ineg                       = 000160
 __setflag                    = 000218
 __imuls                      = 000154
-_malloc                      = D1AC21
+__case8                      = 000124
+_malloc                      = D1AC26
 __alloc_base                 = D031F6
-_free                        = D1ACC9
+_free                        = D1ACCE
 __findlibload                = D1A99F
 __program_icon               = D1A887
 __program_description        = D1A989
@@ -170,36 +169,48 @@ _exit                        = D1AAB5
 __exit                       = D1AA8E
 __exitsp                     = D1AA8E
 __errsp                      = D1AA8E
-_module_SetPowerMax          = D1AFB1
-_module_SetHealthMax         = D1AF94
-_module_SetOnlineState       = D1AF4F
-_module_GetOnlineState       = D1AF3B
-_health_DamageModule         = D1AEE3
-_health_GetHealthPercent     = D1AEC2
-_power_GetPowerDraw          = D1AEAE
-_power_ChangeSpend           = D1AE48
-_power_GetPowerSpend         = D1AE34
-_power_GetDrawSource         = D1AE20
-_power_SetDrawSource         = D1AE09
+_module_SetPowerMax          = D1AF7F
+_module_SetHealthMax         = D1AF67
+_module_SetOnlineState       = D1AF27
+_module_GetOnlineState       = D1AF18
+_health_DamageModule         = D1AEC2
+_health_GetHealthPercent     = D1AEA6
+_power_GetPowerDraw          = D1AE97
+_power_ChangeSpend           = D1AE34
+_power_GetPowerSpend         = D1AE25
+_power_GetDrawSource         = D1AE16
+_power_SetDrawSource         = D1AE04
 _power_GetSpendPercent       = D1ADE8
-_power_GetBatteryPercent     = D1ADC7
-_trekgui_init                = D1AFCC
-_trekgui                     = D1BD51
-_stats_DrawHealthBar         = D1B022
-_main                        = D1B0F5
-_select                      = D1C069
-_Ship                        = D1BD9C
-_Screen_Background           = D1BB9F
-_Screen_UITacticalStats      = D1B930
-_Screen_UISystemStats        = D1B7C1
-_Screen_RenderUI             = D1B715
-_num_GetLength               = D1B6C9
-_text_GetCenterX             = D1B6A3
-_moduledb                    = D1C0BB
-_version                     = D1C0AB
-_tact_title                  = D1C094
-_shields_title               = D1C082
-_mains_title                 = D1C06F
+_power_GetBatteryPercent     = D1ADCC
+_armor_data                  = D1BE66
+_core_data                   = D1BF48
+_engines_data                = D1BFB4
+_lifesupport_data            = D1C038
+_navsens_data                = D1C0D4
+_phasers_data                = D1C142
+_shields_data                = D1C17C
+_targsens_data               = D1C24F
+_torpedo_data                = D1C2D7
+_transporter_data            = D1C33F
+_trekgui_init                = D1AF95
+_trekgui                     = D1C3A1
+_warpdrive_data              = D1C3D4
+_stats_DrawHealthBar         = D1AFE7
+_modicons                    = D1C494
+_main                        = D1B0B9
+_select                      = D1C782
+_Ship                        = D1C4B5
+_Screen_Background           = D1BCB6
+_module_RenderGeneral        = D1BA84
+_Screen_UITacticalStats      = D1B845
+_Screen_UISystemStats        = D1B768
+_Screen_RenderUI             = D1B6C2
+_num_GetLength               = D1B67B
+_text_GetCenterX             = D1B65A
+_moduledb                    = D1C7B2
+_version                     = D1C7A2
+_tact_title                  = D1C793
+_mains_title                 = D1C788
 _ti_CloseAll                 = D1AA0B
 _ti_Open                     = D1AA0F
 _ti_GetDataPtr               = D1AA13

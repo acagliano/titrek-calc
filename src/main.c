@@ -39,7 +39,7 @@
 #define resbits(bits, mask) (bits^mask)
 
 ship_t Ship = {0};
-selected_t select = {0, SYS_MAX};
+selected_t select = {0, 0};
 
 void main(void) {
     uint16_t screen = 0;

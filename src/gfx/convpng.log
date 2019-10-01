@@ -5,7 +5,7 @@ using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-14:
+17:
  shipinterior_left : converted!
  shipinterior_right : converted!
  icon_shieldsstable : converted!
@@ -18,8 +18,11 @@ transparent color : 0x0000
  icon_powerdraw : converted!
  icon_powerspend : converted!
  icon_frequency : converted!
- icon_shieldstrength : converted!
  deflected : converted!
+ tactical_display : converted!
+ mains_display : converted!
+ icon_hullinteg : converted!
+ icon_shieldinteg : converted!
 
 --- moduleicons (C) ---
 using built-in xlibc palette ...
@@ -52,20 +55,12 @@ exporting appvar: trekgui.8xv
  icon_powerdraw
  icon_powerspend
  icon_frequency
- icon_shieldstrength
  deflected
- lifesupport
- core
- warpdrive
- engines
- navsens
- transporter
- shields
- armor
- phasers
- torpedo
- targsens
-compression: (38298 > 5274 bytes)
+ tactical_display
+ mains_display
+ icon_hullinteg
+ icon_shieldinteg
+compression: (35078 > 5668 bytes)
 
 converted in 0 s
 

@@ -1,44 +1,9 @@
 ; Zilog eZ80 ANSI C Compiler Release 3.4
-; -debug -optsize -noreduceopt -nomodsect -peephole -globalopt
+; -optsize -noreduceopt -nomodsect -peephole -globalopt
 ; -localcse -const=ROM 
 	FILE	"SRC\CLASSES\COORDS.C"
 	.assume ADL=1
-.DEBUG "C"
 	SEGMENT CODE
-.BEGREC "NONAME0",12
-.DEFINE "x"
-.VALUE 0
-.CLASS 8
-.TYPE 5
-.ENDEF
-.DEFINE "y"
-.VALUE 4
-.CLASS 8
-.TYPE 5
-.ENDEF
-.DEFINE "z"
-.VALUE 8
-.CLASS 8
-.TYPE 5
-.ENDEF
-.ENDREC "NONAME0"
-.BEGREC "NONAME1",12
-.DEFINE "x"
-.VALUE 0
-.CLASS 8
-.TYPE 5
-.ENDEF
-.DEFINE "y"
-.VALUE 4
-.CLASS 8
-.TYPE 5
-.ENDEF
-.DEFINE "z"
-.VALUE 8
-.CLASS 8
-.TYPE 5
-.ENDEF
-.ENDREC "NONAME1"
 ;    1	
 ;    2	
 ;    3	#include "coords.h"
@@ -46,97 +11,10 @@
 ;    5	
 ;    6	vector_t* coords_GetVector(coords_t* origin, coords_t* dest){
 _coords_GetVector:
-.DEFINE "_coords_GetVector"
-
-.VALUE _coords_GetVector
-
-.CLASS 2
-
-.TAG "NONAME1"
-
-.TYPE 328
-
-.ENDEF
-
-.BEGFUNC "coords_GetVector",6,"_coords_GetVector"
-
-.LINE 6
-
-.DEFINE "origin"
-
-.CLASS 65
-
-.VALUE 6
-
-.TAG "NONAME0"
-
-.TYPE 40
-
-.ENDEF
-
-.DEFINE "dest"
-
-.CLASS 65
-
-.VALUE 9
-
-.TAG "NONAME0"
-
-.TYPE 40
-
-.ENDEF
-
-.DEFINE "x"
-
-.CLASS 65
-
-.VALUE -4
-
-.TYPE 5
-
-.ENDEF
-
-.DEFINE "y"
-
-.CLASS 65
-
-.VALUE -8
-
-.TYPE 5
-
-.ENDEF
-
-.DEFINE "z"
-
-.CLASS 65
-
-.VALUE -12
-
-.TYPE 5
-
-.ENDEF
-
-.DEFINE "vector"
-
-.CLASS 65
-
-.VALUE -24
-
-.TAG "NONAME1"
-
-.TYPE 8
-
-.ENDEF
-
-	PUSH	IX
-	LD	IX,0
-	ADD	IX,SP
-	LEA	HL,IX+-24
-	LD	SP,HL
+	LD	HL,-24
+	CALL	__frameset
 ;    7	    vector_t vector;
 ;    8	    signed long x = origin->x - dest->x;
-.LINE 8
-
 	LD	IY,(IX+6)
 	LD	HL,(IY+0)
 	LD	E,(IY+3)
@@ -147,8 +25,6 @@ _coords_GetVector:
 	LD	(IX+-4),HL
 	LD	(IX+-1),E
 ;    9	    signed long y = origin->y - dest->y;
-.LINE 9
-
 	LD	IY,(IX+6)
 	LD	HL,(IY+4)
 	LD	E,(IY+7)
@@ -159,8 +35,6 @@ _coords_GetVector:
 	LD	(IX+-8),HL
 	LD	(IX+-5),E
 ;   10	    signed long z = origin->z - dest->z;
-.LINE 10
-
 	LD	IY,(IX+6)
 	LD	HL,(IY+8)
 	LD	E,(IY+11)
@@ -171,33 +45,23 @@ _coords_GetVector:
 	LD	(IX+-12),HL
 	LD	(IX+-9),E
 ;   11	    vector.x = x;
-.LINE 11
-
 	LD	BC,(IX+-4)
 	LD	A,(IX+-1)
 	LD	(IX+-24),BC
 	LD	(IX+-21),A
 ;   12	    vector.y = y;
-.LINE 12
-
 	LD	BC,(IX+-8)
 	LD	A,(IX+-5)
 	LD	(IX+-20),BC
 	LD	(IX+-17),A
 ;   13	    vector.z = z;
-.LINE 13
-
 	LD	BC,(IX+-12)
 	LD	A,(IX+-9)
 	LD	(IX+-16),BC
 	LD	(IX+-13),A
 ;   14	    return &vector;
-.LINE 14
-
 	LEA	HL,IX+-24
 ;   15	}
-.LINE 15
-
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -217,7 +81,7 @@ _coords_GetVector:
 ;       Spill Code: 0 (instruction)
 
 
-.ENDFUNC "coords_GetVector",15,"_coords_GetVector"
 	XREF __lsub:ROM
+	XREF __frameset:ROM
 	XDEF _coords_GetVector
 	END

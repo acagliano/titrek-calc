@@ -1,920 +1,8 @@
 ; Zilog eZ80 ANSI C Compiler Release 3.4
-; -debug -optsize -noreduceopt -nomodsect -peephole -globalopt
+; -optsize -noreduceopt -nomodsect -peephole -globalopt
 ; -localcse -const=ROM 
 	FILE	"SRC\MAIN.C"
 	.assume ADL=1
-.DEBUG "C"
-	SEGMENT CODE
-.BEGREC "NONAME0",9
-.DEFINE "sign"
-.VALUE 0
-.CLASS 8
-.TYPE 2
-.ENDEF
-.DEFINE "exp"
-.VALUE 1
-.CLASS 8
-.TYPE 2
-.ENDEF
-.DEFINE "mant"
-.VALUE 2
-.CLASS 8
-.DIM 7
-.TYPE 108
-.ENDEF
-.ENDREC "NONAME0"
-.BEGREC "NONAME1",18
-.DEFINE "real"
-.VALUE 0
-.CLASS 8
-.TAG "NONAME0"
-.TYPE 8
-.ENDEF
-.DEFINE "imag"
-.VALUE 9
-.CLASS 8
-.TAG "NONAME0"
-.TYPE 8
-.ENDEF
-.ENDREC "NONAME1"
-.BEGREC "NONAME2",11
-.DEFINE "dim"
-.VALUE 0
-.CLASS 8
-.TYPE 13
-.ENDEF
-.DEFINE "items"
-.VALUE 2
-.CLASS 8
-.DIM 1
-.TAG "NONAME0"
-.TYPE 104
-.ENDEF
-.ENDREC "NONAME2"
-.BEGREC "NONAME3",20
-.DEFINE "dim"
-.VALUE 0
-.CLASS 8
-.TYPE 13
-.ENDEF
-.DEFINE "items"
-.VALUE 2
-.CLASS 8
-.DIM 1
-.TAG "NONAME1"
-.TYPE 104
-.ENDEF
-.ENDREC "NONAME3"
-.BEGREC "NONAME4",11
-.DEFINE "cols"
-.VALUE 0
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "rows"
-.VALUE 1
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "items"
-.VALUE 2
-.CLASS 8
-.DIM 1
-.TAG "NONAME0"
-.TYPE 104
-.ENDEF
-.ENDREC "NONAME4"
-.BEGREC "NONAME5",3
-.DEFINE "len"
-.VALUE 0
-.CLASS 8
-.TYPE 13
-.ENDEF
-.DEFINE "data"
-.VALUE 2
-.CLASS 8
-.DIM 1
-.TYPE 98
-.ENDEF
-.ENDREC "NONAME5"
-.BEGREC "NONAME6",3
-.DEFINE "len"
-.VALUE 0
-.CLASS 8
-.TYPE 13
-.ENDEF
-.DEFINE "data"
-.VALUE 2
-.CLASS 8
-.DIM 1
-.TYPE 98
-.ENDEF
-.ENDREC "NONAME6"
-.BEGREC "NONAME7",3
-.DEFINE "size"
-.VALUE 0
-.CLASS 8
-.TYPE 13
-.ENDEF
-.DEFINE "data"
-.VALUE 2
-.CLASS 8
-.DIM 1
-.TYPE 108
-.ENDEF
-.ENDREC "NONAME7"
-.BEGREC "fmt_type",19
-.DEFINE "status"
-.VALUE 0
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "flags"
-.VALUE 1
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "size"
-.VALUE 2
-.CLASS 8
-.TYPE 2
-.ENDEF
-.DEFINE "chr"
-.VALUE 3
-.CLASS 8
-.TYPE 2
-.ENDEF
-.DEFINE "type"
-.VALUE 4
-.CLASS 8
-.TYPE 2
-.ENDEF
-.DEFINE "field_width"
-.VALUE 5
-.CLASS 8
-.TYPE 2
-.ENDEF
-.DEFINE "precision"
-.VALUE 6
-.CLASS 8
-.TYPE 2
-.ENDEF
-.DEFINE "set_begin"
-.VALUE 7
-.CLASS 8
-.TYPE 34
-.ENDEF
-.DEFINE "set_end"
-.VALUE 10
-.CLASS 8
-.TYPE 34
-.ENDEF
-.DEFINE "pad_whole"
-.VALUE 13
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "pad_pre_fract"
-.VALUE 14
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "pad_post_fract"
-.VALUE 15
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "pad_at"
-.VALUE 16
-.CLASS 8
-.TYPE 34
-.ENDEF
-.ENDREC "fmt_type"
-.BEGREC "flt_info",12
-.DEFINE "flags"
-.VALUE 0
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "exp"
-.VALUE 1
-.CLASS 8
-.TYPE 2
-.ENDEF
-.DEFINE "digits"
-.VALUE 2
-.CLASS 8
-.DIM 10
-.TYPE 108
-.ENDEF
-.ENDREC "flt_info"
-.BEGREC "NONAME8",6
-.DEFINE "quot"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "rem"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME8"
-.BEGREC "NONAME9",8
-.DEFINE "quot"
-.VALUE 0
-.CLASS 8
-.TYPE 5
-.ENDEF
-.DEFINE "rem"
-.VALUE 4
-.CLASS 8
-.TYPE 5
-.ENDEF
-.ENDREC "NONAME9"
-.BEGREC "header",6
-.DEFINE "s"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME10"
-.TYPE 8
-.ENDEF
-.DEFINE "x"
-.VALUE 0
-.CLASS 11
-.TYPE 2
-.ENDEF
-.ENDREC "header"
-.BEGREC "NONAME10",6
-.DEFINE "ptr"
-.VALUE 0
-.CLASS 8
-.TAG "header"
-.TYPE 40
-.ENDEF
-.DEFINE "size"
-.VALUE 3
-.CLASS 8
-.TYPE 14
-.ENDEF
-.ENDREC "NONAME10"
-.BEGREC "__stdio_file",1
-.DEFINE "slot"
-.VALUE 0
-.CLASS 8
-.TYPE 12
-.ENDEF
-.ENDREC "__stdio_file"
-.BEGREC "NONAME11",3
-.DEFINE "width"
-.VALUE 0
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "height"
-.VALUE 1
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "data"
-.VALUE 2
-.CLASS 8
-.DIM 1
-.TYPE 108
-.ENDEF
-.ENDREC "NONAME11"
-.BEGREC "NONAME12",3
-.DEFINE "width"
-.VALUE 0
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "height"
-.VALUE 1
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "data"
-.VALUE 2
-.CLASS 8
-.DIM 1
-.TYPE 108
-.ENDEF
-.ENDREC "NONAME12"
-.BEGREC "NONAME13",6
-.DEFINE "x"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "y"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME13"
-.BEGREC "NONAME14",12
-.DEFINE "xmin"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "ymin"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "xmax"
-.VALUE 6
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "ymax"
-.VALUE 9
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME14"
-.BEGREC "NONAME15",18
-.DEFINE "map"
-.VALUE 0
-.CLASS 8
-.TYPE 44
-.ENDEF
-.DEFINE "tiles"
-.VALUE 3
-.CLASS 8
-.TAG "NONAME11"
-.TYPE 296
-.ENDEF
-.DEFINE "tile_height"
-.VALUE 6
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "tile_width"
-.VALUE 7
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "draw_height"
-.VALUE 8
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "draw_width"
-.VALUE 9
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "type_width"
-.VALUE 10
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "type_height"
-.VALUE 11
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "height"
-.VALUE 12
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "width"
-.VALUE 13
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "y_loc"
-.VALUE 14
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "x_loc"
-.VALUE 15
-.CLASS 8
-.TYPE 14
-.ENDEF
-.ENDREC "NONAME15"
-.BEGREC "NONAME16",12
-.DEFINE "x"
-.VALUE 0
-.CLASS 8
-.TYPE 5
-.ENDEF
-.DEFINE "y"
-.VALUE 4
-.CLASS 8
-.TYPE 5
-.ENDEF
-.DEFINE "z"
-.VALUE 8
-.CLASS 8
-.TYPE 5
-.ENDEF
-.ENDREC "NONAME16"
-.BEGREC "NONAME17",12
-.DEFINE "x"
-.VALUE 0
-.CLASS 8
-.TYPE 5
-.ENDEF
-.DEFINE "y"
-.VALUE 4
-.CLASS 8
-.TYPE 5
-.ENDEF
-.DEFINE "z"
-.VALUE 8
-.CLASS 8
-.TYPE 5
-.ENDEF
-.ENDREC "NONAME17"
-.BEGREC "NONAME18",3
-.DEFINE "protection"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME18"
-.BEGREC "NONAME19",6
-.DEFINE "protection"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "weight"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME19"
-.BEGREC "NONAME20",3
-.DEFINE "powerout"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME20"
-.BEGREC "NONAME21",3
-.DEFINE "maxspeed"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME21"
-.BEGREC "NONAME22",9
-.DEFINE "targetxz"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "targetxy"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "maxrange"
-.VALUE 6
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME22"
-.BEGREC "NONAME23",12
-.DEFINE "firingspeed"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "reloadtime"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "shielddamage"
-.VALUE 6
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "normaldamage"
-.VALUE 9
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME23"
-.BEGREC "NONAME24",15
-.DEFINE "powerdrain"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "module"
-.VALUE 3
-.CLASS 8
-.TAG "Module"
-.TYPE 8
-.ENDEF
-.ENDREC "NONAME24"
-.BEGREC "Module",12
-.DEFINE "weapon_stats"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME23"
-.TYPE 8
-.ENDEF
-.DEFINE "sensor_stats"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME22"
-.TYPE 8
-.ENDEF
-.DEFINE "integrity_stats"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME19"
-.TYPE 8
-.ENDEF
-.DEFINE "shield_stats"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME18"
-.TYPE 8
-.ENDEF
-.DEFINE "generator_stats"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME20"
-.TYPE 8
-.ENDEF
-.DEFINE "engine_stats"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME21"
-.TYPE 8
-.ENDEF
-.ENDREC "Module"
-.BEGREC "NONAME25",27
-.DEFINE "techclass"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "techtype"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "techid"
-.VALUE 6
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "powerdrain"
-.VALUE 9
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "techinfo"
-.VALUE 12
-.CLASS 8
-.TAG "techinfo"
-.TYPE 8
-.ENDEF
-.ENDREC "NONAME25"
-.BEGREC "techinfo",15
-.DEFINE "module_stats"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME24"
-.TYPE 8
-.ENDEF
-.DEFINE "weapon_stats"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME23"
-.TYPE 8
-.ENDEF
-.ENDREC "techinfo"
-.BEGREC "NONAME26",1
-.DEFINE "drv"
-.VALUE 0
-.CLASS 8
-.TYPE 12
-.ENDEF
-.ENDREC "NONAME26"
-.BEGREC "NONAME27",3
-.DEFINE "occupancy"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME27"
-.BEGREC "NONAME28",3
-.DEFINE "output"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME28"
-.BEGREC "NONAME29",3
-.DEFINE "maxspeed"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME29"
-.BEGREC "NONAME30",3
-.DEFINE "maxrange"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME30"
-.BEGREC "NONAME31",6
-.DEFINE "maxrange"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "maxtargets"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME31"
-.BEGREC "NONAME32",4
-.DEFINE "maxrange"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "maxtargets"
-.VALUE 3
-.CLASS 8
-.TYPE 2
-.ENDEF
-.ENDREC "NONAME32"
-.BEGREC "NONAME33",27
-.DEFINE "resistance"
-.VALUE 0
-.CLASS 8
-.TYPE 14
-.ENDEF
-.DEFINE "frequency"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "maxhealth"
-.VALUE 6
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "shieldhealth"
-.VALUE 9
-.CLASS 8
-.DIM 6
-.TYPE 100
-.ENDEF
-.ENDREC "NONAME33"
-.BEGREC "NONAME34",9
-.DEFINE "yield"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "range"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "speed"
-.VALUE 6
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME34"
-.BEGREC "NONAME35",13
-.DEFINE "equipped"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "compatible"
-.VALUE 3
-.CLASS 8
-.DIM 10
-.TYPE 108
-.ENDEF
-.ENDREC "NONAME35"
-.BEGREC "NONAME36",15
-.DEFINE "priority"
-.VALUE 0
-.CLASS 8
-.TYPE 2
-.ENDEF
-.DEFINE "capacity"
-.VALUE 1
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "current"
-.VALUE 4
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "spend"
-.VALUE 7
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "base"
-.VALUE 10
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "alwaysUse"
-.VALUE 13
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "drawFrom"
-.VALUE 14
-.CLASS 8
-.TYPE 2
-.ENDEF
-.ENDREC "NONAME36"
-.BEGREC "NONAME37",6
-.DEFINE "max"
-.VALUE 0
-.CLASS 8
-.TYPE 4
-.ENDEF
-.DEFINE "current"
-.VALUE 3
-.CLASS 8
-.TYPE 4
-.ENDEF
-.ENDREC "NONAME37"
-.BEGREC "Data_t",27
-.DEFINE "mod_transport"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME31"
-.TYPE 8
-.ENDEF
-.DEFINE "mod_integ"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME26"
-.TYPE 8
-.ENDEF
-.DEFINE "mod_lifesupport"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME27"
-.TYPE 8
-.ENDEF
-.DEFINE "mod_core"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME28"
-.TYPE 8
-.ENDEF
-.DEFINE "mod_engine"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME29"
-.TYPE 8
-.ENDEF
-.DEFINE "mod_navsens"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME30"
-.TYPE 8
-.ENDEF
-.DEFINE "mod_shields"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME33"
-.TYPE 8
-.ENDEF
-.DEFINE "mod_torpedoes"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME35"
-.TYPE 8
-.ENDEF
-.DEFINE "mod_phasers"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME34"
-.TYPE 8
-.ENDEF
-.DEFINE "mod_targsens"
-.VALUE 0
-.CLASS 11
-.TAG "NONAME32"
-.TYPE 8
-.ENDEF
-.ENDREC "Data_t"
-.BEGREC "NONAME38",54
-.DEFINE "unlocked"
-.VALUE 0
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "assigned"
-.VALUE 1
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "techid"
-.VALUE 2
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "techtype"
-.VALUE 3
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "online"
-.VALUE 4
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "typelocked"
-.VALUE 5
-.CLASS 8
-.TYPE 12
-.ENDEF
-.DEFINE "power"
-.VALUE 6
-.CLASS 8
-.TAG "NONAME36"
-.TYPE 8
-.ENDEF
-.DEFINE "health"
-.VALUE 21
-.CLASS 8
-.TAG "NONAME37"
-.TYPE 8
-.ENDEF
-.DEFINE "data"
-.VALUE 27
-.CLASS 8
-.TAG "Data_t"
-.TYPE 8
-.ENDEF
-.ENDREC "NONAME38"
-.BEGREC "NONAME39",717
-.DEFINE "coords"
-.VALUE 0
-.CLASS 8
-.TAG "NONAME16"
-.TYPE 8
-.ENDEF
-.DEFINE "crew"
-.VALUE 12
-.CLASS 8
-.TYPE 14
-.ENDEF
-.DEFINE "system"
-.VALUE 15
-.CLASS 8
-.DIM 6
-.TAG "NONAME38"
-.TYPE 104
-.ENDEF
-.DEFINE "tactical"
-.VALUE 339
-.CLASS 8
-.DIM 6
-.TAG "NONAME38"
-.TYPE 104
-.ENDEF
-.DEFINE "hull"
-.VALUE 663
-.CLASS 8
-.TAG "NONAME38"
-.TYPE 8
-.ENDEF
-.ENDREC "NONAME39"
-.BEGREC "NONAME40",6
-.DEFINE "mains"
-.VALUE 0
-.CLASS 8
-.TYPE 14
-.ENDEF
-.DEFINE "tactical"
-.VALUE 3
-.CLASS 8
-.TYPE 14
-.ENDEF
-.ENDREC "NONAME40"
 	SEGMENT DATA
 _Ship:
 	DL	0
@@ -1260,25 +348,11 @@ _Ship:
 	DW	0
 	DB	0
 	DS	21
-.DEFINE "Ship"
-.ALIAS "_Ship"
-.CLASS 69
-.VALUE _Ship
-.TAG "NONAME39"
-.TYPE 8
-.ENDEF
 _select:
 	DW	0
 	DB	0
-	DW	6
+	DW	0
 	DB	0
-.DEFINE "select"
-.ALIAS "_select"
-.CLASS 69
-.VALUE _select
-.TAG "NONAME40"
-.TYPE 8
-.ENDEF
 ;    1	//--------------------------------------
 ;    2	// Program Name: Star Trek Multplayer
 ;    3	// Author: Anthony Cagliano
@@ -1320,220 +394,29 @@ _select:
 ;   39	#define resbits(bits, mask) (bits^mask)
 ;   40	
 ;   41	ship_t Ship = {0};
-;   42	selected_t select = {0, SYS_MAX};
+;   42	selected_t select = {0, 0};
 	SEGMENT CODE
 ;   43	
 ;   44	void main(void) {
 _main:
-.DEFINE "_main"
-
-.VALUE _main
-
-.CLASS 2
-
-.TYPE 65
-
-.ENDEF
-
-.BEGFUNC "main",44,"_main"
-
-.LINE 44
-
-.DEFINE "screen"
-
-.CLASS 65
-
-.VALUE -2
-
-.TYPE 13
-
-.ENDEF
-
-.DEFINE "i"
-
-.CLASS 65
-
-.VALUE -5
-
-.TYPE 14
-
-.ENDEF
-
-.DEFINE "key"
-
-.CLASS 65
-
-.VALUE -6
-
-.TYPE 12
-
-.ENDEF
-
-.DEFINE "i"
-
-.CLASS 65
-
-.VALUE -10
-
-.TYPE 2
-
-.ENDEF
-
-.DEFINE "i"
-
-.CLASS 65
-
-.VALUE -11
-
-.TYPE 2
-
-.ENDEF
-
-.DEFINE "randnum"
-
-.CLASS 65
-
-.VALUE -12
-
-.TYPE 2
-
-.ENDEF
-
-.DEFINE "i"
-
-.CLASS 65
-
-.VALUE -13
-
-.TYPE 2
-
-.ENDEF
-
-.DEFINE "shield"
-
-.CLASS 65
-
-.VALUE -16
-
-.TAG "NONAME38"
-
-.TYPE 40
-
-.ENDEF
-
-.DEFINE "loopgame"
-
-.CLASS 65
-
-.VALUE -20
-
-.TYPE 12
-
-.ENDEF
-
-.DEFINE "appvar"
-
-.CLASS 65
-
-.VALUE -21
-
-.TYPE 12
-
-.ENDEF
-
-.DEFINE "gfx_sprites"
-
-.CLASS 65
-
-.VALUE -24
-
-.TAG "NONAME12"
-
-.TYPE 40
-
-.ENDEF
-
-.DEFINE "modnum"
-
-.CLASS 65
-
-.VALUE -25
-
-.TYPE 2
-
-.ENDEF
-
-.DEFINE "drv"
-
-.CLASS 65
-
-.VALUE -28
-
-.TYPE 4
-
-.ENDEF
-
-.DEFINE "type"
-
-.CLASS 65
-
-.VALUE -31
-
-.TYPE 4
-
-.ENDEF
-
-.DEFINE "type"
-
-.CLASS 65
-
-.VALUE -37
-
-.TYPE 4
-
-.ENDEF
-
-.DEFINE "health"
-
-.CLASS 65
-
-.VALUE -52
-
-.TYPE 4
-
-.ENDEF
-
-	PUSH	IX
-	LD	IX,0
-	ADD	IX,SP
-	LEA	HL,IX+-76
-	LD	SP,HL
+	LD	HL,-76
+	CALL	__frameset
 ;   45	    uint16_t screen = 0;
-.LINE 45
-
 	LD	(IX+-2),0
 	LD	(IX+-1),0
 ;   46	    bool loopgame = true;
-.LINE 46
-
 	LD	(IX+-20),1
 ;   47	    unsigned int i;
 ;   48	    ti_var_t appvar;
 ;   49	    gfx_rletsprite_t* gfx_sprites = malloc(trekgui_uncompressed_size);
-.LINE 49
-
-	LD	BC,38298
+	LD	BC,35078
 	PUSH	BC
 	CALL	_malloc
 	POP	BC
 	LD	(IX+-24),HL
 ;   50	    gfx_Begin();
-.LINE 50
-
 	CALL	_gfx_Begin
 ;   51	    srandom(rtc_Time());
-.LINE 51
-
 	LD	A,(15925319)
 	LD	C,A
 	LD	B,0
@@ -1544,18 +427,12 @@ _main:
 	POP	BC
 	POP	BC
 ;   52	    ti_CloseAll();
-.LINE 52
-
 	CALL	_ti_CloseAll
 ;   53	    if(!gfx_sprites) return;
-.LINE 53
-
 	LD	HL,(IX+-24)
 	CALL	__icmpzero
 	JR	Z,L_91
 ;   54	    if(!(appvar = ti_Open("trekgui", "r"))) return;
-.LINE 54
-
 	LD	BC,L__1
 	PUSH	BC
 	LD	BC,L__2
@@ -1567,8 +444,6 @@ _main:
 	OR	A,A
 	JR	Z,L_91
 ;   55	    zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
-.LINE 55
-
 	LD	C,(IX+-21)
 	LD	B,0
 	PUSH	BC
@@ -1581,51 +456,35 @@ _main:
 	POP	BC
 	POP	BC
 ;   56	    trekgui_init(gfx_sprites);
-.LINE 56
-
 	LD	BC,(IX+-24)
 	PUSH	BC
 	CALL	_trekgui_init
 	POP	BC
 ;   57	    ti_CloseAll();
-.LINE 57
-
 	CALL	_ti_CloseAll
 ;   58	    int_Disable();
-.LINE 58
-
 di
 ;   59	    gfx_SetDefaultPalette(gfx_8bpp);
-.LINE 59
-
 	LD	BC,39
 	PUSH	BC
 	CALL	_gfx_SetDefaultPalette
 	POP	BC
 ;   60	    gfx_SetDrawBuffer();
-.LINE 60
-
 	LD	BC,1
 	PUSH	BC
 	CALL	_gfx_SetDraw
 	POP	BC
 ;   61	    gfx_SetTextTransparentColor(1);
-.LINE 61
-
 	LD	BC,1
 	PUSH	BC
 	CALL	_gfx_SetTextTransparentColor
 	POP	BC
 ;   62	    gfx_SetTextBGColor(1);
-.LINE 62
-
 	LD	BC,1
 	PUSH	BC
 	CALL	_gfx_SetTextBGColor
 	POP	BC
 ;   63	    module_SetHealthMax(&Ship.hull.health, 1000);
-.LINE 63
-
 	LD	BC,1000
 	PUSH	BC
 	LD	BC,_Ship+684
@@ -1634,16 +493,12 @@ di
 	POP	BC
 	POP	BC
 ;   64	    for(i = 0; i < SYS_MAX; i++){
-.LINE 64
-
 	LD	BC,0
 	LD	(IX+-5),BC
 	JR	L_7
 L_5:
 ;   65	       // Ship.system[i].techclass = MC_SYSTEM;
 ;   66	        Ship.system[i].assigned = true;
-.LINE 66
-
 	LD	BC,_Ship+15
 	LD	(IX+-19),BC
 	LD	(IX+-64),BC
@@ -1660,21 +515,15 @@ L_5:
 	LD	IY,(IX+-61)
 	LD	(IY+1),1
 ;   67	        Ship.system[i].online = true;
-.LINE 67
-
 	LD	(IY+4),1
 ;   68	        Ship.system[i].techtype = i;
-.LINE 68
-
-	LD	A,(IX+-5)
-	LD	DE,BC
 	LD	HL,(IX+-19)
+	LD	DE,BC
 	ADD	HL,DE
 	LD	IY,HL
+	LD	A,(IX+-5)
 	LD	(IY+3),A
 ;   69	        module_SetHealthMax(&Ship.system[i].health, 50);
-.LINE 69
-
 	LD	DE,50
 	PUSH	DE
 	LD	HL,(IX+-19)
@@ -1685,8 +534,6 @@ L_5:
 	POP	BC
 	POP	BC
 ;   70	        module_SetPowerMax(&Ship.system[i].power);
-.LINE 70
-
 	LD	HL,(IX+-5)
 	LD	A,54
 	CALL	__imul_b
@@ -1701,24 +548,18 @@ L_5:
 	LD	(IX+-5),BC
 ;   71	    }
 L_7:
-.LINE 71
-
 	LD	BC,6
 	LD	HL,(IX+-5)
 	OR	A,A
 	SBC	HL,BC
 	JR	C,L_5
 ;   72	    for(i = 0; i < 2; i++){
-.LINE 72
-
 	LD	BC,0
 	LD	(IX+-5),BC
 	JR	L_11
 L_9:
 ;   73	      //  Ship.shield[i].techclass = MC_TACTICAL;
 ;   74	        Ship.tactical[i].unlocked = true;
-.LINE 74
-
 	LD	BC,_Ship+339
 	LD	(IX+-9),BC
 	LD	(IX+-73),BC
@@ -1736,28 +577,20 @@ L_9:
 	LD	A,1
 	LD	(IY+0),A
 ;   75	        Ship.tactical[i].assigned = true;
-.LINE 75
-
 	LD	(IY+1),A
 ;   76	        Ship.tactical[i].online = true;
-.LINE 76
-
-	LD	DE,BC
 	LD	HL,(IX+-9)
+	LD	DE,BC
 	ADD	HL,DE
 	LD	IY,HL
 	LD	(IY+4),1
 ;   77	        Ship.tactical[i].techtype = SHIELD;
-.LINE 77
-
-	LD	DE,BC
 	LD	HL,(IX+-9)
+	LD	DE,BC
 	ADD	HL,DE
 	LD	IY,HL
 	LD	(IY+3),6
 ;   78	        module_SetHealthMax(&Ship.tactical[i].health, 50);
-.LINE 78
-
 	LD	DE,50
 	PUSH	DE
 	LD	HL,(IX+-9)
@@ -1768,8 +601,6 @@ L_9:
 	POP	BC
 	POP	BC
 ;   79	        module_SetPowerMax(&Ship.tactical[i].power);
-.LINE 79
-
 	LD	BC,(IX+-9)
 	LD	(IX+-55),BC
 	LD	HL,(IX+-5)
@@ -1782,14 +613,12 @@ L_9:
 	CALL	_module_SetPowerMax
 	POP	BC
 ;   80	        Ship.tactical[i].data.mod_shields.resistance = 10;
-.LINE 80
-
 	LD	HL,(IX+-5)
+	LD	DE,(IX+-9)
+	LD	BC,10
 	LD	A,54
 	CALL	__imul_b
-	LD	BC,(IX+-9)
-	ADD	HL,BC
-	LD	BC,10
+	ADD	HL,DE
 	LD	IY,HL
 	LD	(IY+27),BC
 	LD	BC,(IX+-5)
@@ -1797,8 +626,6 @@ L_9:
 	LD	(IX+-5),BC
 ;   81	    }
 L_11:
-.LINE 81
-
 	LD	BC,2
 	LD	HL,(IX+-5)
 	OR	A,A
@@ -1806,16 +633,10 @@ L_11:
 	JR	C,L_9
 ;   82	    do {
 L_87:
-.LINE 82
-
 ;   83	        unsigned char key = os_GetCSC();
-.LINE 83
-
 	CALL	_os_GetCSC
 	LD	(IX+-6),A
 ;   84	        Screen_RenderUI(screen, &Ship, &select);
-.LINE 84
-
 	LD	BC,_select
 	PUSH	BC
 	LD	BC,_Ship
@@ -1828,14 +649,10 @@ L_87:
 	POP	BC
 	POP	BC
 ;   85	        if(key == sk_Clear){
-.LINE 85
-
 	LD	A,(IX+-6)
 	CP	A,15
 	JR	NZ,L_21
 ;   86	            if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
-.LINE 86
-
 	LD	BC,(IX+-2)
 	LD.LIS	HL,255
 	OR	A,A
@@ -1847,24 +664,16 @@ L_87:
 	LD	(IX+-2),L
 	LD	(IX+-1),H
 ;   87	            else loopgame = false;
-.LINE 87
-
 	JR	L_21
 L_14:
 	LD	(IX+-20),0
 ;   88	        }
 L_21:
-.LINE 88
-
 ;   89	        if(key == sk_Yequ)
-.LINE 89
-
 	LD	A,(IX+-6)
 	CP	A,53
 	JR	NZ,L_27
 ;   90	            screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
-.LINE 90
-
 	LD.LIS	BC,1
 	LD	HL,(IX+-2)
 	OR	A,A
@@ -1882,14 +691,10 @@ L_19:
 	LD	(IX+-1),H
 L_27:
 ;   91	        if(key == sk_Window)
-.LINE 91
-
 	LD	A,(IX+-6)
 	CP	A,52
 	JR	NZ,L_33
 ;   92	            screen = (screen == SCRN_TACT) ? SCRN_OFF : SCRN_TACT;
-.LINE 92
-
 	LD.LIS	BC,2
 	LD	HL,(IX+-2)
 	OR	A,A
@@ -1907,14 +712,10 @@ L_25:
 	LD	(IX+-1),H
 L_33:
 ;   93	        if(key == sk_Zoom)
-.LINE 93
-
 	LD	A,(IX+-6)
 	CP	A,51
 	JR	NZ,L_39
 ;   94	            screen = (screen == SCRN_MAINS) ? SCRN_OFF : SCRN_MAINS;
-.LINE 94
-
 	LD.LIS	BC,3
 	LD	HL,(IX+-2)
 	OR	A,A
@@ -1932,14 +733,10 @@ L_31:
 	LD	(IX+-1),H
 L_39:
 ;   95	        if(key == sk_Trace)
-.LINE 95
-
 	LD	A,(IX+-6)
 	CP	A,50
 	JR	NZ,L_45
 ;   96	            screen = (screen == SCRN_TRANSPORT) ? SCRN_OFF : SCRN_TRANSPORT;
-.LINE 96
-
 	LD.LIS	BC,4
 	LD	HL,(IX+-2)
 	OR	A,A
@@ -1957,14 +754,10 @@ L_37:
 	LD	(IX+-1),H
 L_45:
 ;   97	        if(key == sk_Graph)
-.LINE 97
-
 	LD	A,(IX+-6)
 	CP	A,49
 	JR	NZ,L_49
 ;   98	            screen = (screen == SCRN_CARGO) ? SCRN_OFF : SCRN_CARGO;
-.LINE 98
-
 	LD.LIS	BC,5
 	LD	HL,(IX+-2)
 	OR	A,A
@@ -1982,14 +775,10 @@ L_43:
 	LD	(IX+-1),H
 L_49:
 ;   99	        if(key == sk_Enter){
-.LINE 99
-
 	LD	A,(IX+-6)
 	CP	A,9
 	JR	NZ,L_58
 ;  100	            if((screen == SCRN_MAINS) || (screen == SCRN_TACT))
-.LINE 100
-
 	LD.LIS	BC,3
 	LD	HL,(IX+-2)
 	OR	A,A
@@ -2002,8 +791,6 @@ L_49:
 	JR	NZ,L_58
 L_47:
 ;  101	                screen = setbits(screen, SCRN_INFO);
-.LINE 101
-
 	LD.LIS	BC,65280
 	LD	HL,(IX+-2)
 	CALL	__sor
@@ -2011,25 +798,17 @@ L_47:
 	LD	(IX+-1),H
 ;  102	        }
 L_58:
-.LINE 102
-
 ;  103	        if(key == sk_Square){
-.LINE 103
-
 	LD	A,(IX+-6)
 	CP	A,45
 	JR	NZ,L_72
 ;  104	            char i;
 ;  105	            char modnum = randInt(0, SYS_MAX - 1);
-.LINE 105
-
 	CALL	_random
 	LD	BC,6
 	CALL	__iremu
 	LD	(IX+-25),L
 ;  106	            char randnum = randInt(5, 10);
-.LINE 106
-
 	CALL	_random
 	LD	BC,6
 	CALL	__iremu
@@ -2037,14 +816,10 @@ L_58:
 	LEA	HL,IY+5
 	LD	(IX+-12),L
 ;  107	            for(i = 0; i < TACT_MAX; i++){
-.LINE 107
-
 	LD	(IX+-13),0
 	JR	L_55
 L_53:
 ;  108	                module_t *shield = &Ship.tactical[i];
-.LINE 108
-
 	LD	A,(IX+-13)
 	SEXT	HL
 	LD	L,(IX+-13)
@@ -2054,8 +829,6 @@ L_53:
 	ADD	HL,BC
 	LD	(IX+-16),HL
 ;  109	                if((shield->techtype == SHIELD) && shield->online){
-.LINE 109
-
 	LD	IY,(IX+-16)
 	LD	A,(IY+3)
 	CP	A,6
@@ -2065,8 +838,6 @@ L_53:
 	OR	A,A
 	JR	Z,L_54
 ;  110	                    int health = health_GetHealthPercent(&shield->health);
-.LINE 110
-
 	LD	IY,(IX+-16)
 	LEA	BC,IY+21
 	LD	(IX+-76),BC
@@ -2075,22 +846,16 @@ L_53:
 	POP	BC
 	LD	(IX+-52),HL
 ;  111	                    int drv = shield->data.mod_shields.resistance;
-.LINE 111
-
 	LD	IY,(IX+-16)
 	LD	BC,(IY+27)
 	LD	(IX+-28),BC
 ;  112	                    drv = health * drv / 100;
-.LINE 112
-
 	LD	HL,(IX+-52)
 	CALL	__imuls
 	LD	BC,100
 	CALL	__idivs
 	LD	(IX+-28),HL
 ;  113	                    health_DamageModule(&shield->health, -(randnum));
-.LINE 113
-
 	LD	A,(IX+-12)
 	SEXT	HL
 	LD	L,(IX+-12)
@@ -2101,8 +866,6 @@ L_53:
 	POP	BC
 	POP	BC
 ;  114	                    randnum -= drv;
-.LINE 114
-
 	LD	B,(IX+-28)
 	LD	A,(IX+-12)
 	SUB	A,B
@@ -2110,16 +873,12 @@ L_53:
 ;  115	                }
 ;  116	            }
 L_54:
-.LINE 116
-
 	INC	(IX+-13)
 L_55:
 	LD	A,(IX+-13)
 	CP	A,6
 	JP	M,L_53
 ;  117	            health_DamageModule(&Ship.hull.health, -(randnum));
-.LINE 117
-
 	LD	A,(IX+-12)
 	SEXT	HL
 	LD	L,(IX+-12)
@@ -2131,8 +890,6 @@ L_55:
 	POP	BC
 	POP	BC
 ;  118	            health_DamageModule(&Ship.system[modnum].health, -(randnum));
-.LINE 118
-
 	LD	A,(IX+-12)
 	SEXT	HL
 	LD	L,(IX+-12)
@@ -2152,22 +909,15 @@ L_55:
 	POP	BC
 ;  119	        }
 L_72:
-.LINE 119
-
 ;  120	        if(key == sk_Down) {
-.LINE 120
-
 	LD	A,(IX+-6)
 	CP	A,1
 	JR	NZ,L_86
 ;  121	            char i;
 ;  122	            switch(screen){
-.LINE 122
-
 	LD	BC,(IX+-2)
 	CALL	__stoiu
-	CALL	__case8D
-	JP	(HL)
+	CALL	__case8
 L__26:
 	DW	2
 	DB	1
@@ -2180,19 +930,13 @@ L__26:
 
 ;  123	                case 1:
 L_59:
-.LINE 123
-
 ;  124	                    for(i = select.tactical + 1; i < (TACT_MAX - 1); i++){
-.LINE 124
-
 	LD	A,(_select+3)
 	INC	A
 	LD	(IX+-10),A
 	JR	L_65
 L_63:
 ;  125	                        int type = Ship.tactical[i].techtype;
-.LINE 125
-
 	LD	A,(IX+-10)
 	SEXT	HL
 	LD	L,(IX+-10)
@@ -2206,11 +950,8 @@ L_63:
 	LD	L,A
 	LD	(IX+-31),HL
 ;  126	                        if( type == SHIELD || type == ARMOR ){
-.LINE 126
-
-	LD	BC,6
-	LD	HL,(IX+-31)
 	OR	A,A
+	LD	BC,6
 	SBC	HL,BC
 	JR	Z,L_62
 	LD	BC,7
@@ -2220,21 +961,15 @@ L_63:
 	JR	NZ,L_64
 L_62:
 ;  127	                            select.tactical = i;
-.LINE 127
-
 	LD	A,(IX+-10)
 	SEXT	HL
 	LD	L,(IX+-10)
 	LD	(_select+3),HL
 ;  128	                            break;
-.LINE 128
-
 	JR	L_86
 ;  129	                        }
 ;  130	                    }
 L_64:
-.LINE 130
-
 	INC	(IX+-10)
 L_65:
 	LD	A,(IX+-10)
@@ -2242,16 +977,10 @@ L_65:
 	CALL	__setflag
 	JP	M,L_63
 ;  131	                    break;
-.LINE 131
-
 	JR	L_86
 ;  132	                case 3:
 L_67:
-.LINE 132
-
 ;  133	                    if(select.mains < (SYS_MAX - 1)) select.mains++;
-.LINE 133
-
 	LD	BC,5
 	LD	HL,(_select)
 	OR	A,A
@@ -2264,22 +993,15 @@ L_67:
 ;  135	            }
 ;  136	        }
 L_86:
-.LINE 136
-
 ;  137	        if(key == sk_Up){
-.LINE 137
-
 	LD	A,(IX+-6)
 	CP	A,4
 	JR	NZ,L_88
 ;  138	            char i;
 ;  139	            switch(screen){
-.LINE 139
-
 	LD	BC,(IX+-2)
 	CALL	__stoiu
-	CALL	__case8D
-	JP	(HL)
+	CALL	__case8
 L__32:
 	DW	2
 	DB	1
@@ -2292,19 +1014,13 @@ L__32:
 
 ;  140	                case 1:
 L_73:
-.LINE 140
-
 ;  141	                    for(i = select.tactical - 1; i >= 0; i--){
-.LINE 141
-
 	LD	A,(_select+3)
 	DEC	A
 	LD	(IX+-11),A
 	JR	L_79
 L_77:
 ;  142	                        int type = Ship.tactical[i].techtype;
-.LINE 142
-
 	LD	A,(IX+-11)
 	SEXT	HL
 	LD	L,(IX+-11)
@@ -2318,11 +1034,8 @@ L_77:
 	LD	L,A
 	LD	(IX+-37),HL
 ;  143	                        if( type == SHIELD || type == ARMOR ){
-.LINE 143
-
-	LD	BC,6
-	LD	HL,(IX+-37)
 	OR	A,A
+	LD	BC,6
 	SBC	HL,BC
 	JR	Z,L_76
 	LD	BC,7
@@ -2332,37 +1045,25 @@ L_77:
 	JR	NZ,L_78
 L_76:
 ;  144	                            select.tactical = i;
-.LINE 144
-
 	LD	A,(IX+-11)
 	SEXT	HL
 	LD	L,(IX+-11)
 	LD	(_select+3),HL
 ;  145	                            break;
-.LINE 145
-
 	JR	L_88
 ;  146	                        }
 ;  147	                    }
 L_78:
-.LINE 147
-
 	DEC	(IX+-11)
 L_79:
 	LD	A,(IX+-11)
 	OR	A,A
 	JP	P,L_77
 ;  148	                    break;
-.LINE 148
-
 	JR	L_88
 ;  149	                case 3:
 L_81:
-.LINE 149
-
 ;  150	                    if(select.mains > 0) select.mains--;
-.LINE 150
-
 	LD	BC,(_select)
 	OR	A,A
 	SBC	HL,HL
@@ -2378,32 +1079,22 @@ L_81:
 ;  154	            
 ;  155	    } while(loopgame == true);
 L_88:
-.LINE 155
-
 	LD	A,(IX+-20)
 	CP	A,1
 	JR	Z,L_87
 ;  156	    free(gfx_sprites);
-.LINE 156
-
 	LD	BC,(IX+-24)
 	PUSH	BC
 	CALL	_free
 	POP	BC
 ;  157	    gfx_End();
-.LINE 157
-
 	CALL	_gfx_End
 ;  158	    int_Enable();
-.LINE 158
-
 ei
 ;  159	    pgrm_CleanUp();
 ;  160	    return;
 ;  161	}
 L_91:
-.LINE 161
-
 	LD	SP,IX
 	POP	IX
 	RET	
@@ -2464,7 +1155,6 @@ L_91:
 ;       Spill Code: 0 (instruction)
 
 
-.ENDFUNC "main",161,"_main"
 	SEGMENT STRSECT
 L__1:
 	DB	"r"
@@ -2500,9 +1190,10 @@ L__2:
 	XREF __iremu:ROM
 	XREF __sxor:ROM
 	XREF __stoiu:ROM
+	XREF __frameset:ROM
 	XREF __setflag:ROM
 	XREF __icmpzero:ROM
-	XREF __case8D:ROM
+	XREF __case8:ROM
 	XREF __imul_b:ROM
 	XDEF _main
 	XDEF _select
