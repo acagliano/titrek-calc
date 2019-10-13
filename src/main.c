@@ -34,6 +34,7 @@
 #include "classes/screens.h"
 #include "statscreens.h"
 #include "gfx/trekgui.h"
+#include "gfx-engine/gui.h"
 /* Put your function prototypes here */
 #define setbits(bits, mask) (bits|mask)
 #define resbits(bits, mask) (bits^mask)
@@ -46,6 +47,7 @@ void main(void) {
     bool loopgame = true;
     unsigned int i;
     ti_var_t appvar;
+    uint8_t opt = 0;
     gfx_rletsprite_t* gfx_sprites = malloc(trekgui_uncompressed_size);
     gfx_Begin();
     srandom(rtc_Time());
@@ -61,6 +63,12 @@ void main(void) {
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
+    while(1){
+        opt = gfx_RenderSplash();
+        if(opt == OPT_PLAY) break;
+        if(opt == OPT_QUIT) {loopgame = false; break;}
+        if(opt == OPT_ABOUT || opt == OPT_SETTINGS){}
+    }
     module_SetHealthMax(&Ship.hull.health, 1000);
     for(i = 0; i < SYS_MAX; i++){
        // Ship.system[i].techclass = MC_SYSTEM;

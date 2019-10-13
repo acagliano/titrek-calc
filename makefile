@@ -30,4 +30,5 @@ GFXDIR ?= src/gfx
 
 USE_FLASH_FUNCTIONS ?= NO
 
+CEDEV=/Users/acagliano/CEdev
 include $(CEDEV)/include/.makefile

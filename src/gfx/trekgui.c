@@ -3,35 +3,36 @@
 #include "trekgui.h"
 
 #include <fileioc.h>
-uint8_t *trekgui[28] = {
+uint8_t *trekgui[29] = {
  (uint8_t*)0,
- (uint8_t*)13150,
- (uint8_t*)26128,
- (uint8_t*)28260,
- (uint8_t*)30189,
- (uint8_t*)32122,
- (uint8_t*)33462,
- (uint8_t*)33551,
- (uint8_t*)33642,
- (uint8_t*)33746,
- (uint8_t*)33816,
- (uint8_t*)33909,
- (uint8_t*)34018,
- (uint8_t*)34202,
- (uint8_t*)34586,
- (uint8_t*)34836,
- (uint8_t*)34958,
- (uint8_t*)35078,
- (uint8_t*)35234,
- (uint8_t*)35342,
- (uint8_t*)35534,
- (uint8_t*)35666,
- (uint8_t*)35776,
- (uint8_t*)35874,
- (uint8_t*)36085,
- (uint8_t*)36311,
- (uint8_t*)36369,
- (uint8_t*)36473,
+ (uint8_t*)13818,
+ (uint8_t*)26968,
+ (uint8_t*)39946,
+ (uint8_t*)42078,
+ (uint8_t*)44007,
+ (uint8_t*)45940,
+ (uint8_t*)47280,
+ (uint8_t*)47369,
+ (uint8_t*)47460,
+ (uint8_t*)47564,
+ (uint8_t*)47634,
+ (uint8_t*)47727,
+ (uint8_t*)47836,
+ (uint8_t*)48020,
+ (uint8_t*)48404,
+ (uint8_t*)48654,
+ (uint8_t*)48776,
+ (uint8_t*)48896,
+ (uint8_t*)49052,
+ (uint8_t*)49160,
+ (uint8_t*)49352,
+ (uint8_t*)49484,
+ (uint8_t*)49594,
+ (uint8_t*)49692,
+ (uint8_t*)49903,
+ (uint8_t*)50129,
+ (uint8_t*)50187,
+ (uint8_t*)50291,
 };
 
 bool trekgui_init(void *decompressed_addr) {
@@ -41,5 +42,5 @@ bool trekgui_init(void *decompressed_addr) {
     for (i = 0; i < trekgui_num; i++) {
         trekgui[i] += data;
     }
-
+    return 1;
 }

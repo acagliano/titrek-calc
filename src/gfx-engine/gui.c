@@ -1,10 +1,11 @@
 #include <graphx.h>
 #include <stdint.h>
+#include <tice.h>
 #include "../gfx/trekgui.h"
 #include "../classes/ships.h"
 #include "../gfx/moduleicons.h"
 
-#define MODICON_START 17
+#define MODICON_START 18
 gfx_rletsprite_t* modicons[TARG_SENS + 1] = {
     0
 };
@@ -28,4 +29,31 @@ void gfx_InitModuleIcons(void){
     for(i = 0; i < ct; i++){
         modicons[i] = ((gfx_rletsprite_t*)trekgui[src++]);
     }
+}
+
+uint8_t gfx_RenderSplash(void){
+    uint24_t text_x = 60;
+    uint8_t text_y = 140;
+    uint24_t key = 0;
+    uint8_t selected = 0;
+    gfx_ZeroScreen();
+    gfx_RLETSprite(splash, 320 - 260, 20);
+    gfx_SetTextFGColor(229);
+    gfx_PrintStringXY("Play Game", text_x, text_y);
+    gfx_PrintStringXY("Settings", text_x, text_y + 15);
+    gfx_PrintStringXY("About Game", text_x, text_y + 30);
+    gfx_PrintStringXY("Quit Game", text_x, text_y + 45);
+    while((key = os_GetCSC()) != sk_Enter){
+        if(key){
+            gfx_SetColor(0);
+            gfx_FillCircle(text_x - 10, selected * 15 + text_y + 3, 4);
+        }
+        if(key == sk_Up) selected -= (selected > 0);
+        if(key == sk_Down) selected += (selected < 3);
+        if(key == sk_Clear) {selected = 3; break;}
+        gfx_SetColor(229);
+        gfx_FillCircle(text_x - 10, selected * 15 + text_y + 3, 4);
+        gfx_BlitBuffer();
+    }
+    return selected;
 }
