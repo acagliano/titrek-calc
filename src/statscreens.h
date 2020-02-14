@@ -16,6 +16,7 @@ void Screen_UIInventory(void);
 void Screen_UITransporter(void);
 void Screen_UIReplicator(void);
 void Screen_UISensors(void);
+void Overlay_UIModuleInfo(module_t* module);
 
 int Stats_DrawHealthBar(unsigned int percent, unsigned int length, int x, int y, unsigned char border_color, unsigned char bar_color, gfx_rletsprite_t* icon);
 void Screen_Background(unsigned char active);

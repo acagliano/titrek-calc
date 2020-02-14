@@ -1,12 +1,19 @@
 opened convpng.ini
 
+--- internal (C) ---
+using built-in xlibc palette ...
+warning: might ignore transparent color value for a fixed palette.
+transparent color index : 0
+transparent color : 0x0000
+1:
+ splash : converted! (34952 > 3775 bytes)
+
 --- guiicons (C) ---
 using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-18:
- splash : converted!
+17:
  shipinterior_left : converted!
  shipinterior_right : converted!
  icon_shieldsstable : converted!
@@ -44,7 +51,6 @@ transparent color : 0x0000
  targsens : converted!
 
 exporting appvar: trekgui.8xv
- splash
  shipinterior_left
  shipinterior_right
  icon_shieldsstable
@@ -73,9 +79,9 @@ exporting appvar: trekgui.8xv
  phasers
  torpedo
  targsens
-compression: (50427 > 10113 bytes)
+compression: (36609 > 6340 bytes)
 
-converted in 1 s
+converted in 0 s
 
 [warning] image quality might be too low.
 please try grouping similar images, reducing image colors, 

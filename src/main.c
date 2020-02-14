@@ -35,6 +35,7 @@
 #include "statscreens.h"
 #include "gfx/trekgui.h"
 #include "gfx-engine/gui.h"
+#include "gfx/internal.h"
 /* Put your function prototypes here */
 #define setbits(bits, mask) (bits|mask)
 #define resbits(bits, mask) (bits^mask)
@@ -49,12 +50,14 @@ void main(void) {
     ti_var_t appvar;
     uint8_t opt = 0;
     gfx_rletsprite_t* gfx_sprites = malloc(trekgui_uncompressed_size);
+    gfx_rletsprite_t* splash = malloc(splash_width * splash_height);
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
     if(!gfx_sprites) return;
     if(!(appvar = ti_Open("trekgui", "r"))) return;
     zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
+    zx7_Decompress(splash, splash_compressed);
     trekgui_init(gfx_sprites);
     gfx_InitModuleIcons();
     ti_CloseAll();
@@ -64,7 +67,7 @@ void main(void) {
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
     while(1){
-        opt = gfx_RenderSplash();
+        opt = gfx_RenderSplash(splash);
         if(opt == OPT_PLAY) break;
         if(opt == OPT_QUIT) {loopgame = false; break;}
         if(opt == OPT_ABOUT || opt == OPT_SETTINGS){}
@@ -129,7 +132,7 @@ void main(void) {
         if(key == sk_Down) {
             char i;
             switch(screen){
-                case 1:
+                case SCRN_TACT:
                     for(i = select.tactical + 1; i < (TACT_MAX - 1); i++){
                         int type = Ship.tactical[i].techtype;
                         if( type == SHIELD || type == ARMOR ){
@@ -138,7 +141,7 @@ void main(void) {
                         }
                     }
                     break;
-                case 3:
+                case SCRN_MAINS:
                     if(select.mains < (SYS_MAX - 1)) select.mains++;
                     break;
             }
@@ -146,7 +149,7 @@ void main(void) {
         if(key == sk_Up){
             char i;
             switch(screen){
-                case 1:
+                case SCRN_TACT:
                     for(i = select.tactical - 1; i >= 0; i--){
                         int type = Ship.tactical[i].techtype;
                         if( type == SHIELD || type == ARMOR ){
@@ -155,7 +158,7 @@ void main(void) {
                         }
                     }
                     break;
-                case 3:
+                case SCRN_MAINS:
                     if(select.mains > 0) select.mains--;
                     break;
             }

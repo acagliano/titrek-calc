@@ -20,7 +20,7 @@
 
 char mains_title[] = "[MAIN SYS]";
 char tact_title[] = "[TACTICAL SYS]";
-char version[] = "v0.86 pre-alpha";
+char version[] = "v0.87 pre-alpha";
 
 char moduledb[][12] = {
     "LifeSup",
@@ -34,6 +34,19 @@ char moduledb[][12] = {
     "Phasers",
     "Torpedo",
     "TargSens"
+};
+char modulenames[][20] = {
+    "Life Support",
+    "Warp Core",
+    "Warp Drive",
+    "Sublight Engines",
+    "Nav Sensors",
+    "Transporter",
+    "Shields",
+    "Hull Armor",
+    "Phasers",
+    "Torpedo",
+    "Targetting Sensors"
 };
 
 int text_GetCenterX(char* string){
@@ -54,17 +67,18 @@ void Screen_RenderUI(uint24_t screen, ship_t* Ship, selected_t* select){
             break;
         case SCRN_TACT:
             Screen_UITacticalStats(&Ship->tactical, select->tactical);
+            if(screen > 0xff)
+                Overlay_UIModuleInfo(&Ship->tactical[select->tactical]);
             break;
         case SCRN_MAINS:
             Screen_UISystemStats(&Ship->system, select->mains);
+            if(screen > 0xff)
+                Overlay_UIModuleInfo(&Ship->system[select->mains]);
             break;
         case SCRN_TRANSPORT:
             break;
         case SCRN_CARGO:
             break;
-    }
-    if(screen > 0xff) {
-        gfx_PrintStringXY("Info Window Here", 60, 100);
     }
     gfx_BlitBuffer();
     gfx_SetTextFGColor(0);
@@ -166,7 +180,36 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
 }
 
 
-
+void Overlay_UIModuleInfo(module_t* module) {
+    int24_t health = health_GetHealthPercent(&module->health),
+            power = power_GetBatteryPercent(&module->power);
+    uint24_t x = 60, width = 200;
+    uint8_t y = 30, height = 110;
+    uint24_t text_x = x + 4;
+    uint8_t text_y = y + 4;
+    uint24_t techtype = module->techtype;
+    gfx_SetTextFGColor(0);
+    gfx_RenderWindow(x, y, width, height, 139, 205, 3);
+    gfx_FillRectangleColor(139, x + 2, y + 2, width - 4, 16);
+    gfx_RLETSprite(modicons[techtype], text_x + 2, y + 2);
+    gfx_PrintStringXY(modulenames[techtype], text_x + 20, text_y + 2);
+    text_y += 17;
+    gfx_RLETSprite(icon_health, text_x, text_y - 2);
+    stats_DrawHealthBar(health, 130, text_x + 15, text_y, 0, 149, 77);
+    gfx_SetTextXY(text_x + 15 + 135, text_y);
+    gfx_PrintUInt(health, 1 + (health > 9) + (health > 99));
+    gfx_PrintString("%");
+    text_y += 12;
+    gfx_RLETSprite(icon_sourcereserve, text_x, text_y - 2);
+    stats_DrawHealthBar(power, 130, text_x + 15, text_y, 0, 149, 77);
+    gfx_SetTextXY(text_x + 15 + 135, text_y);
+    gfx_PrintUInt(power, 1 + (power > 9) + (power > 99));
+    gfx_PrintString("%");
+    text_y += 12;
+    gfx_PrintStringXY("Status: ", text_x + 2, text_y);
+    if(module->online) gfx_PrintString("Online");
+    else gfx_PrintString("Offline");
+}
 
 
 

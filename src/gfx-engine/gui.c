@@ -5,7 +5,7 @@
 #include "../classes/ships.h"
 #include "../gfx/moduleicons.h"
 
-#define MODICON_START 18
+#define MODICON_START 17
 gfx_rletsprite_t* modicons[TARG_SENS + 1] = {
     0
 };
@@ -31,7 +31,7 @@ void gfx_InitModuleIcons(void){
     }
 }
 
-uint8_t gfx_RenderSplash(void){
+uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash){
     uint24_t text_x = 60;
     uint8_t text_y = 140;
     uint24_t key = 0;
@@ -57,3 +57,10 @@ uint8_t gfx_RenderSplash(void){
     }
     return selected;
 }
+
+ void gfx_RenderWindow(uint24_t x, uint8_t y, uint24_t width, uint8_t height, uint8_t borderColor, uint8_t windowColor, uint8_t borderSize){
+    gfx_SetColor(borderColor);
+    gfx_FillRectangle(x, y, width, height);
+    gfx_SetColor(windowColor);
+    gfx_FillRectangle(x + borderSize, y + borderSize, width - (borderSize<<1), height - (borderSize<<1));
+ }
