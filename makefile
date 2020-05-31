@@ -7,7 +7,7 @@
 # ** Add all shared library names to L **
 # ----------------------------
 
-NAME        ?= STARTREK
+NAME        ?= TITREK
 DEBUGMODE   ?= NDEBUG
 COMPRESSED  ?= NO
 ICON        ?= iconc.png
@@ -30,5 +30,5 @@ GFXDIR ?= src/gfx
 
 USE_FLASH_FUNCTIONS ?= NO
 
-CEDEV=/Users/acagliano/CEdev
+CEDEV=/Users/acagliano/CEdev-srldrvce
 include $(CEDEV)/include/.makefile

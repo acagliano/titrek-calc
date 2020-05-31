@@ -23,6 +23,11 @@ enum ModuleTypes {
     TARG_SENS
 };
 
+enum ModuleClasses {
+    mUnassigned = 0,
+    mSystem,
+    mTactical
+};
 
 
 #endif

@@ -1,3 +1,4 @@
+
 #include <tice.h>
 #include <string.h>
 #include "classes/ships.h"
@@ -66,12 +67,12 @@ void Screen_RenderUI(uint24_t screen, ship_t* Ship, selected_t* select){
         case SCRN_SENS:
             break;
         case SCRN_TACT:
-            Screen_UITacticalStats(&Ship->tactical, select->tactical);
+            Screen_UITacticalStats(&Ship->system, MAX_MODULES, select->tactical);
             if(screen > 0xff)
-                Overlay_UIModuleInfo(&Ship->tactical[select->tactical]);
+                Overlay_UIModuleInfo(&Ship->system[select->tactical]);
             break;
         case SCRN_MAINS:
-            Screen_UISystemStats(&Ship->system, select->mains);
+            Screen_UISystemStats(&Ship->system, MAX_MODULES, select->mains);
             if(screen > 0xff)
                 Overlay_UIModuleInfo(&Ship->system[select->mains]);
             break;
@@ -85,51 +86,56 @@ void Screen_RenderUI(uint24_t screen, ship_t* Ship, selected_t* select){
     return;
 }
 
-void Screen_UISystemStats(module_t* systems, uint24_t selected){
-    unsigned char i, cur_y;
+void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selected){
+    unsigned char i, j = 0, cur_y;
     int cur_x;
     gfx_RLETSprite(mains_display, viewer_x, viewer_y - 3);
     gfx_PrintStringXY(mains_title, viewer_x + 30, viewer_y + 1);
-    for(i = 0; i < SYS_MAX; i++){
+    for(i = 0; i < syscount; i++){
         // loop module health display
         module_t* module = &systems[i];
-        cur_y = i * 18 + viewer_y + 14;
-        cur_x = viewer_x + 40;
-        if(selected == i) {
-            gfx_SetColor(230);
-            gfx_FillRectangle(cur_x - 6, cur_y, 6, 16);
+        if(module->modclass == mSystem){
+            cur_y = j * 18 + viewer_y + 14;
+            cur_x = viewer_x + 40;
+            if(selected == i) {
+                gfx_SetColor(230);
+                gfx_FillRectangle(cur_x - 6, cur_y, 6, 16);
+            }
+            gfx_SetColor(255);
+            gfx_SetTextXY(cur_x, cur_y);
+            module_RenderGeneral(module, cur_x, cur_y);
+            j++;
         }
-        gfx_SetColor(255);
-        gfx_SetTextXY(cur_x, cur_y);
-        module_RenderGeneral(module, cur_x, cur_y);
-       
     }
     return;
 }
 
-void Screen_UITacticalStats(module_t* tactical, uint24_t selected){
-    unsigned char i, cur_y = viewer_y + 20;
+void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selected){
+    unsigned char i, j=0, cur_y = viewer_y + 20;
     int cur_x = viewer_x;
     uint24_t shield_health = 0, shield_resist = 0, shield_num = 0;
     bool shields_active = false;
     gfx_RLETSprite(tactical_display, viewer_x, viewer_y - 3);
     gfx_PrintStringXY(tact_title, viewer_x + 37, viewer_y + 1);
-    for(i = 0; i < TACT_MAX; i++){
-        int temp_y = 18 * i + viewer_y + 14;
+    for(i = 0; i < syscount; i++){
+        int temp_y = 18 * j + viewer_y + 14;
         int temp_x = cur_x + 90;
-        module_t* module = &tactical[i];
-        if(selected == i) {
-            gfx_SetColor(230);
-            gfx_FillRectangle(temp_x - 6, temp_y, 6, 16);
-        }
-        module_RenderGeneral(module, temp_x, temp_y);
-        if(module->techtype == SHIELD){
-            if(module->online){
-                shields_active = true;
-                shield_health += health_GetHealthPercent(&module->health);
-                shield_resist *= module->data.mod_shields.resistance;
-                shield_num++;
+        module_t* module = &systems[i];
+        if(module->modclass == mTactical){
+            if(selected == i) {
+                gfx_SetColor(230);
+                gfx_FillRectangle(temp_x - 6, temp_y, 6, 16);
             }
+            module_RenderGeneral(module, temp_x, temp_y);
+            if(module->techtype == SHIELD){
+                if(module->online){
+                    shields_active = true;
+                    shield_health += health_GetHealthPercent(&module->health);
+                    shield_resist *= module->data.mod_shields.resistance;
+                    shield_num++;
+                }
+            }
+            j++;
         }
     }
         if(shields_active) {
@@ -146,7 +152,7 @@ void Screen_UITacticalStats(module_t* tactical, uint24_t selected){
         }
         gfx_RLETSprite(icon_hullinteg, cur_x, cur_y - 1);
         cur_x += 12;
-        stats_DrawHealthBar(health_GetHealthPercent(&tactical[TACT_MAX].health), 60, cur_x, cur_y, 33, 107, 74);
+     //   stats_DrawHealthBar(health_GetHealthPercent(&systems[TACT_MAX].health), 60, cur_x, cur_y, 33, 107, 74);
 }
 
 
@@ -159,7 +165,7 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
     uint24_t x_space = vWidth - (x + 10);
     uint24_t width = (x_space > 200) ? 200 : x_space;
     gfx_RectangleColor(229, x, y, width, 16);
-    if(module->assigned){
+    if(module->modclass){
         uint8_t techtype = module->techtype;
         uint24_t barwidth;
         x_space -= 90;

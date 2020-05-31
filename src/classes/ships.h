@@ -121,7 +121,8 @@ typedef union Data_t {
 
 
 typedef struct {
-    bool unlocked, assigned;
+    bool unlocked;
+    uint8_t modclass;
     unsigned char techid;
     unsigned char techtype;     // locked, determines compatible tech type
 //    unsigned char techclass;    // locked, determines compatible module classes
@@ -141,11 +142,11 @@ char module_SetOnlineState(module_t* module, char state);   // set module state 
 // EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
 
 #define TACT_MAX 6
+#define MAX_MODULES (TACT_MAX + SYS_MAX)
 typedef struct {
     coords_t coords;
     uint24_t crew;
-    module_t system[SYS_MAX];
-    module_t tactical[TACT_MAX];
+    module_t system[MAX_MODULES];
     module_t hull;
 } ship_t;
 // Core system defines

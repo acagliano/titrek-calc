@@ -9,8 +9,8 @@
 extern char mainsys_strings[][10];
 
 void Screen_RenderUI(uint24_t screen, ship_t* modules, selected_t* select);
-void Screen_UISystemStats(module_t* systems, uint24_t selected);
-void Screen_UITacticalStats(module_t* tactical, uint24_t selected);
+void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selected);
+void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selected);
 void Screen_UIViewer(void);
 void Screen_UIInventory(void);
 void Screen_UITransporter(void);
