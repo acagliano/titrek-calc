@@ -13,22 +13,21 @@ COMPRESSED  ?= NO
 ICON        ?= iconc.png
 DESCRIPTION ?= "Star Trek Multiplayer"
 
-L ?= graphx fileioc keypadc
+L ?= graphx fileioc keypadc srldrvce
 
 # ----------------------------
-# Specify source and output locations
+# Other Options (Advanced)
 # ----------------------------
 
-SRCDIR ?= src
-OBJDIR ?= obj
-BINDIR ?= bin
-GFXDIR ?= src/gfx
+#EXTRA_CFLAGS        ?=
+#USE_FLASH_FUNCTIONS ?= YES|NO
+#OUTPUT_MAP          ?= YES|NO
+#ARCHIVED            ?= YES|NO
+#OPT_MODE            ?= -optsize|-optspeed
+#SRCDIR              ?= src
+#OBJDIR              ?= obj
+#BINDIR              ?= bin
+#GFXDIR              ?= src/gfx
+#V                   ?= 1
 
-# ----------------------------
-# Use OS helper functions (Advanced)
-# ----------------------------
-
-USE_FLASH_FUNCTIONS ?= NO
-
-CEDEV=/Users/acagliano/CEdev-srldrvce
 include $(CEDEV)/include/.makefile

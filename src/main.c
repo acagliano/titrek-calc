@@ -47,6 +47,28 @@
 
 ship_t Ship = {0};
 selected_t select = {0, 0};
+usb_device_t usb_device = NULL;
+srl_device_t srl;
+gfx_UninitedRLETSprite(gfx_sprites, trekgui_uncompressed_size);
+
+/* Main Menu */
+
+void PlayGame(void);
+void ExitGame(void);
+
+void MainMenu(void) {
+    uint8_t opt = 0;
+    gfx_UninitedRLETSprite(splash, splash_width * splash_height);
+    zx7_Decompress(splash, splash_compressed);
+    while(1){
+        opt = gfx_RenderSplash(splash);
+            if(opt == OPT_PLAY) PlayGame();
+            if(opt == OPT_QUIT) break;
+            if(opt == OPT_ABOUT || opt == OPT_SETTINGS){}
+        }
+    }
+
+
 
 /* Handle USB events */
 static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
@@ -68,66 +90,64 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 }
 
 void main(void) {
-    uint16_t screen = 0;
-    bool loopgame = true;
+    usb_error_t usb_error;
+    uint8_t usb_timeout = 0xff;
+    srl_error_t srl_error;
+    uint8_t srl_buf[2048];
     unsigned int i;
-    ti_var_t appvar;
-    uint8_t opt = 0;
-    gfx_rletsprite_t* gfx_sprites = malloc(trekgui_uncompressed_size);
-    gfx_rletsprite_t* splash = malloc(splash_width * splash_height);
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
-    if(!gfx_sprites) return;
-    if(!(appvar = ti_Open("trekgui", "r"))) return;
-    zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
-    zx7_Decompress(splash, splash_compressed);
-    trekgui_init(gfx_sprites);
-    gfx_InitModuleIcons();
-    ti_CloseAll();
     int_Disable();
+    
+    usb_error = usb_Init(handle_usb_event, &usb_device, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
+    if(usb_error) goto error;
+    
+    while(!usb_device && usb_timeout--) {
+           kb_Scan();
+
+           /* Exit if clear is pressed */
+           if(kb_IsDown(kb_KeyClear)) {
+               goto error;
+           }
+           /* Handle any USB events that have occured */
+           usb_HandleEvents();
+       }
+    srl_error = srl_Init(&srl, usb_device, srl_buf, sizeof(srl_buf), SRL_INTERFACE_ANY);
+    if(srl_error) goto error;
     gfx_SetDefaultPalette(gfx_8bpp);
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
-mainmenu:
-    while(1){
-        opt = gfx_RenderSplash(splash);
-        if(opt == OPT_PLAY) goto play;
-        if(opt == OPT_QUIT) goto exit;
-        if(opt == OPT_ABOUT || opt == OPT_SETTINGS){}
-    }
-play:
-	usb_error_t usb_error;
-	srl_error_t srl_error;
-	usb_device_t usb_device = NULL;
-	srl_device_t srl;
-	/* A buffer for internal use by the serial library */
-	uint8_t srl_buf[2048];
-	/* Initialize the USB driver with our event handler and the serial device descriptors */
-	usb_error = usb_Init(handle_usb_event, &usb_device, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
-	if(usb_error) goto exit;
+    MainMenu();
+error:
+    usb_Cleanup();
+    gfx_End();
+    int_Enable();
+    pgrm_CleanUp();
+    return;
+}
 
-	/* Wait for a USB device to be connected */
-	while(!usb_device) {
-		kb_Scan();
 
-		/* Exit if clear is pressed */
-		if(kb_IsDown(kb_KeyClear)) {
-			goto exit;
-		}
-		/* Handle any USB events that have occured */
-		usb_HandleEvents();
-	}
+void PlayGame(void){
+    /* A buffer for internal use by the serial library */
+    ti_var_t appvar;
+    uint16_t screen = 0;
+    bool loopgame = true;
+    if(!gfx_sprites) return;
+    if(!(appvar = ti_Open("trekgui", "r"))) return;
+    zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
+    trekgui_init(gfx_sprites);
+    gfx_InitModuleIcons();
 
-	/* Initialize the serial library with the USB device */
-	srl_error = srl_Init(&srl, usb_device, srl_buf, sizeof(srl_buf), SRL_INTERFACE_ANY);
-	if(srl_error) goto exit;
+    /* Wait for a USB device to be connected */
+   
 
-	do {
-		/* A buffer to store bytes read by the serial library */
+    /* Initialize the serial library with the USB device */
+    do {
+        /* A buffer to store bytes read by the serial library */
         char in_buf[64];
-		size_t bytes_read;
+        size_t bytes_read;
         unsigned char key = os_GetCSC();
                Screen_RenderUI(screen, &Ship, &select);
                if(key == sk_Clear){
@@ -212,24 +232,21 @@ play:
                    }
                }
 
-		usb_HandleEvents();
+        usb_HandleEvents();
 
-		/* If the device was disconnected, exit */
-		if(!usb_device) break; // here, can we `goto` the main menu?
-		/* Read up to 64 bytes from serial */
-		bytes_read = srl_Read(&srl, in_buf, sizeof(in_buf));
-		/* Only write when bytes were received */
-		if(bytes_read) {
-			/* Write the same bytes back to the other device */
-			srl_Write(&srl, in_buf, bytes_read);
-		}
+        /* If the device was disconnected, exit */
+        if(!usb_device) break; // here, can we `goto` the main menu?
+        /* Read up to 64 bytes from serial */
+        bytes_read = srl_Read(&srl, in_buf, sizeof(in_buf));
+        /* Only write when bytes were received */
+        if(bytes_read) {
+            /* Write the same bytes back to the other device */
+            srl_Write(&srl, in_buf, bytes_read);
+        }
 
-	} while(loopgame);
-exit:
-    usb_Cleanup();
-    free(gfx_sprites);
-    gfx_End();
-    int_Enable();
-    pgrm_CleanUp();
-    return;
+    } while(loopgame);
+}
+
+void ExitGame(void){
+   
 }
