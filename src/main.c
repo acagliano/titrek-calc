@@ -54,7 +54,6 @@ gfx_UninitedRLETSprite(gfx_sprites, trekgui_uncompressed_size);
 /* Main Menu */
 
 void PlayGame(void);
-void ExitGame(void);
 
 void MainMenu(void) {
     uint8_t opt = 0;
@@ -245,8 +244,4 @@ void PlayGame(void){
         }
 
     } while(loopgame);
-}
-
-void ExitGame(void){
-   
 }
