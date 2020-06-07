@@ -31,7 +31,7 @@ void gfx_InitModuleIcons(void){
     }
 }
 
-uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash){
+uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash, bool net){
     uint24_t text_x = 60;
     uint8_t text_y = 140;
     uint24_t key = 0;
@@ -43,6 +43,11 @@ uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash){
     gfx_PrintStringXY("Settings", text_x, text_y + 15);
     gfx_PrintStringXY("About Game", text_x, text_y + 30);
     gfx_PrintStringXY("Quit Game", text_x, text_y + 45);
+    if(!net) {
+        gfx_SetTextFGColor(224);
+        gfx_PrintStringXY("Networking disabled!", text_x + 100, text_y + 45);
+    }
+    
     while((key = os_GetCSC()) != sk_Enter){
         if(key){
             gfx_SetColor(0);
