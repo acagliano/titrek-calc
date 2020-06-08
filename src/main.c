@@ -144,6 +144,7 @@ void PlayGame(void){
     if(!(appvar = ti_Open("trekgui", "r"))) return;
     zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
     trekgui_init(gfx_sprites);
+    ntwk_Login(&srl);
     gfx_InitModuleIcons();
 
     /* Wait for a USB device to be connected */
