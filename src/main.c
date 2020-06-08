@@ -6,6 +6,7 @@
 //--------------------------------------
 
 /* Keep these headers */
+#define usb_callback_data_t usb_device_t
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -38,7 +39,6 @@
 #include "gfx/internal.h"
 
 // USB Libraries
-#define usb_callback_data_t usb_device_t
 #include <usbdrvce.h>
 #include <srldrvce.h>
 
@@ -144,7 +144,7 @@ void PlayGame(void){
     if(!(appvar = ti_Open("trekgui", "r"))) return;
     zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
     trekgui_init(gfx_sprites);
-    ntwk_Login(&srl);
+    ntwk_Login();
     gfx_InitModuleIcons();
 
     /* Wait for a USB device to be connected */

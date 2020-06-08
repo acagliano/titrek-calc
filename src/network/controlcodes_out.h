@@ -7,7 +7,7 @@ enum ControlCodes_Outbound {
     LOGIN,
     DISCONNECT,
     PLAYER_MOV,
-    CHUNK_REQ
+    CHUNK_REQ,
     SEND_PING = 0x00d,
     SEND_MESSAGE = 0x00e,
     DEBUG_ENABLE = 0x0ff

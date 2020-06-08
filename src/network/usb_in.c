@@ -7,7 +7,7 @@
 #include "controlcodes_in.h"
 
 void conn_HandleInput(usb_packet_t* in_buff, size_t buff_size, flags_t* gameflags){
-    uint8t ctl = in_buff->control;
+    uint8_t ctl = in_buff->control;
     uint8_t response = in_buff->data[0];    // for handlers needing only response codes
     uint8_t* data = &in_buff->data[0];      // for handlers needing arbitrary data
     switch(ctl){
@@ -21,9 +21,6 @@ void conn_HandleInput(usb_packet_t* in_buff, size_t buff_size, flags_t* gameflag
             gameflags->logged_in = false;
             break;
         case RESP_MESSAGE:
-            // to handle
-            break;
-        case RESP_DEBUG:
             // to handle
             break;
     }
