@@ -27,7 +27,7 @@
 #include <keypadc.h>
 
 // Game Data Types (Structure Definitions)
-
+#include "equates.h"
 #include "classes/ships.h"
 #include "classes/coords.h"
 #include "classes/tech.h"
@@ -46,10 +46,6 @@
 
 #define setbits(bits, mask) (bits|mask)
 #define resbits(bits, mask) (bits^mask)
-
-typedef struct {
-    bool network;
-} flags_t;
 
 ship_t Ship = {0};
 selected_t select = {0, 0};
@@ -250,7 +246,7 @@ void PlayGame(void){
         if(current_size) {
           if(srl_Available(&srl) >= current_size) {
             srl_Read(&srl, in_buff, current_size);
-            conn_HandleInput((usb_packet_t*)&in_buff);
+            conn_HandleInput((usb_packet_t*)&in_buff, &gameflags);
           }
         } else {
           if(srl_Available(&srl) >= 3) srl_Read(&srl, (void*)current_size, 3);

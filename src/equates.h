@@ -6,5 +6,9 @@
 #define vWidth 300
 #define vHeight 170
 
+typedef struct {
+    bool network;
+    bool logged_in
+} flags_t;
 
 #endif
