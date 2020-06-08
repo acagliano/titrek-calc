@@ -247,7 +247,7 @@ void PlayGame(void){
         if(current_size) {
           if(srl_Available(&srl) >= current_size) {
             srl_Read(&srl, in_buff, current_size);
-            conn_HandleInput((usb_packet_t*)&in_buff, &gameflags);
+            conn_HandleInput((usb_packet_t*)&in_buff, current_size, &gameflags);
           }
         } else {
           if(srl_Available(&srl) >= 3) srl_Read(&srl, (void*)current_size, 3);

@@ -18,7 +18,7 @@ uint8_t prompt_for(uint8_t* prompt, uint8_t* buffer, size_t len, x, y){
 }
 
 
-void netwk_Login(srl_device_t* srl){
+void ntwk_Login(void){
     uint8_t username[24] = {0};
     uint8_t passwd[32] = {0};
     uint8_t ctlcode = LOGIN;
@@ -33,9 +33,34 @@ void netwk_Login(srl_device_t* srl){
     un_len = strlen(&username) + 1; // get length of username (plus terminating)
     pass_len = strlen(&passwd) + 1; // get length of passwd (plus terminating)
     packet_len = un_len + pass_len + 1; // add buffer lengths and control byte => packet size
-    srl_Write(srl, &packet_len, 3);     // write packet length to srl
-    srl_Write(srl, &ctlcode, 1);           // write LOGIN control byte to srl
-    srl_Write(srl, &username, un_len);  // write length bytes from username buffer to srl
-    srl_Write(srl, &passwd, pass_len);  // write length bytes from passwd buffer to srl
+    srl_Write(&srl, &packet_len, 3);     // write packet length to srl
+    srl_Write(&srl, &ctlcode, 1);           // write LOGIN control byte to srl
+    srl_Write(&srl, &username, un_len);  // write length bytes from username buffer to srl
+    srl_Write(&srl, &passwd, pass_len);  // write length bytes from passwd buffer to srl
     // we should be done here?
+}
+
+void ntwk_Register(uint8_t* loginstuff, size_t buff_size){
+// input = pointer to preserved username/password data from login function
+    uint8_t email[64] = {0};
+    uint8_t ctlcode = REGISTER;
+    uint24_t packet_len;
+    uint8_t email_len;
+    gfx_PrintStringXY("No matching account found!", 0, 0);
+    gfx_PrintStringXY("Let's create one...", 0, 8);
+    prompt_for("Email:", &email, 63, 0, 16);    // get email address
+    email_len = strlen(&email) + 1;     // get length of email buffer
+    packet_len = buff_size + email_len + 1; // add 3 buffers + 1 (control) => packet size
+    srl_Write(&srl, &packet_len, 3);                // write size to srl
+    srl_Write(&srl, &loginstuff, buff_size);    // write loginstuff to srl
+    srl_Write(&srl, &email, email_len);                 // write email to srl
+    // we should be done here
+}
+
+void ntwk_Disconnect(void){
+    uint8_t ctlcode = DISCONNECT;
+    uint24_t packet_len = 1;
+    srl_Write(&srl, &packet_len, 3);
+    srl_Write(&srl, &ctlcode, 1);
+    // we should be done here
 }

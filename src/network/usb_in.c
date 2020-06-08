@@ -6,7 +6,7 @@
 #include "usb.h"
 #include "controlcodes_in.h"
 
-void conn_HandleInput(usb_packet_t* in_buff, flags_t* gameflags){
+void conn_HandleInput(usb_packet_t* in_buff, size_t buff_size, flags_t* gameflags){
     uint8t ctl = in_buff->control;
     uint8_t response = in_buff->data[0];    // for handlers needing only response codes
     uint8_t* data = &in_buff->data[0];      // for handlers needing arbitrary data
@@ -14,7 +14,7 @@ void conn_HandleInput(usb_packet_t* in_buff, flags_t* gameflags){
         case REGISTER:
         case LOGIN:
             if(response == RL_SUCCESS) gameflags->logged_in = true;
-            if((response == RL_MISSING) && (ctl == LOGIN)) ntwk_Register(&in_buff->data[1]);
+            if((response == RL_MISSING) && (ctl == LOGIN)) ntwk_Register(&in_buff->data[1], buff_size - 2);
             else gui_NetworkErrorResponse(ctl, response);
             break;
         case DISCONNECT:

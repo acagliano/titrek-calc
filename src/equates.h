@@ -6,6 +6,8 @@
 #define vWidth 300
 #define vHeight 170
 
+extern srl_device_t srl;
+
 typedef struct {
     bool network;
     bool logged_in
