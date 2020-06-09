@@ -1,3 +1,4 @@
+#include <tice.h>
 #include <graphx.h>
 #include <stddef.h>
 #include "network/controlcodes.h"
@@ -38,4 +39,6 @@ void gui_NetworkErrorResponse(uint8_t controlcode, uint8_t responsecode){
     gfx_PrintString(" Error");
     gfx_SetTextXY(widget_x + 40, widget_y + 18);
     gfx_PrintString(err_codes[responsecode - 1]);
+    gfx_BlitBuffer();
+    while(!os_GetCSC());
 }

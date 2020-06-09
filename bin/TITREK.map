@@ -6,10 +6,10 @@ libs     D1A9F7 D1AAC0            C9h
 startup  D1AAC0 D1AAFF            3Fh
 cleanup  D1AAFF D1AB13            14h
 exit     D1AB13 D1AB19             6h
-code     D1AB19 D1C803          1CEAh
-data     D1C803 D1DC3C          1439h
-strsect  D1DC3C D1DD23            E7h
-text     D1DD23 D1DD9B            78h
+code     D1AB19 D1C8C9          1DB0h
+data     D1C8C9 D1DD02          1439h
+strsect  D1DD02 D1DDE9            E7h
+text     D1DDE9 D1DE61            78h
 bss      D031F6 D0C121 D13FD6   8F2Bh
 header   D1A87F D1A882             3h
 
@@ -18,7 +18,7 @@ Label                            Value
 _os_DisableHomeTextBuffer      = D1AB19
 _os_EnableHomeTextBuffer       = D1AB2B
 _random                        = D1AB3D
-__state                        = D1C803
+__state                        = D1C8C9
 _srandom                       = D1AB94
 __setstate                     = D1AB9B
 _boot_GetBootMajorVer          = 000080
@@ -202,45 +202,45 @@ _power_GetSpendPercent         = D1AC4C
 _power_GetBatteryPercent       = D1AC30
 _gui_NetworkErrorResponse      = D1AE62
 _gfx_DrawErrorWidget           = D1ADF9
-_err_codes                     = D1C859
-_ctl_codes                     = D1C835
-_splash_compressed             = D1C8A4
-_trekgui_init                  = D1AECA
-_trekgui                       = D1D763
-_gfx_RenderWindow              = D1B1E1
-_gfx_RenderSplash              = D1B04B
-_gfx_InitModuleIcons           = D1AFF0
-_stats_DrawHealthBar           = D1AF1E
-_modicons                      = D1D7B7
-_PlayGame                      = D1B3F1
-_main                          = D1B303
-_MainMenu                      = D1B264
-_gameflags                     = D1DAB1
-_gfx_sprites                   = D1DAAE
+_err_codes                     = D1C91F
+_ctl_codes                     = D1C8FB
+_splash_compressed             = D1C96A
+_trekgui_init                  = D1AEDB
+_trekgui                       = D1D829
+_gfx_RenderWindow              = D1B1F2
+_gfx_RenderSplash              = D1B05C
+_gfx_InitModuleIcons           = D1B001
+_stats_DrawHealthBar           = D1AF2F
+_modicons                      = D1D87D
+_PlayGame                      = D1B402
+_main                          = D1B314
+_MainMenu                      = D1B275
+_gameflags                     = D1DB77
+_gfx_sprites                   = D1DB74
 _gfx_sprites_data              = D0321E
 _srl                           = D031F6
-_usb_device                    = D1DAAB
-_select                        = D1DAA5
-_Ship                          = D1D7D8
-_conn_HandleInput              = D1B8E1
-_ntwk_Disconnect               = D1BB93
-_ntwk_Register                 = D1BAD8
-_ntwk_Login                    = D1B9D5
-_prompt_for                    = D1B969
-_Screen_Background             = D1C491
-_Overlay_UIModuleInfo          = D1C250
-_module_RenderGeneral          = D1C01E
-_Screen_UITacticalStats        = D1BE0A
-_Screen_UISystemStats          = D1BD14
-_Screen_RenderUI               = D1BC3B
-_num_GetLength                 = D1BBF4
-_text_GetCenterX               = D1BBD3
-_modulenames                   = D1DB60
-_moduledb                      = D1DADC
-_version                       = D1DAD0
-_tact_title                    = D1DAC1
-_mains_title                   = D1DAB6
-_user_input                    = D1C60C
+_usb_device                    = D1DB71
+_select                        = D1DB6B
+_Ship                          = D1D89E
+_conn_HandleInput              = D1B9A7
+_ntwk_Disconnect               = D1BC59
+_ntwk_Register                 = D1BB9E
+_ntwk_Login                    = D1BA9B
+_prompt_for                    = D1BA2F
+_Screen_Background             = D1C557
+_Overlay_UIModuleInfo          = D1C316
+_module_RenderGeneral          = D1C0E4
+_Screen_UITacticalStats        = D1BED0
+_Screen_UISystemStats          = D1BDDA
+_Screen_RenderUI               = D1BD01
+_num_GetLength                 = D1BCBA
+_text_GetCenterX               = D1BC99
+_modulenames                   = D1DC26
+_moduledb                      = D1DBA2
+_version                       = D1DB96
+_tact_title                    = D1DB87
+_mains_title                   = D1DB7C
+_user_input                    = D1C6D2
 _ti_CloseAll                   = D1AA0B
 _ti_Open                       = D1AA0F
 _ti_GetDataPtr                 = D1AA13

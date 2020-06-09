@@ -6,6 +6,7 @@
 #include "usb.h"
 #include "controlcodes.h"
 
+
 void conn_HandleInput(usb_packet_t* in_buff, size_t buff_size, flags_t* gameflags){
     uint8_t ctl = in_buff->control;
     uint8_t response = in_buff->data[0];    // for handlers needing only response codes
