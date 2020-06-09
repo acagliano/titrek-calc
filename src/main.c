@@ -65,7 +65,7 @@ void MainMenu(void) {
     while(1){
         opt = gfx_RenderSplash(splash, gameflags.network);
             if(opt == OPT_PLAY) PlayGame();
-            if(opt == OPT_QUIT) break;
+            if(opt == OPT_QUIT) {gameflags.exit = 1; break;}
             if(opt == OPT_ABOUT || opt == OPT_SETTINGS){}
         }
     }
@@ -123,7 +123,9 @@ void main(void) {
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
-    MainMenu();
+    do {
+        MainMenu();
+    } while(!gameflags.exit);
 error:
     usb_Cleanup();
     gfx_End();
@@ -150,18 +152,18 @@ void PlayGame(void){
             if(srl_Available(&srl) >= current_size) {
                 srl_Read(&srl, in_buff, current_size);
                 conn_HandleInput((usb_packet_t*)&in_buff, current_size, &gameflags);
-                current_size = 0;
+                break;
             }
         } else {
             if(srl_Available(&srl) >= 3) srl_Read(&srl, (void*)current_size, 3);
         }
         if(timeout-- == 0) break;
     } while(!gameflags.logged_in);
-    if(gameflags.logged_in){
-        zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
-        trekgui_init(gfx_sprites);
-        gfx_InitModuleIcons();
-    }
+    if(!gameflags.logged_in) return;
+    zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
+    trekgui_init(gfx_sprites);
+    gfx_InitModuleIcons();
+    current_size = 0;
     do {
         /* A buffer to store bytes read by the serial library */
         size_t bytes_read;
