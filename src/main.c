@@ -64,7 +64,7 @@ void MainMenu(void) {
     zx7_Decompress(splash, splash_compressed);
     while(1){
         opt = gfx_RenderSplash(splash, gameflags.network);
-            if(opt == OPT_PLAY) PlayGame();
+            if(opt == OPT_PLAY) {gameflags.loopgame = 1; PlayGame();}
             if(opt == OPT_QUIT) {gameflags.exit = 1; break;}
             if(opt == OPT_ABOUT || opt == OPT_SETTINGS){}
         }
