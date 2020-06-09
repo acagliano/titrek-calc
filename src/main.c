@@ -159,7 +159,7 @@ void PlayGame(void){
         Screen_RenderUI(screen, &Ship, &select);
         if(key == sk_Clear){
             if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
-                else loopgame = false;
+                else ntwk_Disconnect();
             }
         if(key == sk_Yequ)
             screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;

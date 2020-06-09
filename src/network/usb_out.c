@@ -6,7 +6,7 @@
 #include <string.h>
 #include "../equates.h"
 #include "usb.h"
-#include "controlcodes_out.h"
+#include "controlcodes.h"
 #include "../asm/exposure.h"
 
 uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y){

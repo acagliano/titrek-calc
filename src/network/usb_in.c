@@ -4,7 +4,7 @@
 #include "../equates.h"
 #include "../errorscreens.h"
 #include "usb.h"
-#include "controlcodes_in.h"
+#include "controlcodes.h"
 
 void conn_HandleInput(usb_packet_t* in_buff, size_t buff_size, flags_t* gameflags){
     uint8_t ctl = in_buff->control;
@@ -13,14 +13,14 @@ void conn_HandleInput(usb_packet_t* in_buff, size_t buff_size, flags_t* gameflag
     switch(ctl){
         case REGISTER:
         case LOGIN:
-            if(response == RL_SUCCESS) gameflags->logged_in = true;
-            if((response == RL_MISSING) && (ctl == LOGIN)) ntwk_Register(&in_buff->data[1], buff_size - 2);
+            if(response == SUCCESS) gameflags->logged_in = true;
+            if((response == MISSING) && (ctl == LOGIN)) ntwk_Register(&in_buff->data[1], buff_size - 2);
             else gui_NetworkErrorResponse(ctl, response);
             break;
         case DISCONNECT:
             gameflags->logged_in = false;
             break;
-        case RESP_MESSAGE:
+        case MESSAGE:
             // to handle
             break;
     }

@@ -21,7 +21,7 @@
 
 char mains_title[] = "[MAIN SYS]";
 char tact_title[] = "[TACTICAL SYS]";
-char version[] = "v0.87 pre-alpha";
+char version[] = "v0.90 alpha";
 
 char moduledb[][12] = {
     "LifeSup",

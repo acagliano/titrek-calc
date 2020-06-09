@@ -1,6 +1,6 @@
 #include <graphx.h>
 #include <stddef.h>
-#include "network/controlcodes_in.h"
+#include "network/controlcodes.h"
 
 #define center_x (320/2)
 #define center_y (240/2)
