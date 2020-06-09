@@ -14,14 +14,16 @@ char ctl_codes[][12] = {
     "Register",
     "Login",
     "Disconnect",
+    "Status"
 };
 
-char err_codes[][15] = {
+char err_codes[][20] = {
     "Auth Invalid",
     "Duplicate",
     "Missing",      // placeholder
     "Banned",
     "Version Err"
+    "Logging you in..."
 };
 
 void gfx_DrawErrorWidget(void){
@@ -36,9 +38,7 @@ void gui_NetworkErrorResponse(uint8_t controlcode, uint8_t responsecode){
     gfx_DrawErrorWidget();
     gfx_SetTextXY(widget_x + 40, widget_y + 8);
     gfx_PrintString(ctl_codes[controlcode]);
-    gfx_PrintString(" Error");
     gfx_SetTextXY(widget_x + 40, widget_y + 18);
     gfx_PrintString(err_codes[responsecode - 1]);
     gfx_BlitBuffer();
-    while(!os_GetCSC());
 }

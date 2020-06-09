@@ -140,38 +140,24 @@ void PlayGame(void){
     ti_var_t appvar;
     uint16_t screen = 0;
     static size_t current_size = 0;
-    char in_buff[1024];
-    uint24_t timeout = 0xffff;
+    static char in_buff[1024];
     if(!gameflags.network) return;
     if(!gfx_sprites) return;
     if(!(appvar = ti_Open("trekgui", "r"))) return;
     ntwk_Login();
-    do {
-        usb_HandleEvents();
-        if(current_size) {
-            if(srl_Available(&srl) >= current_size) {
-                srl_Read(&srl, in_buff, current_size);
-                conn_HandleInput((usb_packet_t*)&in_buff, current_size, &gameflags);
-                break;
-            }
-        } else {
-            if(srl_Available(&srl) >= 3) srl_Read(&srl, (void*)current_size, 3);
-        }
-        if(timeout-- == 0) break;
-    } while(!gameflags.logged_in);
-    if(!gameflags.logged_in) return;
     zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
     trekgui_init(gfx_sprites);
     gfx_InitModuleIcons();
-    current_size = 0;
     do {
         /* A buffer to store bytes read by the serial library */
         size_t bytes_read;
         unsigned char key = os_GetCSC();
         Screen_RenderUI(screen, &Ship, &select);
+        if(!gameflags.logged_in) gui_NetworkErrorResponse(3, 5);
         if(key == sk_Clear){
             if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
-                else ntwk_Disconnect();
+            else if(gameflags.logged_in) ntwk_Disconnect();
+                else gameflags.loopgame = false;
             }
         if(key == sk_Yequ)
             screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
@@ -266,5 +252,5 @@ void PlayGame(void){
           if(srl_Available(&srl) >= 3) srl_Read(&srl, (void*)current_size, 3);
         }
 
-    } while(gameflags.logged_in);
+    } while(gameflags.loopgame);
 }

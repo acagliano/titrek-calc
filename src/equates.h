@@ -13,6 +13,7 @@ extern srl_device_t srl;
 
 typedef struct {
     bool exit;
+    bool loopgame;
     bool network;
     bool logged_in;
 } flags_t;

@@ -16,7 +16,10 @@ void conn_HandleInput(usb_packet_t* in_buff, size_t buff_size, flags_t* gameflag
         case LOGIN:
             if(response == SUCCESS) gameflags->logged_in = true;
             if((response == MISSING) && (ctl == LOGIN)) ntwk_Register(&in_buff->data[1], buff_size - 2);
-            else gui_NetworkErrorResponse(ctl, response);
+            else {
+                gui_NetworkErrorResponse(ctl, response);
+                while(!os_GetCSC());
+                }
             break;
         case DISCONNECT:
             gameflags->logged_in = false;
