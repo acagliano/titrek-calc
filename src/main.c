@@ -38,6 +38,7 @@
 #include "gfx-engine/gui.h"
 #include "gfx/internal.h"
 #include "errorscreens.h"
+#include "asm/exposure.h"
 
 // USB Libraries
 #include <usbdrvce.h>
@@ -119,6 +120,9 @@ void main(void) {
     zx7_Decompress(err_icon, icon_internalerr_compressed);
     
     usb_error = usb_Init(handle_usb_event, &usb_device, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
+    gfx_PrintStringXY("Initializing USB...", 0, 0);
+    gfx_PrintStringXY("[Clear] to Quit", 0, 10);
+    gfx_BlitBuffer();
     if(!usb_error){
         while(!usb_device && usb_timeout--) {
            kb_Scan();
@@ -167,7 +171,7 @@ void PlayGame(void){
     do {
         /* A buffer to store bytes read by the serial library */
         size_t bytes_read;
-        unsigned char key = os_GetCSC();
+        sk_key_t key = getKey();
         Screen_RenderUI(screen, &Ship, &select);
         if(!gameflags.logged_in) gui_NetworkErrorResponse(3, 6);
         gfx_BlitBuffer();

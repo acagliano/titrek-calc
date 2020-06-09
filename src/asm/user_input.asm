@@ -13,9 +13,13 @@
 .ref _gfx_FillRectangle
 .ref _gfx_SetDraw
 .ref _gfx_BlitLines
+.ref _getKey
+.ref _kb_AnyKey
 
 ;uint8_t user_input(char *buffer,size_t length,uint8_t flags);
 _user_input:
+    call _kb_AnyKey
+    jr nz,_user_input
 	ld hl,-11
 	call $12C ;ti._frameset
 	xor a,a
@@ -122,9 +126,14 @@ __print_overtype:
 	pop bc
 	pop bc
 __keys:
-	call $02014C ;ti.GetCSC
+	call _getKey
 	or a,a
 	jr z,__keys
+	push af
+__wait_key_off_loop:
+	call _kb_AnyKey
+	jr nz,__wait_key_off_loop
+	pop af
 	cp a,56
 	jq z,__delete
 	cp a,15
