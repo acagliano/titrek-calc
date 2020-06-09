@@ -81,7 +81,6 @@ void Screen_RenderUI(uint24_t screen, ship_t* Ship, selected_t* select){
         case SCRN_CARGO:
             break;
     }
-    gfx_BlitBuffer();
     gfx_SetTextFGColor(0);
     return;
 }

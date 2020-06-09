@@ -1,3 +1,4 @@
+#include <keypadc.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <srldrvce.h>
@@ -18,7 +19,7 @@ void conn_HandleInput(usb_packet_t* in_buff, size_t buff_size, flags_t* gameflag
             if((response == MISSING) && (ctl == LOGIN)) ntwk_Register(&in_buff->data[1], buff_size - 2);
             else {
                 gui_NetworkErrorResponse(ctl, response);
-                while(!os_GetCSC());
+                while(!kb_AnyKey());
                 }
             break;
         case DISCONNECT:

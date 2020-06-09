@@ -37,6 +37,7 @@
 #include "gfx/trekgui.h"
 #include "gfx-engine/gui.h"
 #include "gfx/internal.h"
+#include "errorscreens.h"
 
 // USB Libraries
 #include <usbdrvce.h>
@@ -52,6 +53,7 @@ selected_t select = {0, 0};
 usb_device_t usb_device = NULL;
 srl_device_t srl;
 gfx_UninitedRLETSprite(gfx_sprites, trekgui_uncompressed_size);
+gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
 
 /* Main Menu */
@@ -66,7 +68,20 @@ void MainMenu(void) {
         opt = gfx_RenderSplash(splash, gameflags.network);
             if(opt == OPT_PLAY) {gameflags.loopgame = 1; PlayGame();}
             if(opt == OPT_QUIT) {gameflags.exit = 1; break;}
-            if(opt == OPT_ABOUT || opt == OPT_SETTINGS){}
+            if(opt == OPT_ABOUT) {
+                gfx_ZeroScreen();
+                gfx_PrintStringXY("## About Project TI-Trek ##", 5, 5);
+                gfx_PrintStringXY("A multiplayer space combat game", 10, 20);
+                gfx_PrintStringXY("for the TI-84+ CE!", 10, 30);
+                gfx_PrintStringXY("_Authors_", 10, 40);
+                gfx_PrintStringXY("ACagliano - lead, client", 15, 50);
+                gfx_PrintStringXY("beck - lead, server", 15, 60);
+                gfx_PrintStringXY("command - lead, USB bridge", 15, 70);
+                gfx_PrintStringXY("(c) 2019, Project TI-Trek", 5, 230);
+                gfx_BlitBuffer();
+                while(os_GetCSC() != sk_Clear);
+            }
+            if(opt == OPT_SETTINGS){}
         }
     }
 
@@ -93,7 +108,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 
 void main(void) {
     usb_error_t usb_error;
-    uint8_t usb_timeout = 0xff;
+    uint24_t usb_timeout = 0xffff;
     srl_error_t srl_error;
     uint8_t srl_buf[2048];
     unsigned int i;
@@ -101,6 +116,7 @@ void main(void) {
     srandom(rtc_Time());
     ti_CloseAll();
     int_Disable();
+    zx7_Decompress(err_icon, icon_internalerr_compressed);
     
     usb_error = usb_Init(handle_usb_event, &usb_device, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
     if(!usb_error){
@@ -140,11 +156,11 @@ void PlayGame(void){
     ti_var_t appvar;
     uint16_t screen = 0;
     static size_t current_size = 0;
-    static char in_buff[1024];
+    char in_buff[1024];
     if(!gameflags.network) return;
     if(!gfx_sprites) return;
     if(!(appvar = ti_Open("trekgui", "r"))) return;
-    ntwk_Login();
+    ntwk_Login(&gameflags);
     zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
     trekgui_init(gfx_sprites);
     gfx_InitModuleIcons();
@@ -153,7 +169,8 @@ void PlayGame(void){
         size_t bytes_read;
         unsigned char key = os_GetCSC();
         Screen_RenderUI(screen, &Ship, &select);
-        if(!gameflags.logged_in) gui_NetworkErrorResponse(3, 5);
+        if(!gameflags.logged_in) gui_NetworkErrorResponse(3, 6);
+        gfx_BlitBuffer();
         if(key == sk_Clear){
             if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
             else if(gameflags.logged_in) ntwk_Disconnect();

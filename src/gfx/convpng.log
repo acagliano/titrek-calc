@@ -5,8 +5,9 @@ using built-in xlibc palette ...
 warning: might ignore transparent color value for a fixed palette.
 transparent color index : 0
 transparent color : 0x0000
-1:
+2:
  splash : converted! (34952 > 3775 bytes)
+ icon_internalerr : converted! (578 > 140 bytes)
 
 --- guiicons (C) ---
 using built-in xlibc palette ...
