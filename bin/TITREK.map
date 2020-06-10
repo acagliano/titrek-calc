@@ -2,25 +2,25 @@ Segment  Base   Top    High   Length
 -------- ------ ------ ------ -------
 icon     D1A882 D1A99F           11Dh
 launcher D1A99F D1A9F7            58h
-libs     D1A9F7 D1AAC8            D1h
-startup  D1AAC8 D1AB07            3Fh
-cleanup  D1AB07 D1AB1B            14h
-exit     D1AB1B D1AB21             6h
-code     D1AB21 D1C9FF          1EDEh
-data     D1C9FF D1DF4A          154Bh
-strsect  D1DF4A D1E109           1BFh
-text     D1E109 D1E181            78h
-bss      D031F6 D0C241 D13FD6   904Bh
+libs     D1A9F7 D1AAD4            DDh
+startup  D1AAD4 D1AB13            3Fh
+cleanup  D1AB13 D1AB27            14h
+exit     D1AB27 D1AB2D             6h
+code     D1AB2D D1CA8D          1F60h
+data     D1CA8D D1DFD8          154Bh
+strsect  D1DFD8 D1E1BE           1E6h
+text     D1E1BE D1E236            78h
+bss      D031F6 D0693D D13FD6   3747h
 header   D1A87F D1A882             3h
 
 Label                            Value
 ------------------------------   ------
-_os_DisableHomeTextBuffer      = D1AB21
-_os_EnableHomeTextBuffer       = D1AB33
-_random                        = D1AB45
-__state                        = D1C9FF
-_srandom                       = D1AB9C
-__setstate                     = D1ABA3
+_os_DisableHomeTextBuffer      = D1AB2D
+_os_EnableHomeTextBuffer       = D1AB3F
+_random                        = D1AB51
+__state                        = D1CA8D
+_srandom                       = D1ABA8
+__setstate                     = D1ABAF
 _boot_GetBootMajorVer          = 000080
 _boot_GetHardwareVer           = 000084
 _boot_GetBootMinorVer          = 00008C
@@ -156,10 +156,10 @@ _asm_DisableAPD                = 021134
 _asm_EnableAPD                 = 021138
 _asm_DrawStatusBar             = 021A3C
 _asm_ArcChk                    = 022040
-_zx7_Decompress                = D1ABB3
+_zx7_Decompress                = D1ABBF
 __case8                        = 000124
-__frameset                     = D1AC1F
-__frameset0                    = D1AC2D
+__frameset                     = D1AC2B
+__frameset0                    = D1AC39
 __icmpzero                     = 000138
 __idivs                        = 00013C
 __idvrmu                       = 000140
@@ -180,105 +180,109 @@ __sxor                         = 000268
 __findlibload                  = D1A99F
 __program_icon                 = D1A887
 __program_description          = D1A989
-__ccleanup                     = D1AB07
+__ccleanup                     = D1AB13
 _errno                         = D008DC
 _init                          = D1A882
-_exit                          = D1AB1D
-__exit                         = D1AAF6
-__exitsp                       = D1AAF6
-__errsp                        = D1AAF6
-_module_SetPowerMax            = D1ADEB
-_module_SetHealthMax           = D1ADD3
-_module_SetOnlineState         = D1AD93
-_module_GetOnlineState         = D1AD84
-_health_DamageModule           = D1AD2E
-_health_GetHealthPercent       = D1AD12
-_power_GetPowerDraw            = D1AD03
-_power_ChangeSpend             = D1ACA0
-_power_GetPowerSpend           = D1AC91
-_power_GetDrawSource           = D1AC82
-_power_SetDrawSource           = D1AC70
-_power_GetSpendPercent         = D1AC54
-_power_GetBatteryPercent       = D1AC38
-_gui_NetworkErrorResponse      = D1AE81
-_gfx_DrawErrorWidget           = D1AE01
-_err_codes                     = D1CA61
-_ctl_codes                     = D1CA31
-_icon_internalerr_compressed   = D1CB21
-_splash_compressed             = D1CBAD
-_trekgui_init                  = D1AEDE
-_trekgui                       = D1DA6C
-_gfx_RenderWindow              = D1B1F5
-_gfx_RenderSplash              = D1B05F
-_gfx_InitModuleIcons           = D1B004
-_stats_DrawHealthBar           = D1AF32
-_modicons                      = D1DAC0
-_PlayGame                      = D1B542
-_main                          = D1B3FB
-_MainMenu                      = D1B278
-_gameflags                     = D1DDBD
-_err_icon                      = D1DDBA
-_err_icon_data                 = D0C121
-_gfx_sprites                   = D1DDB7
-_gfx_sprites_data              = D0321E
+_exit                          = D1AB29
+__exit                         = D1AB02
+__exitsp                       = D1AB02
+__errsp                        = D1AB02
+_module_SetPowerMax            = D1ADF7
+_module_SetHealthMax           = D1ADDF
+_module_SetOnlineState         = D1AD9F
+_module_GetOnlineState         = D1AD90
+_health_DamageModule           = D1AD3A
+_health_GetHealthPercent       = D1AD1E
+_power_GetPowerDraw            = D1AD0F
+_power_ChangeSpend             = D1ACAC
+_power_GetPowerSpend           = D1AC9D
+_power_GetDrawSource           = D1AC8E
+_power_SetDrawSource           = D1AC7C
+_power_GetSpendPercent         = D1AC60
+_power_GetBatteryPercent       = D1AC44
+_gui_NetworkErrorResponse      = D1AE8D
+_gfx_DrawErrorWidget           = D1AE0D
+_err_codes                     = D1CAEF
+_ctl_codes                     = D1CABF
+_icon_internalerr_compressed   = D1CBAF
+_splash_compressed             = D1CC3B
+_trekgui_init                  = D1AEEA
+_trekgui                       = D1DAFA
+_gfx_RenderWindow              = D1B201
+_gfx_RenderSplash              = D1B06B
+_gfx_InitModuleIcons           = D1B010
+_stats_DrawHealthBar           = D1AF3E
+_modicons                      = D1DB4E
+_PlayGame                      = D1B544
+_main                          = D1B3EC
+_MainMenu                      = D1B284
+_gameflags                     = D1DE4B
+_err_icon                      = D1DE48
+_err_icon_data                 = D0681D
+_splash                        = D1DE45
+_splash_data                   = D03221
+_gfx_sprites                   = D0321E
 _srl                           = D031F6
-_usb_device                    = D1DDB4
-_select                        = D1DDAE
-_Ship                          = D1DAE1
-_conn_HandleInput              = D1BA66
-_ntwk_Disconnect               = D1BD5F
-_ntwk_Register                 = D1BC9E
-_ntwk_Login                    = D1BB7C
-_prompt_for                    = D1BAF5
-_Screen_Background             = D1C653
-_Overlay_UIModuleInfo          = D1C412
-_module_RenderGeneral          = D1C1E0
-_Screen_UITacticalStats        = D1BFCC
-_Screen_UISystemStats          = D1BED6
-_Screen_RenderUI               = D1BE07
-_num_GetLength                 = D1BDC0
-_text_GetCenterX               = D1BD9F
-_modulenames                   = D1DE6E
-_moduledb                      = D1DDEA
-_version                       = D1DDDE
-_tact_title                    = D1DDCF
-_mains_title                   = D1DDC4
-_getKey                        = D1C7CE
-_user_input                    = D1C802
+_usb_device                    = D1DE42
+_select                        = D1DE3C
+_Ship                          = D1DB6F
+_conn_HandleInput              = D1BAF4
+_ntwk_Disconnect               = D1BDED
+_ntwk_Register                 = D1BD2C
+_ntwk_Login                    = D1BC0A
+_prompt_for                    = D1BB83
+_Screen_Background             = D1C6E1
+_Overlay_UIModuleInfo          = D1C4A0
+_module_RenderGeneral          = D1C26E
+_Screen_UITacticalStats        = D1C05A
+_Screen_UISystemStats          = D1BF64
+_Screen_RenderUI               = D1BE95
+_num_GetLength                 = D1BE4E
+_text_GetCenterX               = D1BE2D
+_modulenames                   = D1DEFC
+_moduledb                      = D1DE78
+_version                       = D1DE6C
+_tact_title                    = D1DE5D
+_mains_title                   = D1DE52
+_getKey                        = D1C85C
+_user_input                    = D1C890
 _ti_CloseAll                   = D1AA0B
 _ti_Open                       = D1AA0F
-_ti_GetDataPtr                 = D1AA13
-_gfx_Begin                     = D1AA20
-_gfx_End                       = D1AA24
-_gfx_SetColor                  = D1AA28
-_gfx_SetDefaultPalette         = D1AA2C
-_gfx_SetDraw                   = D1AA30
-_gfx_Blit                      = D1AA34
-_gfx_BlitLines                 = D1AA38
-_gfx_PrintChar                 = D1AA3C
-_gfx_PrintUInt                 = D1AA40
-_gfx_PrintString               = D1AA44
-_gfx_PrintStringXY             = D1AA48
-_gfx_SetTextXY                 = D1AA4C
-_gfx_SetTextBGColor            = D1AA50
-_gfx_SetTextFGColor            = D1AA54
-_gfx_SetTextTransparentColor   = D1AA58
-_gfx_GetStringWidth            = D1AA5C
-_gfx_GetTextX                  = D1AA60
-_gfx_GetTextY                  = D1AA64
-_gfx_HorizLine                 = D1AA68
-_gfx_FillCircle                = D1AA6C
-_gfx_Rectangle                 = D1AA70
-_gfx_FillRectangle             = D1AA74
-_gfx_ZeroScreen                = D1AA78
-_gfx_RLETSprite                = D1AA7C
-_kb_Scan                       = D1AA8A
-_kb_AnyKey                     = D1AA8E
-_srl_Init                      = D1AA9D
-_srl_Available                 = D1AAA1
-_srl_Read                      = D1AAA5
-_srl_Write                     = D1AAA9
-_srl_GetCDCStandardDescriptors = D1AAAD
-_usb_Init                      = D1AABC
-_usb_Cleanup                   = D1AAC0
-_usb_HandleEvents              = D1AAC4
+_ti_Delete                     = D1AA13
+_ti_Resize                     = D1AA17
+_ti_SetArchiveStatus           = D1AA1B
+_ti_GetDataPtr                 = D1AA1F
+_gfx_Begin                     = D1AA2C
+_gfx_End                       = D1AA30
+_gfx_SetColor                  = D1AA34
+_gfx_SetDefaultPalette         = D1AA38
+_gfx_SetDraw                   = D1AA3C
+_gfx_Blit                      = D1AA40
+_gfx_BlitLines                 = D1AA44
+_gfx_PrintChar                 = D1AA48
+_gfx_PrintUInt                 = D1AA4C
+_gfx_PrintString               = D1AA50
+_gfx_PrintStringXY             = D1AA54
+_gfx_SetTextXY                 = D1AA58
+_gfx_SetTextBGColor            = D1AA5C
+_gfx_SetTextFGColor            = D1AA60
+_gfx_SetTextTransparentColor   = D1AA64
+_gfx_GetStringWidth            = D1AA68
+_gfx_GetTextX                  = D1AA6C
+_gfx_GetTextY                  = D1AA70
+_gfx_HorizLine                 = D1AA74
+_gfx_FillCircle                = D1AA78
+_gfx_Rectangle                 = D1AA7C
+_gfx_FillRectangle             = D1AA80
+_gfx_ZeroScreen                = D1AA84
+_gfx_RLETSprite                = D1AA88
+_kb_Scan                       = D1AA96
+_kb_AnyKey                     = D1AA9A
+_srl_Init                      = D1AAA9
+_srl_Available                 = D1AAAD
+_srl_Read                      = D1AAB1
+_srl_Write                     = D1AAB5
+_srl_GetCDCStandardDescriptors = D1AAB9
+_usb_Init                      = D1AAC8
+_usb_Cleanup                   = D1AACC
+_usb_HandleEvents              = D1AAD0

@@ -53,7 +53,8 @@ ship_t Ship = {0};
 selected_t select = {0, 0};
 usb_device_t usb_device = NULL;
 srl_device_t srl;
-gfx_UninitedRLETSprite(gfx_sprites, trekgui_uncompressed_size);
+gfx_rletsprite_t* gfx_sprites;
+gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
 
@@ -63,8 +64,6 @@ void PlayGame(void);
 
 void MainMenu(void) {
     uint8_t opt = 0;
-    gfx_UninitedRLETSprite(splash, splash_width * splash_height);
-    zx7_Decompress(splash, splash_compressed);
     while(1){
         opt = gfx_RenderSplash(splash, gameflags.network);
             if(opt == OPT_PLAY) {gameflags.loopgame = 1; PlayGame();}
@@ -117,8 +116,8 @@ void main(void) {
     srandom(rtc_Time());
     ti_CloseAll();
     int_Disable();
+    zx7_Decompress(splash, splash_compressed);
     zx7_Decompress(err_icon, icon_internalerr_compressed);
-    
     usb_error = usb_Init(handle_usb_event, &usb_device, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
     gfx_PrintStringXY("Initializing USB...", 0, 0);
     gfx_PrintStringXY("[Clear] to Quit", 0, 10);
@@ -157,16 +156,28 @@ error:
 
 void PlayGame(void){
     /* A buffer for internal use by the serial library */
-    ti_var_t appvar;
+    ti_var_t appv_compr, appv_decomp;
     uint16_t screen = 0;
     static size_t current_size = 0;
     char in_buff[1024];
     if(!gameflags.network) return;
-    if(!gfx_sprites) return;
-    if(!(appvar = ti_Open("trekgui", "r"))) return;
+    appv_compr = ti_Open("trekgui", "r");
+    appv_decomp = ti_Open("trekGFX", "r");
+    if((!appv_compr) && (!appv_decomp)) return;
+    if(appv_compr){
+        gfx_rletsprite_t *compr_src, *decomp_dest;
+        appv_decomp = ti_Open("trekGFX", "w+");
+        if(!(ti_Resize(trekgui_uncompressed_size, appv_decomp))) return;
+        compr_src = (gfx_rletsprite_t*)ti_GetDataPtr(appv_compr);
+        decomp_dest = (gfx_rletsprite_t*)ti_GetDataPtr(appv_decomp);
+        zx7_Decompress(decomp_dest, compr_src);
+        ti_CloseAll();
+        ti_Delete("trekgui");
+    }
+    appv_decomp = ti_Open("trekGFX", "r");
+    ti_SetArchiveStatus(true, appv_decomp);
     ntwk_Login(&gameflags);
-    zx7_Decompress(gfx_sprites, ti_GetDataPtr(appvar));
-    trekgui_init(gfx_sprites);
+    trekgui_init(ti_GetDataPtr(appv_decomp));
     gfx_InitModuleIcons();
     do {
         /* A buffer to store bytes read by the serial library */
@@ -261,7 +272,7 @@ void PlayGame(void){
         usb_HandleEvents();
 
         /* If the device was disconnected, exit */
-        if(!usb_device) break; // here, can we `goto` the main menu?
+        if(!usb_device) return; // here, can we `goto` the main menu?
         /* Handle input */
         if(current_size) {
           if(srl_Available(&srl) >= current_size) {
