@@ -95,6 +95,8 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 		if(!*callback_data) {
 			/* Set the USB device */
 			*callback_data = event_data;
+            srl_error = srl_Init(&srl, usb_device, srl_buf, sizeof(srl_buf), SRL_INTERFACE_ANY);
+            if(!srl_error) gameflags.network = true;
 		}
 	}
 
@@ -115,13 +117,10 @@ void main(void) {
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
-    int_Disable();
+    disableInts();
     zx7_Decompress(splash, splash_compressed);
     zx7_Decompress(err_icon, icon_internalerr_compressed);
     usb_error = usb_Init(handle_usb_event, &usb_device, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
-    gfx_PrintStringXY("Initializing USB...", 0, 0);
-    gfx_PrintStringXY("[Clear] to Quit", 0, 10);
-    gfx_BlitBuffer();
     if(!usb_error){
         while(!usb_device && usb_timeout--) {
            kb_Scan();
@@ -134,8 +133,6 @@ void main(void) {
            usb_HandleEvents();
        }
        if(usb_device){
-            srl_error = srl_Init(&srl, usb_device, srl_buf, sizeof(srl_buf), SRL_INTERFACE_ANY);
-            if(!srl_error) gameflags.network = true;
         }
     }
     gfx_SetDefaultPalette(gfx_8bpp);
@@ -148,7 +145,7 @@ void main(void) {
 error:
     usb_Cleanup();
     gfx_End();
-    int_Enable();
+    enableInts();
     pgrm_CleanUp();
     return;
 }
@@ -160,7 +157,7 @@ void PlayGame(void){
     uint16_t screen = 0;
     static size_t current_size = 0;
     char in_buff[1024];
-    if(!gameflags.network) return;
+    //if(!gameflags.network) return;
     appv_compr = ti_Open("trekgui", "r");
     appv_decomp = ti_Open("trekGFX", "r");
     if((!appv_compr) && (!appv_decomp)) return;

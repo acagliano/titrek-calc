@@ -1,7 +1,7 @@
 
-.def _getKey
-.ref _kb_AnyKey
-.ref _kb_Scan
+public _getKey
+extern _kb_AnyKey
+extern _kb_Scan
 
 ;sk_key_t getKey(void);
 _getKey:

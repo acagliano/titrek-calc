@@ -1,20 +1,20 @@
 ;user input subroutine for use with ez80 C toolchain programs
 ;author: Adam "beckadamtheinventor" Beckingham
 
-.def _user_input
-.ref _gfx_SetColor
-.ref _gfx_PrintString
-.ref _gfx_PrintChar
-.ref _gfx_GetTextX
-.ref _gfx_GetTextY
-.ref _gfx_SetTextXY
-.ref _gfx_SetTextFGColor
-.ref _gfx_HorizLine
-.ref _gfx_FillRectangle
-.ref _gfx_SetDraw
-.ref _gfx_BlitLines
-.ref _getKey
-.ref _kb_AnyKey
+public _user_input
+extern _gfx_SetColor
+extern _gfx_PrintString
+extern _gfx_PrintChar
+extern _gfx_GetTextX
+extern _gfx_GetTextY
+extern _gfx_SetTextXY
+extern _gfx_SetTextFGColor
+extern _gfx_HorizLine
+extern _gfx_FillRectangle
+extern _gfx_SetDraw
+extern _gfx_BlitLines
+extern _getKey
+extern _kb_AnyKey
 
 ;uint8_t user_input(char *buffer,size_t length,uint8_t flags);
 _user_input:
