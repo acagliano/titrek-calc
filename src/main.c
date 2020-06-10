@@ -33,7 +33,7 @@
 #include "classes/tech.h"
 #include "classes/screens.h"
 #include "statscreens.h"
-#include "gfx/trekgui.h"
+#include "gfx/TrekGFX.h"
 #include "gfx-engine/gui.h"
 #include "gfx/internal.h"
 #include "errorscreens.h"
@@ -141,36 +141,16 @@ error:
 void PlayGame(void){
     /* A buffer for internal use by the serial library */
     gfx_rletsprite_t *compr_src, *decomp_dest;
-    ti_var_t appv_compr, appv_decomp;
+    ti_var_t assets;
     uint16_t screen = 0;
     static size_t current_size = 0;
     char in_buff[1024];
     if(!gameflags.network) return;
-    appv_compr = ti_Open("Trekgui", "r");
-    appv_decomp = ti_Open("TrekGFX", "w+");
-    if(!appv_compr) {
-        dbg_sprintf(dbgout, "Failed to open input appvar\n");
-        return;
-    }
-    if(!appv_decomp) {
-        dbg_sprintf(dbgout, "Failed to open output appvar\n");
-        return;
-    }
-    if(!(ti_Resize(trekgui_uncompressed_size, appv_decomp))) {
-        dbg_sprintf(dbgout, "Failed to resize output appvar\n");
-        return;
-    }
-    compr_src = (gfx_rletsprite_t*)ti_GetDataPtr(appv_compr);
-    decomp_dest = (gfx_rletsprite_t*)ti_GetDataPtr(appv_decomp);
-    zx7_Decompress(decomp_dest, compr_src);
-    ti_Close(appv_compr);
-    //ti_Delete("Trekgui");
-    ti_SetArchiveStatus(true, appv_decomp);
     if(!ntwk_Login()) {
         dbg_sprintf(dbgout, "Failed to login\n");
         return;
     }
-    trekgui_init(ti_GetDataPtr(appv_decomp));
+    if(!TrekGFX_init()) return;
     gfx_InitModuleIcons();
     do {
         /* A buffer to store bytes read by the serial library */

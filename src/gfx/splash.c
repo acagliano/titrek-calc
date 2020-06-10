@@ -1,4 +1,4 @@
-// convpng v7.3
+// convpng v7.2
 #include <stdint.h>
 #include "internal.h"
 

@@ -3,7 +3,7 @@
 #include <tice.h>
 #include <usbdrvce.h>
 #include <keypadc.h>
-#include "../gfx/trekgui.h"
+#include "../gfx/TrekGFX.h"
 #include "../classes/ships.h"
 #include "../gfx/moduleicons.h"
 #include "../equates.h"
@@ -27,10 +27,10 @@ void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y
 }
 
 void gfx_InitModuleIcons(void){
-    uint24_t src = MODICON_START, ct = trekgui_num - MODICON_START, i;
+    uint24_t src = MODICON_START, ct = TrekGFX_num - MODICON_START, i;
     
     for(i = 0; i < ct; i++){
-        modicons[i] = ((gfx_rletsprite_t*)trekgui[src++]);
+        modicons[i] = ((gfx_rletsprite_t*)TrekGFX[src++]);
     }
 }
 

@@ -1,9 +1,9 @@
 // convpng v7.2
 #include <stdint.h>
-#include "trekgui.h"
+#include "TrekGFX.h"
 
 #include <fileioc.h>
-uint8_t *trekgui[28] = {
+uint8_t *TrekGFX[28] = {
  (uint8_t*)0,
  (uint8_t*)13150,
  (uint8_t*)26128,
@@ -34,13 +34,19 @@ uint8_t *trekgui[28] = {
  (uint8_t*)36473,
 };
 
-bool trekgui_init(void *decompressed_addr) {
+bool TrekGFX_init(void) {
     unsigned int data, i;
+    ti_var_t appvar;
 
-    data = (unsigned int)decompressed_addr - (unsigned int)trekgui[0];
-    for (i = 0; i < trekgui_num; i++) {
-        trekgui[i] += data;
+    ti_CloseAll();
+
+    appvar = ti_Open("TrekGFX", "r");
+    data = (unsigned int)ti_GetDataPtr(appvar) - (unsigned int)TrekGFX[0];
+    for (i = 0; i < TrekGFX_num; i++) {
+        TrekGFX[i] += data;
     }
 
-    return true;
+    ti_CloseAll();
+
+    return (bool)appvar;
 }

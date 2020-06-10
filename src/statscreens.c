@@ -3,7 +3,7 @@
 #include <string.h>
 #include "classes/ships.h"
 #include "statscreens.h"
-#include "gfx/trekgui.h"
+#include "gfx/TrekGFX.h"
 #include "classes/screens.h"
 #include <graphx.h>
 #include <compression.h>
