@@ -6,7 +6,6 @@
 //--------------------------------------
 
 /* Keep these headers */
-#define usb_callback_data_t usb_device_t
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -44,6 +43,10 @@
 #include <usbdrvce.h>
 #include <srldrvce.h>
 
+#define DEBUG
+#undef NDEBUG
+#include <debug.h>
+
 #include "network/usb.h"
 
 #define setbits(bits, mask) (bits|mask)
@@ -51,12 +54,13 @@
 
 ship_t Ship = {0};
 selected_t select = {0, 0};
-usb_device_t usb_device = NULL;
-srl_device_t srl;
 gfx_rletsprite_t* gfx_sprites;
 gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
+
+srl_device_t srl;
+uint8_t srl_buf[2048];
 
 /* Main Menu */
 
@@ -65,25 +69,25 @@ void PlayGame(void);
 void MainMenu(void) {
     uint8_t opt = 0;
     while(1){
-        opt = gfx_RenderSplash(splash, gameflags.network);
-            if(opt == OPT_PLAY) {gameflags.loopgame = 1; PlayGame();}
-            if(opt == OPT_QUIT) {gameflags.exit = 1; break;}
-            if(opt == OPT_ABOUT) {
-                gfx_ZeroScreen();
-                gfx_PrintStringXY("## About Project TI-Trek ##", 5, 5);
-                gfx_PrintStringXY("A multiplayer space combat game", 10, 20);
-                gfx_PrintStringXY("for the TI-84+ CE!", 10, 30);
-                gfx_PrintStringXY("_Authors_", 10, 40);
-                gfx_PrintStringXY("ACagliano - lead, client", 15, 50);
-                gfx_PrintStringXY("beck - lead, server", 15, 60);
-                gfx_PrintStringXY("command - lead, USB bridge", 15, 70);
-                gfx_PrintStringXY("(c) 2019, Project TI-Trek", 5, 230);
-                gfx_BlitBuffer();
-                while(os_GetCSC() != sk_Clear);
-            }
-            if(opt == OPT_SETTINGS){}
+        opt = gfx_RenderSplash(splash);
+        if(opt == OPT_PLAY) {gameflags.loopgame = 1; PlayGame();}
+        if(opt == OPT_QUIT) {gameflags.exit = 1; break;}
+        if(opt == OPT_ABOUT) {
+            gfx_ZeroScreen();
+            gfx_PrintStringXY("## About Project TI-Trek ##", 5, 5);
+            gfx_PrintStringXY("A multiplayer space combat game", 10, 20);
+            gfx_PrintStringXY("for the TI-84+ CE!", 10, 30);
+            gfx_PrintStringXY("_Authors_", 10, 40);
+            gfx_PrintStringXY("ACagliano - lead, client", 15, 50);
+            gfx_PrintStringXY("beck - lead, server", 15, 60);
+            gfx_PrintStringXY("command - lead, USB bridge", 15, 70);
+            gfx_PrintStringXY("(c) 2019, Project TI-Trek", 5, 230);
+            gfx_BlitBuffer();
+            while(!kb_IsDown(kb_KeyClear)) kb_Scan();
         }
+        if(opt == OPT_SETTINGS){}
     }
+}
 
 
 
@@ -92,49 +96,33 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 								  usb_callback_data_t *callback_data) {
 	/* When a device is connected, or when connected to a computer */
 	if(event == USB_DEVICE_CONNECTED_EVENT || event == USB_HOST_CONFIGURE_EVENT) {
-		if(!*callback_data) {
-			/* Set the USB device */
-			*callback_data = event_data;
-            srl_error = srl_Init(&srl, usb_device, srl_buf, sizeof(srl_buf), SRL_INTERFACE_ANY);
-            if(!srl_error) gameflags.network = true;
-		}
+	    usb_device_t device = event_data;
+        srl_error_t srl_error = srl_Init(&srl, device, srl_buf, sizeof(srl_buf), SRL_INTERFACE_ANY);
+        if(!srl_error) {
+            gameflags.network = true;
+        }
 	}
 
 	/* When a device is disconnected */
 	if(event == USB_DEVICE_DISCONNECTED_EVENT) {
-		*callback_data = NULL;
+        gameflags.network = false;
 	}
 
 	return USB_SUCCESS;
 }
 
-void main(void) {
+int main(void) {
     usb_error_t usb_error;
-    uint24_t usb_timeout = 0xffff;
-    srl_error_t srl_error;
-    uint8_t srl_buf[2048];
-    unsigned int i;
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
-    disableInts();
     zx7_Decompress(splash, splash_compressed);
     zx7_Decompress(err_icon, icon_internalerr_compressed);
-    usb_error = usb_Init(handle_usb_event, &usb_device, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
-    if(!usb_error){
-        while(!usb_device && usb_timeout--) {
-           kb_Scan();
 
-           /* Exit if clear is pressed */
-           if(kb_IsDown(kb_KeyClear)) {
-               goto error;
-           }
-           /* Handle any USB events that have occured */
-           usb_HandleEvents();
-       }
-       if(usb_device){
-        }
-    }
+    gameflags.network = false;
+    usb_error = usb_Init(handle_usb_event, NULL, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
+    if(usb_error) goto error;
+
     gfx_SetDefaultPalette(gfx_8bpp);
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
@@ -145,35 +133,43 @@ void main(void) {
 error:
     usb_Cleanup();
     gfx_End();
-    enableInts();
     pgrm_CleanUp();
-    return;
+    return 0;
 }
 
 
 void PlayGame(void){
     /* A buffer for internal use by the serial library */
+    gfx_rletsprite_t *compr_src, *decomp_dest;
     ti_var_t appv_compr, appv_decomp;
     uint16_t screen = 0;
     static size_t current_size = 0;
     char in_buff[1024];
-    //if(!gameflags.network) return;
-    appv_compr = ti_Open("trekgui", "r");
-    appv_decomp = ti_Open("trekGFX", "r");
-    if((!appv_compr) && (!appv_decomp)) return;
-    if(appv_compr){
-        gfx_rletsprite_t *compr_src, *decomp_dest;
-        appv_decomp = ti_Open("trekGFX", "w+");
-        if(!(ti_Resize(trekgui_uncompressed_size, appv_decomp))) return;
-        compr_src = (gfx_rletsprite_t*)ti_GetDataPtr(appv_compr);
-        decomp_dest = (gfx_rletsprite_t*)ti_GetDataPtr(appv_decomp);
-        zx7_Decompress(decomp_dest, compr_src);
-        ti_CloseAll();
-        ti_Delete("trekgui");
+    if(!gameflags.network) return;
+    appv_compr = ti_Open("Trekgui", "r");
+    appv_decomp = ti_Open("TrekGFX", "w+");
+    if(!appv_compr) {
+        dbg_sprintf(dbgout, "Failed to open input appvar\n");
+        return;
     }
-    appv_decomp = ti_Open("trekGFX", "r");
+    if(!appv_decomp) {
+        dbg_sprintf(dbgout, "Failed to open output appvar\n");
+        return;
+    }
+    if(!(ti_Resize(trekgui_uncompressed_size, appv_decomp))) {
+        dbg_sprintf(dbgout, "Failed to resize output appvar\n");
+        return;
+    }
+    compr_src = (gfx_rletsprite_t*)ti_GetDataPtr(appv_compr);
+    decomp_dest = (gfx_rletsprite_t*)ti_GetDataPtr(appv_decomp);
+    zx7_Decompress(decomp_dest, compr_src);
+    ti_Close(appv_compr);
+    //ti_Delete("Trekgui");
     ti_SetArchiveStatus(true, appv_decomp);
-    ntwk_Login(&gameflags);
+    if(!ntwk_Login()) {
+        dbg_sprintf(dbgout, "Failed to login\n");
+        return;
+    }
     trekgui_init(ti_GetDataPtr(appv_decomp));
     gfx_InitModuleIcons();
     do {
@@ -186,8 +182,8 @@ void PlayGame(void){
         if(key == sk_Clear){
             if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
             else if(gameflags.logged_in) ntwk_Disconnect();
-                else gameflags.loopgame = false;
-            }
+            else gameflags.loopgame = false;
+        }
         if(key == sk_Yequ)
             screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
         if(key == sk_Window)
@@ -269,12 +265,12 @@ void PlayGame(void){
         usb_HandleEvents();
 
         /* If the device was disconnected, exit */
-        if(!usb_device) return; // here, can we `goto` the main menu?
+        if(!gameflags.network) return;
         /* Handle input */
         if(current_size) {
           if(srl_Available(&srl) >= current_size) {
             srl_Read(&srl, in_buff, current_size);
-            conn_HandleInput((usb_packet_t*)&in_buff, current_size, &gameflags);
+              conn_HandleInput((usb_packet_t *) &in_buff, current_size);
             current_size = 0;
           }
         } else {

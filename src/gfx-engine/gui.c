@@ -1,9 +1,12 @@
 #include <graphx.h>
 #include <stdint.h>
 #include <tice.h>
+#include <usbdrvce.h>
+#include <keypadc.h>
 #include "../gfx/trekgui.h"
 #include "../classes/ships.h"
 #include "../gfx/moduleicons.h"
+#include "../equates.h"
 
 #define MODICON_START 17
 gfx_rletsprite_t* modicons[TARG_SENS + 1] = {
@@ -31,7 +34,7 @@ void gfx_InitModuleIcons(void){
     }
 }
 
-uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash, bool net){
+uint8_t gfx_RenderSplash(gfx_rletsprite_t *splash) {
     uint24_t text_x = 60;
     uint8_t text_y = 140;
     uint24_t key = 0;
@@ -43,23 +46,40 @@ uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash, bool net){
     gfx_PrintStringXY("Settings", text_x, text_y + 15);
     gfx_PrintStringXY("About Game", text_x, text_y + 30);
     gfx_PrintStringXY("Quit Game", text_x, text_y + 45);
-    if(!net) {
-        gfx_SetTextFGColor(224);
-        gfx_PrintStringXY("Networking disabled!", text_x + 100, text_y + 45);
-    }
     
-    while((key = os_GetCSC()) != sk_Enter){
-        if(key){
-            gfx_SetColor(0);
-            gfx_FillCircle(text_x - 10, selected * 15 + text_y + 3, 4);
+    do {
+        kb_Scan();
+        gfx_SetColor(0);
+        gfx_FillCircle(text_x - 10, selected * 15 + text_y + 3, 4);
+        if(kb_IsDown(kb_KeyUp)) {
+            selected -= (selected > 0);
+            while(kb_IsDown(kb_KeyUp)) {usb_HandleEvents(); kb_Scan();}
         }
-        if(key == sk_Up) selected -= (selected > 0);
-        if(key == sk_Down) selected += (selected < 3);
-        if(key == sk_Clear) {selected = 3; break;}
+        if(kb_IsDown(kb_KeyDown)) {
+            selected += (selected < 3);
+            while(kb_IsDown(kb_KeyDown)) {usb_HandleEvents(); kb_Scan();}
+        }
+        if(kb_IsDown(kb_KeyClear)) {
+            selected = 3;
+            while(kb_IsDown(kb_KeyClear)) {usb_HandleEvents(); kb_Scan();}
+            break;
+        }
         gfx_SetColor(229);
         gfx_FillCircle(text_x - 10, selected * 15 + text_y + 3, 4);
+
+        if(gameflags.network) {
+            gfx_SetColor(0);
+            gfx_FillRectangle_NoClip(text_x + 100, text_y + 45, gfx_GetStringWidth("Networking disabled!"), 10);
+        } else {
+            gfx_SetTextFGColor(224);
+            gfx_PrintStringXY("Networking disabled!", text_x + 100, text_y + 45);
+        }
+
+
         gfx_BlitBuffer();
-    }
+        usb_HandleEvents();
+    } while(!kb_IsDown(kb_KeyEnter));
+    while(kb_IsDown(kb_KeyEnter)) {usb_HandleEvents(); kb_Scan();};
     return selected;
 }
 

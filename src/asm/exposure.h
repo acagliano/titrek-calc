@@ -7,8 +7,6 @@
 
 char user_input(char* buffer, size_t length, uint8_t flags);
 uint8_t getKey(void);
-void enableInts(void);
-void disableInts(void);
 
 
 #endif

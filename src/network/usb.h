@@ -7,11 +7,11 @@ typedef struct {
 } usb_packet_t;
 
 // Inbound
-void conn_HandleInput(usb_packet_t* in_buff, size_t buff_size, flags_t* gameflags);
+void conn_HandleInput(usb_packet_t *in_buff, size_t buff_size);
 
 // Outbound
-void ntwk_Login(flags_t* flags);
-void ntwk_Register(uint8_t* loginstuff, size_t buff_size);
+bool ntwk_Login(void);
+bool ntwk_Register(uint8_t* loginstuff, size_t buff_size);
 void ntwk_Disconnect(void);
 
 #endif

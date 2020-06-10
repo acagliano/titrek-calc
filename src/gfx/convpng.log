@@ -51,7 +51,7 @@ transparent color : 0x0000
  torpedo : converted!
  targsens : converted!
 
-exporting appvar: trekgui.8xv
+exporting appvar: Trekgui.8xv
  shipinterior_left
  shipinterior_right
  icon_shieldsstable

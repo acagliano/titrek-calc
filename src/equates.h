@@ -19,5 +19,6 @@ typedef struct {
     bool network;
     bool logged_in;
 } flags_t;
+extern flags_t gameflags;
 
 #endif
