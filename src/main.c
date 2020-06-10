@@ -74,6 +74,7 @@ void MainMenu(void) {
         if(opt == OPT_QUIT) {gameflags.exit = 1; break;}
         if(opt == OPT_ABOUT) {
             gfx_ZeroScreen();
+            gfx_SetColor(239);
             gfx_PrintStringXY("## About Project TI-Trek ##", 5, 5);
             gfx_PrintStringXY("A multiplayer space combat game", 10, 20);
             gfx_PrintStringXY("for the TI-84+ CE!", 10, 30);
