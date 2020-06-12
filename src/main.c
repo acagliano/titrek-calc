@@ -61,6 +61,7 @@ bool debug = 0;
 gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
+userinfo_t userinfo;
 
 srl_device_t srl;
 uint8_t srl_buf[2048];
@@ -164,7 +165,7 @@ void PlayGame(void){
         size_t bytes_read;
         sk_key_t key = getKey();
         Screen_RenderUI(screen, &Ship, &select);
-        if(!gameflags.logged_in) gui_NetworkErrorResponse(3, 6);
+        if(!gameflags.logged_in) gui_NetworkErrorResponse(3, 6, false);
         gfx_BlitBuffer();
         if(key == sk_Clear){
             if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
@@ -257,11 +258,7 @@ void PlayGame(void){
         /* Handle input */
         if(current_size) {
           if(srl_Available(&srl) >= current_size) {
-            if(srl_Read(&srl, in_buff, current_size) == current_size){
-                gui_NetworkErrorResponse(3, 7);
-                gfx_BlitBuffer();
-                while(!kb_AnyKey()) kb_Scan();
-            }
+            srl_Read(&srl, in_buff, current_size);
             conn_HandleInput((usb_packet_t *) &in_buff, current_size);
             current_size = 0;
           }

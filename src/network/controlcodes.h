@@ -15,7 +15,7 @@ enum ControlCodes {
 
 //returned from some routines
 enum ResponseCodes {
-    SUCCESS = 0xd0,
+    SUCCESS = 0,
     INVALID,
     DUPLICATE,
     MISSING,

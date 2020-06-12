@@ -1,4 +1,5 @@
 #include <tice.h>
+#include <keypadc.h>
 #include <graphx.h>
 #include <stddef.h>
 #include <compression.h>
@@ -27,7 +28,7 @@ char err_codes[][32] = {
     "Banned",
     "Version Err",
     "Logging you in...",
-    "Packet Received"
+    "Packet Format Err"
 };
 
 debug_type[][10] = {
@@ -43,11 +44,15 @@ void gfx_DrawErrorWidget(void){
     gfx_RLETSprite(err_icon, widget_x+5, widget_y+7);
 }
 
-void gui_NetworkErrorResponse(uint8_t controlcode, uint8_t responsecode){
+void gui_NetworkErrorResponse(uint8_t controlcode, uint8_t responsecode, bool blocking){
     gfx_DrawErrorWidget();
     gfx_SetTextXY(widget_x + 50, widget_y + 8);
     gfx_PrintString(ctl_codes[controlcode]);
     gfx_SetTextXY(widget_x + 50, widget_y + 18);
     gfx_PrintString(err_codes[responsecode - 1]);
+    if(blocking){
+        gfx_BlitBuffer();
+        while(!kb_IsDown(kb_KeyClear)) kb_Scan();
+    }
 }
 

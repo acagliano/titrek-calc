@@ -16,9 +16,9 @@ void conn_HandleInput(usb_packet_t *in_buff, size_t buff_size) {
         case REGISTER:
         case LOGIN:
             if(response == SUCCESS) gameflags.logged_in = true;
-            if((response == MISSING) && (ctl == LOGIN)) ntwk_Register(&in_buff->data[1], buff_size - 2);
+            if((response == MISSING) && (ctl == LOGIN)) ntwk_Register();
             else {
-                gui_NetworkErrorResponse(ctl, response);
+                gui_NetworkErrorResponse(ctl, response, false);
                 while(!kb_AnyKey());
             }
             break;
@@ -28,6 +28,8 @@ void conn_HandleInput(usb_packet_t *in_buff, size_t buff_size) {
         case MESSAGE:
             // to handle
             break;
+        default:
+            gui_NetworkErrorResponse(3, 7, true);
     }
 }
 
