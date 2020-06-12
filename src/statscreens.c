@@ -21,7 +21,6 @@
 
 char mains_title[] = "[MAIN SYS]";
 char tact_title[] = "[TACTICAL SYS]";
-char version[] = "v0.90 alpha";
 
 char moduledb[][12] = {
     "LifeSup",
@@ -216,13 +215,6 @@ void Overlay_UIModuleInfo(module_t* module) {
     else gfx_PrintString("Offline");
 }
 
-
-
-
-
-
-
-
 void Screen_Background(unsigned char active) {
     int i;
     gfx_SetTextFGColor(255);
@@ -241,6 +233,6 @@ void Screen_Background(unsigned char active) {
     gfx_PrintStringXY("Repair", 200, lcars_texty);
     gfx_PrintStringXY("Cargo", 268, lcars_texty);
     gfx_SetTextFGColor(148);
-    gfx_PrintStringXY(version, 160 - (7 * strlen(version) / 2), 0);
+    gfx_PrintStringXY(versionstr, 160 - (7 * strlen(versionstr) / 2), 0);
     gfx_SetTextFGColor(0);
 }

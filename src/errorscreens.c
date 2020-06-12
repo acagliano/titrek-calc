@@ -26,7 +26,12 @@ char err_codes[][32] = {
     "Missing",      // placeholder
     "Banned",
     "Version Err",
-    "Logging you in..."
+    "Logging you in...",
+    "Packet Received"
+};
+
+debug_type[][10] = {
+    "srl_recv"
 };
 
 void gfx_DrawErrorWidget(void){
@@ -45,3 +50,4 @@ void gui_NetworkErrorResponse(uint8_t controlcode, uint8_t responsecode){
     gfx_SetTextXY(widget_x + 50, widget_y + 18);
     gfx_PrintString(err_codes[responsecode - 1]);
 }
+

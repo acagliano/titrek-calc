@@ -52,9 +52,12 @@
 #define setbits(bits, mask) (bits|mask)
 #define resbits(bits, mask) (bits^mask)
 
+char version[] = {0, 0, 91, ALPHA};
+char *versionstr = "0.0.91 alpha";
 ship_t Ship = {0};
 selected_t select = {0, 0};
 gfx_rletsprite_t* gfx_sprites;
+bool debug = 0;
 gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
@@ -144,7 +147,7 @@ void PlayGame(void){
     gfx_rletsprite_t *compr_src, *decomp_dest;
     ti_var_t assets;
     uint16_t screen = 0;
-    static size_t current_size = 0;
+    size_t current_size = 0;
     char in_buff[1024];
     if(!gameflags.network) return;
     if(!ntwk_Login()) {
@@ -165,6 +168,7 @@ void PlayGame(void){
             else if(gameflags.logged_in) ntwk_Disconnect();
             else gameflags.loopgame = false;
         }
+        if(key == sk_Stat) debug == true;
         if(key == sk_Yequ)
             screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
         if(key == sk_Window)
@@ -250,12 +254,16 @@ void PlayGame(void){
         /* Handle input */
         if(current_size) {
           if(srl_Available(&srl) >= current_size) {
-            srl_Read(&srl, in_buff, current_size);
-              conn_HandleInput((usb_packet_t *) &in_buff, current_size);
+            if(srl_Read(&srl, in_buff, current_size) == current_size){
+                gui_NetworkErrorResponse(3, 7);
+                gfx_BlitBuffer();
+                while(!kb_AnyKey()) kb_Scan();
+            }
+            conn_HandleInput((usb_packet_t *) &in_buff, current_size);
             current_size = 0;
           }
         } else {
-          if(srl_Available(&srl) >= 3) srl_Read(&srl, (void*)current_size, 3);
+          if(srl_Available(&srl) >= 3) srl_Read(&srl, (void*)&current_size, 3);
         }
 
     } while(gameflags.loopgame);
