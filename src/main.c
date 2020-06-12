@@ -101,7 +101,10 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 	/* When a device is connected, or when connected to a computer */
 	if(event == USB_DEVICE_CONNECTED_EVENT || event == USB_HOST_CONFIGURE_EVENT) {
 	    usb_device_t device = event_data;
+	    char dummy;
         srl_error_t srl_error = srl_Init(&srl, device, srl_buf, sizeof(srl_buf), SRL_INTERFACE_ANY);
+        if(!srl_error) srl_SetRate(&srl, 115200);
+        if(!srl_error) srl_Read(&srl, &dummy, 1);
         if(!srl_error) {
             gameflags.network = true;
         }
