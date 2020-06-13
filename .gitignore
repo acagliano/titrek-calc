@@ -224,7 +224,7 @@ fastlane/screenshots
 
 obj
 bin
-src/deprecated
+src/deprecated/*
 src/gfx/*.c
 src/gfx/*.h
 *.log
