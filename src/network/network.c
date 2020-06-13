@@ -3,8 +3,8 @@
 #include <debug.h>
 #include "network.h"
 #include "../equates.h"
+#include "../classes/settings.h"
 #include "usb.h"
-#define PACKET_LIMIT 5
 
 bool ntwk_init(void) {
     gameflags.network = false;
@@ -15,7 +15,7 @@ void ntwk_process(void) {
     static size_t current_size = 0;
     uint8_t i;
     static char in_buff[1024];
-    for(i = 0; i < PACKET_LIMIT && srl_Available(&srl); i++){
+    for(i = 0; i < settings.limits.packet_limit && srl_Available(&srl); i++){
         usb_HandleEvents();
 
         /* If the device was disconnected, exit */

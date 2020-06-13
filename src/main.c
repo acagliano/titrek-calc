@@ -30,8 +30,8 @@
 #include "equates.h"
 #include "classes/ships.h"
 #include "classes/coords.h"
-#include "classes/tech.h"
 #include "classes/screens.h"
+#include "classes/settings.h"
 #include "statscreens.h"
 #include "gfx/TrekGFX.h"
 #include "gfx-engine/gui.h"
@@ -52,6 +52,7 @@
 #define setbits(bits, mask) (bits|mask)
 #define resbits(bits, mask) (bits^mask)
 
+char *settingsappv = "TrekSett";
 char version[] = {0, 0, 91, ALPHA};
 char *versionstr = "0.0.91 alpha";
 ship_t Ship = {0};
@@ -61,7 +62,7 @@ bool debug = 0;
 gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
-userinfo_t userinfo;
+settings_t settings = {0};
 
 /* Main Menu */
 
@@ -92,11 +93,16 @@ void MainMenu(void) {
 }
 
 int main(void) {
+    ti_var_t savefile;
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
     zx7_Decompress(splash, splash_compressed);
     zx7_Decompress(err_icon, icon_internalerr_compressed);
+    if(savefile = ti_Open(settingsappv, "r")){
+        ti_Read(&settings, sizeof(settings), 1, savefile);
+        ti_Close(savefile);
+    } else set_defaults();
 
     if(!ntwk_init()) goto error;
 
@@ -109,6 +115,7 @@ int main(void) {
     } while(!gameflags.exit);
 error:
     usb_Cleanup();
+    write_settings();
     gfx_End();
     pgrm_CleanUp();
     return 0;
@@ -214,7 +221,7 @@ void PlayGame(void){
                     break;
                 }
             }
-
+        
         ntwk_process();
 
     } while(gameflags.loopgame && gameflags.network);

@@ -66,12 +66,12 @@ void Screen_RenderUI(uint24_t screen, selected_t* select){
         case SCRN_SENS:
             break;
         case SCRN_TACT:
-            Screen_UITacticalStats(&Ship.system, MAX_MODULES, select->tactical);
+            Screen_UITacticalStats(Ship.system, MAX_MODULES, select->tactical);
             if(screen > 0xff)
                 Overlay_UIModuleInfo(&Ship.system[select->tactical]);
             break;
         case SCRN_MAINS:
-            Screen_UISystemStats(&Ship.system, MAX_MODULES, select->mains);
+            Screen_UISystemStats(Ship.system, MAX_MODULES, select->mains);
             if(screen > 0xff)
                 Overlay_UIModuleInfo(&Ship.system[select->mains]);
             break;

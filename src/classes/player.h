@@ -3,9 +3,9 @@
 #define player_h
 
 typedef struct {
-    char username[16];
-    char password[32];
-} player_t;
+    char username[24];
+    char passwd[32];
+} userinfo_t;
 
 
 

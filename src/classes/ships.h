@@ -4,7 +4,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "coords.h"
-#include "tech.h"
 #include "modules.h"
 // POWER CONTROL STRUCTURE
 #define DRAW_CORE 0
