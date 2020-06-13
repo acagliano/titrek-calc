@@ -1,6 +1,8 @@
 #include <usbdrvce.h>
 #include <srldrvce.h>
+#include <debug.h>
 #include "../equates.h"
+#include "network.h"
 
 srl_device_t srl;
 uint8_t srl_buf[2048];
@@ -9,7 +11,9 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
                                     usb_callback_data_t *callback_data);
 
 bool init_usb(void) {
-    usb_error_t usb_error = usb_Init(handle_usb_event, NULL, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
+    usb_error_t usb_error;
+    gameflags.network = false;
+    usb_error = usb_Init(handle_usb_event, NULL, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
     return !usb_error;
 }
 
@@ -35,3 +39,32 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 
     return USB_SUCCESS;
 }
+
+bool usb_read_to_size(size_t size) {
+    if(net_buf_size > size) {
+        // todo: this should probably disconnect you
+        dbg_sprintf(dbgerr, "Network buffer in invalid state\n");
+        return true;
+    }
+    if(net_buf_size + srl_Available(&srl) >= size) {
+        srl_Read(&srl, &net_buf[net_buf_size], size - net_buf_size);
+        return true;
+    }
+    return false;
+}
+
+void usb_write(void *buf, size_t size) {
+    srl_Write(&srl, buf, size);
+}
+
+void usb_process(void) {
+    usb_HandleEvents();
+}
+
+net_mode_t mode_srl = {
+        MODE_CEMU_PIPE,
+        init_usb,
+        usb_process,
+        usb_read_to_size,
+        usb_write
+};
