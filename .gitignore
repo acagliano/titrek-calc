@@ -226,3 +226,8 @@ obj
 bin
 src/gfx/*.c
 src/gfx/*.h
+*.log
+.idea
+cmake-build*
+*.8xv
+
