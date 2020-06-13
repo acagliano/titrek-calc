@@ -63,6 +63,7 @@ gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
 settings_t settings = {0};
+uint24_t ticknum = 0;
 
 /* Main Menu */
 
@@ -221,8 +222,17 @@ void PlayGame(void){
                     break;
                 }
             }
-        
+        if(!(ticknum % settings.limits.chunk_refresh))
+            ntwk_send(REQCHUNK,
+                PS_VAL(Ship.rotate.yaw),
+                PS_VAL(Ship.rotate.pitch),
+                PS_VAL(Ship.rotate.roll));
+        if(!(ticknum % settings.limits.entity_refresh))
+            ntwk_send(REQENTITY,
+                PS_VAL(Ship.rotate.yaw),
+                PS_VAL(Ship.rotate.pitch),
+                PS_VAL(Ship.rotate.roll));
         ntwk_process();
-
+        ticknum++;
     } while(gameflags.loopgame && gameflags.network);
 }

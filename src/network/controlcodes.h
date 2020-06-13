@@ -7,6 +7,8 @@ enum ControlCodes {
     DISCONNECT,
     MOVESHIP,
     REQCHUNK,
+    REQENTITY,
+    REQSENSDATA, // May add REQPOSITION if needed
     PING = 0xfc,
     MESSAGE = 0xfd,
     DEBUG = 0xfe,

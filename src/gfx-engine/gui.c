@@ -108,9 +108,9 @@ bool gui_Login(void) {
     gfx_ZeroScreen();
     gfx_BlitBuffer();
     if(!settings.userinfo.username[0])
-        text_y = prompt_for("Username:", settings.userinfo.username, 23, text_x, text_y, 0);
+        text_y = prompt_for("Username:", settings.userinfo.username, 24, text_x, text_y, 0);
     if(!settings.userinfo.passwd[0])
-        text_y = prompt_for("Password:", settings.userinfo.passwd, 31, text_x, text_y, 1);
+        text_y = prompt_for("Password:", settings.userinfo.passwd, 32, text_x, text_y, 1);
     if(!settings.userinfo.username[0] || !settings.userinfo.passwd[0]) return false;
 
     return ntwk_send(LOGIN,
