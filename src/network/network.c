@@ -3,6 +3,7 @@
 #include <debug.h>
 #include "network.h"
 #include "../equates.h"
+#include "../classes/settings.h"
 #include "../asm/exposure.h"
 
 net_mode_t *mode;
@@ -18,20 +19,25 @@ bool ntwk_init(void) {
 }
 
 void ntwk_process(void) {
-    if(mode->process) mode->process();
-
+    uint8_t i;
     static size_t packet_size = 0;
-    /* If the device was disconnected, exit */
-    if(!gameflags.network) return;
 
-    /* Handle input */
-    if(packet_size) {
-        if(mode->read_to_size(packet_size)) {
-            conn_HandleInput((packet_t *) &net_buf, packet_size);
-            packet_size = 0;
+    for(i = 0; i < 2 * settings.limits.packet_limit; i++ ) {
+        if(mode->process) mode->process();
+
+        /* If the device was disconnected, exit */
+        if(!gameflags.network) return;
+
+        /* Handle input */
+        if(packet_size) {
+            if(mode->read_to_size(packet_size)) {
+                conn_HandleInput((packet_t *) &net_buf, packet_size);
+                packet_size = 0;
+            } else break;
+        } else {
+            if(mode->read_to_size(sizeof(packet_size))) packet_size = *(size_t*)net_buf;
+            else break;
         }
-    } else {
-        if(mode->read_to_size(sizeof(packet_size))) packet_size = *(size_t*)net_buf;
     }
 }
 

@@ -31,11 +31,4 @@ enum Versioning {
     BETA
 };
 
-typedef struct {
-    char username[24];
-    char passwd[32];
-    char email[64];
-} userinfo_t;
-extern userinfo_t userinfo;
-
 #endif

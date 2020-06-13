@@ -3,6 +3,7 @@
 #include <keypadc.h>
 #include "../gfx/TrekGFX.h"
 #include "../classes/ships.h"
+#include "../classes/settings.h"
 #include "../equates.h"
 #include "../network/network.h"
 #include "gui.h"
@@ -104,37 +105,38 @@ uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y
 bool gui_Login(void) {
     uint24_t text_x = 0;
     uint8_t text_y = 0;
-
     gfx_ZeroScreen();
     gfx_BlitBuffer();
-    text_y = prompt_for("Username:", userinfo.username, 23, text_x, text_y, 0);
-    text_y = prompt_for("Password:", userinfo.passwd, 31, text_x, text_y, 1);
-    if(!userinfo.username[0] || !userinfo.passwd[0]) return false;
+    if(!settings.userinfo.username[0])
+        text_y = prompt_for("Username:", settings.userinfo.username, 23, text_x, text_y, 0);
+    if(!settings.userinfo.passwd[0])
+        text_y = prompt_for("Password:", settings.userinfo.passwd, 31, text_x, text_y, 1);
+    if(!settings.userinfo.username[0] || !settings.userinfo.passwd[0]) return false;
 
     return ntwk_send(LOGIN,
-        PS_STR(userinfo.username),
-        PS_STR(userinfo.passwd)
+        PS_STR(settings.userinfo.username),
+        PS_STR(settings.userinfo.passwd)
     );
 }
 
 bool gui_Register(void) {
 // input = pointer to preserved username/password data from login function
-
+    char email[64];
     if(!gameflags.network) return false;
 
     gfx_ZeroScreen();
     gfx_SetTextFGColor(255);
     gfx_PrintStringXY("User: ", 0, 0);
-    gfx_PrintString(userinfo.username);
+    gfx_PrintString(settings.userinfo.username);
     gfx_PrintStringXY("No matching account found!", 0, 10);
     gfx_PrintStringXY("Let's create one...", 0, 20);
     gfx_BlitBuffer();
-    prompt_for("Email:", userinfo.email, 63, 0, 30, 0);    // get email address
-    if(!userinfo.email[0]) return false;
+    prompt_for("Email:", &email, 63, 0, 30, 0);    // get email address
+    if(!email[0]) return false;
 
     return ntwk_send(REGISTER,
-        PS_STR(userinfo.username),
-        PS_STR(userinfo.passwd),
-        PS_STR(userinfo.email)
+        PS_STR(settings.userinfo.username),
+        PS_STR(settings.userinfo.passwd),
+        PS_STR(email)
     );
 }

@@ -80,9 +80,9 @@ int compare_objects(const void *p, const void *q) {
     unsigned int dx = x.distance;
     unsigned int dy = y.distance;
     /* Avoid return x - y, which can cause undefined behaviour
-     because of signed integer overflow. */
+     because of signed integer overflow. 
      
-     /*
+     
     if (dx < dy)
         return 1;  // Return -1 if you want ascending, 1 if you want descending order.
     else if (dx > dy)
