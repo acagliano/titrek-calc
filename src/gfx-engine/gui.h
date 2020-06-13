@@ -1,6 +1,8 @@
 #ifndef gui_h
 #define gui_h
 
+#define wait_kb_release(key) while(kb_IsDown(key)) {ntwk_process(); kb_Scan();}
+
 enum SplashOpts {OPT_PLAY, OPT_SETTINGS, OPT_ABOUT, OPT_QUIT};
 
 extern gfx_rletsprite_t* modicons[TARG_SENS + 1];

@@ -41,13 +41,12 @@
 
 // USB Libraries
 #include <usbdrvce.h>
-#include <srldrvce.h>
 
 #define DEBUG
 #undef NDEBUG
 #include <debug.h>
 
-#include "network/usb.h"
+#include "network/network.h"
 
 #define setbits(bits, mask) (bits|mask)
 #define resbits(bits, mask) (bits^mask)
@@ -62,9 +61,6 @@ gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
 userinfo_t userinfo;
-
-srl_device_t srl;
-uint8_t srl_buf[2048];
 
 /* Main Menu */
 
@@ -94,42 +90,14 @@ void MainMenu(void) {
     }
 }
 
-
-
-/* Handle USB events */
-static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
-								  usb_callback_data_t *callback_data) {
-	/* When a device is connected, or when connected to a computer */
-	if(event == USB_DEVICE_CONNECTED_EVENT || event == USB_HOST_CONFIGURE_EVENT) {
-	    usb_device_t device = event_data;
-	    char dummy;
-        srl_error_t srl_error = srl_Init(&srl, device, srl_buf, sizeof(srl_buf), SRL_INTERFACE_ANY);
-        if(!srl_error) srl_SetRate(&srl, 115200);
-        if(!srl_error) srl_Read(&srl, &dummy, 1);
-        if(!srl_error) {
-            gameflags.network = true;
-        }
-	}
-
-	/* When a device is disconnected */
-	if(event == USB_DEVICE_DISCONNECTED_EVENT) {
-        gameflags.network = false;
-	}
-
-	return USB_SUCCESS;
-}
-
 int main(void) {
-    usb_error_t usb_error;
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
     zx7_Decompress(splash, splash_compressed);
     zx7_Decompress(err_icon, icon_internalerr_compressed);
 
-    gameflags.network = false;
-    usb_error = usb_Init(handle_usb_event, NULL, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
-    if(usb_error) goto error;
+    if(!ntwk_init()) goto error;
 
     gfx_SetDefaultPalette(gfx_8bpp);
     gfx_SetDrawBuffer();
@@ -147,12 +115,7 @@ error:
 
 
 void PlayGame(void){
-    /* A buffer for internal use by the serial library */
-    gfx_rletsprite_t *compr_src, *decomp_dest;
-    ti_var_t assets;
     uint16_t screen = 0;
-    size_t current_size = 0;
-    char in_buff[1024];
     if(!gameflags.network) return;
     if(!ntwk_Login()) {
         dbg_sprintf(dbgout, "Failed to login\n");
@@ -251,20 +214,7 @@ void PlayGame(void){
                 }
             }
 
-        usb_HandleEvents();
+        ntwk_process();
 
-        /* If the device was disconnected, exit */
-        if(!gameflags.network) return;
-        /* Handle input */
-        if(current_size) {
-          if(srl_Available(&srl) >= current_size) {
-            srl_Read(&srl, in_buff, current_size);
-            conn_HandleInput((usb_packet_t *) &in_buff, current_size);
-            current_size = 0;
-          }
-        } else {
-          if(srl_Available(&srl) >= 3) srl_Read(&srl, (void*)&current_size, 3);
-        }
-
-    } while(gameflags.loopgame);
+    } while(gameflags.loopgame && gameflags.network);
 }

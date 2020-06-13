@@ -1,12 +1,11 @@
 #include <graphx.h>
 #include <stdint.h>
-#include <tice.h>
-#include <usbdrvce.h>
 #include <keypadc.h>
 #include "../gfx/TrekGFX.h"
 #include "../classes/ships.h"
-#include "../gfx/moduleicons.h"
 #include "../equates.h"
+#include "../network/network.h"
+#include "gui.h"
 
 #define MODICON_START 17
 gfx_rletsprite_t* modicons[TARG_SENS + 1] = {
@@ -37,7 +36,6 @@ void gfx_InitModuleIcons(void){
 uint8_t gfx_RenderSplash(gfx_rletsprite_t *splash) {
     uint24_t text_x = 60;
     uint8_t text_y = 140;
-    uint24_t key = 0;
     uint8_t selected = 0;
     gfx_ZeroScreen();
     gfx_RLETSprite(splash, 320 - 260, 20);
@@ -53,15 +51,15 @@ uint8_t gfx_RenderSplash(gfx_rletsprite_t *splash) {
         gfx_FillCircle(text_x - 10, selected * 15 + text_y + 3, 4);
         if(kb_IsDown(kb_KeyUp)) {
             selected -= (selected > 0);
-            while(kb_IsDown(kb_KeyUp)) {usb_HandleEvents(); kb_Scan();}
+            wait_kb_release(kb_KeyUp);
         }
         if(kb_IsDown(kb_KeyDown)) {
             selected += (selected < 3);
-            while(kb_IsDown(kb_KeyDown)) {usb_HandleEvents(); kb_Scan();}
+            wait_kb_release(kb_KeyDown);
         }
         if(kb_IsDown(kb_KeyClear)) {
             selected = 3;
-            while(kb_IsDown(kb_KeyClear)) {usb_HandleEvents(); kb_Scan();}
+            wait_kb_release(kb_KeyClear);
             break;
         }
         gfx_SetColor(229);
@@ -77,9 +75,9 @@ uint8_t gfx_RenderSplash(gfx_rletsprite_t *splash) {
 
 
         gfx_BlitBuffer();
-        usb_HandleEvents();
+        ntwk_process();
     } while(!kb_IsDown(kb_KeyEnter));
-    while(kb_IsDown(kb_KeyEnter)) {usb_HandleEvents(); kb_Scan();};
+    wait_kb_release(kb_KeyEnter);
     return selected;
 }
 

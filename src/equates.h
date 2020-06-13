@@ -14,7 +14,6 @@
 
 extern ship_t Ship;
 extern gfx_rletsprite_t* err_icon;
-extern srl_device_t srl;
 
 typedef struct {
     bool exit;

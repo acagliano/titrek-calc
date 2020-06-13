@@ -1,14 +1,12 @@
 #include <keypadc.h>
-#include <stddef.h>
 #include <stdbool.h>
-#include <srldrvce.h>
 #include "../equates.h"
 #include "../errorscreens.h"
-#include "usb.h"
 #include "controlcodes.h"
+#include "network.h"
 
 
-void conn_HandleInput(usb_packet_t *in_buff, size_t buff_size) {
+void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     uint8_t ctl = in_buff->control;
     uint8_t response = in_buff->data[0];    // for handlers needing only response codes
     uint8_t* data = &in_buff->data[0];      // for handlers needing arbitrary data
