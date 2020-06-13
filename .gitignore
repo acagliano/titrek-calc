@@ -223,3 +223,6 @@ fastlane/report.xml
 fastlane/screenshots
 
 obj
+bin
+src/gfx/*.c
+src/gfx/*.h
