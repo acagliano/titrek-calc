@@ -38,6 +38,7 @@
 #include "gfx/internal.h"
 #include "errorscreens.h"
 #include "asm/exposure.h"
+#include "network/controlcodes.h"
 
 // USB Libraries
 #include <usbdrvce.h>
@@ -117,7 +118,7 @@ error:
 void PlayGame(void){
     uint16_t screen = 0;
     if(!gameflags.network) return;
-    if(!ntwk_Login()) {
+    if(!gui_Login()) {
         dbg_sprintf(dbgout, "Failed to login\n");
         return;
     }
@@ -132,7 +133,7 @@ void PlayGame(void){
         gfx_BlitBuffer();
         if(key == sk_Clear){
             if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
-            else if(gameflags.logged_in) ntwk_Disconnect();
+            else if(gameflags.logged_in) ntwk_send_nodata(DISCONNECT);
             else gameflags.loopgame = false;
         }
         if(key == sk_Stat) debug == true;

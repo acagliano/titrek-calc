@@ -28,9 +28,4 @@ bool ntwk_send_(uint8_t num_parts, uint8_t ctrl, ...);
 // Inbound
 void conn_HandleInput(packet_t *in_buff, size_t buff_size);
 
-// Outbound
-bool ntwk_Login(void);
-bool ntwk_Register(void);
-void ntwk_Disconnect(void);
-
 #endif //TITREK_NETWORK_H
