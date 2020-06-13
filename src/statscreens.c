@@ -57,7 +57,7 @@ int num_GetLength(int number){
     return 1 + (number >= 10) + (number >= 100);
 }
 
-void Screen_RenderUI(uint24_t screen, ship_t* Ship, selected_t* select){
+void Screen_RenderUI(uint24_t screen, selected_t* select){
     Screen_Background(screen);
     gfx_SetTextFGColor(255);
     switch(screen & 0xff){
@@ -66,14 +66,14 @@ void Screen_RenderUI(uint24_t screen, ship_t* Ship, selected_t* select){
         case SCRN_SENS:
             break;
         case SCRN_TACT:
-            Screen_UITacticalStats(&Ship->system, MAX_MODULES, select->tactical);
+            Screen_UITacticalStats(&Ship.system, MAX_MODULES, select->tactical);
             if(screen > 0xff)
-                Overlay_UIModuleInfo(&Ship->system[select->tactical]);
+                Overlay_UIModuleInfo(&Ship.system[select->tactical]);
             break;
         case SCRN_MAINS:
-            Screen_UISystemStats(&Ship->system, MAX_MODULES, select->mains);
+            Screen_UISystemStats(&Ship.system, MAX_MODULES, select->mains);
             if(screen > 0xff)
-                Overlay_UIModuleInfo(&Ship->system[select->mains]);
+                Overlay_UIModuleInfo(&Ship.system[select->mains]);
             break;
         case SCRN_TRANSPORT:
             break;

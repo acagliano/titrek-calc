@@ -164,7 +164,7 @@ void PlayGame(void){
         /* A buffer to store bytes read by the serial library */
         size_t bytes_read;
         sk_key_t key = getKey();
-        Screen_RenderUI(screen, &Ship, &select);
+        Screen_RenderUI(screen, &select);
         if(!gameflags.logged_in) gui_NetworkErrorResponse(3, 6, false);
         gfx_BlitBuffer();
         if(key == sk_Clear){

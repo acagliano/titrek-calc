@@ -16,5 +16,11 @@ typedef struct {
 } vector_t;
 vector_t* coords_GetVector(coords_t* origin, coords_t* dest);
 
+typedef struct {
+    uint8_t yaw;
+    uint8_t pitch;
+    uint8_t roll;
+} rotations_t;
+
 
 #endif

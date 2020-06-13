@@ -17,10 +17,7 @@ void conn_HandleInput(usb_packet_t *in_buff, size_t buff_size) {
         case LOGIN:
             if(response == SUCCESS) gameflags.logged_in = true;
             if((response == MISSING) && (ctl == LOGIN)) ntwk_Register();
-            else {
-                gui_NetworkErrorResponse(ctl, response, false);
-                while(!kb_AnyKey());
-            }
+            else gui_NetworkErrorResponse(ctl, response, true);
             break;
         case DISCONNECT:
             gameflags.logged_in = false;

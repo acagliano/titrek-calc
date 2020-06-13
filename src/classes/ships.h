@@ -113,13 +113,6 @@ typedef union Data_t {
     targsens_data_t mod_targsens;
 } data_t;
 
-
-
-
-
-
-
-
 typedef struct {
     bool unlocked;
     uint8_t modclass;
@@ -141,13 +134,20 @@ char module_SetOnlineState(module_t* module, char state);   // set module state 
 // EX: 73% of STEP_NORMAL might return 73% of 20 (16), or 70% effectiveness.
 // EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
 
+typedef struct {
+    health_t health;
+    uint8_t composite[5];
+    // other data here?
+} hull_t;
+
+
 #define TACT_MAX 6
 #define MAX_MODULES (TACT_MAX + SYS_MAX)
 typedef struct {
-    coords_t coords;
     uint24_t crew;
+    rotations_t rotate;
+    hull_t hull;
     module_t system[MAX_MODULES];
-    module_t hull;
 } ship_t;
 // Core system defines
 

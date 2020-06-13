@@ -223,3 +223,4 @@ fastlane/report.xml
 fastlane/screenshots
 
 obj
+bin

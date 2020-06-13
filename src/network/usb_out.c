@@ -25,8 +25,7 @@ bool ntwk_Login(void) {
     uint8_t ctlcode = LOGIN;
     uint24_t text_x = 0;
     uint8_t text_y = 0;
-    uint24_t packet_len;
-    uint8_t un_len, pass_len;
+    uint24_t packet_len = sizeof(userinfo_t) + 1;
 
     if(!gameflags.network) return false;
 
@@ -35,13 +34,9 @@ bool ntwk_Login(void) {
     text_y = prompt_for("Username:", &userinfo.username, 23, text_x, text_y, 0);
     text_y = prompt_for("Password:", &userinfo.passwd, 31, text_x, text_y, 1);
     if(!userinfo.username[0] || !userinfo.passwd[0]) return false;
-    un_len = strlen(userinfo.username) + 1; // get length of username (plus terminating)
-    pass_len = strlen(userinfo.passwd) + 1; // get length of passwd (plus terminating)
-    packet_len = un_len + pass_len + 1; // add buffer lengths and control byte => packet size
     srl_Write(&srl, &packet_len, 3);     // write packet length to srl
     srl_Write(&srl, &ctlcode, 1);           // write LOGIN control byte to srl
-    srl_Write(&srl, &userinfo.username, un_len);  // write length bytes from username buffer to srl
-    srl_Write(&srl, &userinfo.passwd, pass_len);  // write length bytes from passwd buffer to srl
+    srl_Write(&srl, &userinfo, sizeof(userinfo_t));  // write struct to srl
     // we should be done here?
     return true;
 }
@@ -49,8 +44,7 @@ bool ntwk_Login(void) {
 bool ntwk_Register(void){
 // input = pointer to preserved username/password data from login function
     uint8_t ctlcode = REGISTER;
-    uint24_t packet_len;
-    uint8_t email_len,un_len, pass_len;
+    uint24_t packet_len = sizeof(userinfo_t) + 1;
 
     if(!gameflags.network) return false;
 
@@ -63,14 +57,9 @@ bool ntwk_Register(void){
     gfx_BlitBuffer();
     prompt_for("Email:", &userinfo.email, 63, 0, 30, 0);    // get email address
     if(!userinfo.email[0]) return false;
-    email_len = strlen(userinfo.email) + 1;     // get length of email buffer
-    un_len = strlen(userinfo.username) + 1; // get length of username (plus terminating)
-    pass_len = strlen(userinfo.passwd) + 1; // get length of passwd (plus terminating)
-    packet_len = un_len + pass_len + email_len + 1; // add 3 buffers + 1 (control) => packet size
     srl_Write(&srl, &packet_len, 3);                // write size to srl
-    srl_Write(&srl, &userinfo.username, un_len);  // write length bytes from username buffer to srl
-    srl_Write(&srl, &userinfo.passwd, pass_len);  // write length bytes from passwd buffer to srl
-    srl_Write(&srl, &userinfo.email, email_len);                 // write email to srl
+    srl_Write(&srl, &ctlcode, 1);           // write LOGIN control byte to srl
+    srl_Write(&srl, &userinfo, sizeof(userinfo_t));  // write struct to srl
     // we should be done here
     return true;
 }
@@ -84,4 +73,13 @@ void ntwk_Disconnect(void){
     srl_Write(&srl, &packet_len, 3);
     srl_Write(&srl, &ctlcode, 1);
     // we should be done here
+}
+
+
+void ntwk_SendChunkRequest(
+// packet format:
+// yaw (XY), pitch (YZ), roll (XY)
+    uint8_t ctlcode = REQCHUNK;
+    if(!gameflags.network) return;
+    
 }

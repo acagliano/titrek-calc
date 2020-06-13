@@ -4,12 +4,15 @@
 #include <srldrvce.h>
 #include <stdbool.h>
 #include <graphx.h>
+#include "classes/ships.h"
 
 #define xStart 10
 #define yStart 14
 #define vWidth 300
 #define vHeight 170
 
+
+extern ship_t Ship;
 extern gfx_rletsprite_t* err_icon;
 extern srl_device_t srl;
 
