@@ -122,7 +122,10 @@ void PlayGame(void){
         dbg_sprintf(dbgout, "Failed to login\n");
         return;
     }
-    if(!TrekGFX_init()) return;
+    if(!TrekGFX_init()) {
+        dbg_sprintf(dbgout, "Failed to init graphics\n");
+        return;
+    }
     gfx_InitModuleIcons();
     do {
         /* A buffer to store bytes read by the serial library */
@@ -218,4 +221,5 @@ void PlayGame(void){
         ntwk_process();
 
     } while(gameflags.loopgame && gameflags.network);
+    dbg_sprintf(dbgout, "%u%u\n", gameflags.loopgame, gameflags.network);
 }

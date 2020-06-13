@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
 
 #include "../util.h"
 
@@ -11,6 +12,25 @@ typedef struct {
     uint8_t control;
     uint8_t data[1];
 } packet_t;
+
+enum net_mode_id {
+    MODE_SERIAL,
+    MODE_CEMU_PIPE
+};
+
+typedef struct {
+    uint8_t id;
+    bool (*init)(void);
+    void (*process)(void);
+    bool (*read_to_size)(size_t size);
+    void (*write)(void *data, size_t size);
+} net_mode_t;
+
+extern net_mode_t mode_srl;
+extern net_mode_t mode_pipe;
+
+extern char net_buf[1024];
+extern size_t net_buf_size;
 
 bool ntwk_init(void);
 void ntwk_process(void);
