@@ -62,9 +62,9 @@ void usb_process(void) {
 }
 
 net_mode_t mode_srl = {
-        MODE_CEMU_PIPE,
-        init_usb,
-        usb_process,
-        usb_read_to_size,
-        usb_write
+        MODE_SERIAL,
+        &init_usb,
+        &usb_process,
+        &usb_read_to_size,
+        &usb_write
 };

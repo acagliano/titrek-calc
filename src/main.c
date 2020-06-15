@@ -236,6 +236,7 @@ void PlayGame(void){
                 PS_VAL(Ship.rotate.pitch),
                 PS_VAL(Ship.rotate.roll));
         ntwk_process();
+        gfx_SwapDraw();
         ticknum++;
     } while(gameflags.loopgame && gameflags.network);
     dbg_sprintf(dbgout, "%u%u\n", gameflags.loopgame, gameflags.network);

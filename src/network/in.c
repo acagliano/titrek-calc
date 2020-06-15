@@ -5,6 +5,7 @@
 #include "controlcodes.h"
 #include "network.h"
 #include "../gfx-engine/gui.h"
+#include "../rendering/engine.h"
 
 void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     uint8_t ctl = in_buff->control;
@@ -14,12 +15,15 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     switch(ctl){
         case REGISTER:
         case LOGIN:
-            if(response == SUCCESS) gameflags.logged_in = true;
+            if(response == SUCCESS) {gameflags.logged_in = true; break;}
             if((response == MISSING) && (ctl == LOGIN)) gui_Register();
             else gui_NetworkErrorResponse(ctl, response, true);
             break;
         case DISCONNECT:
             gameflags.logged_in = false;
+            break;
+        case REQCHUNK:
+            renderFrame((body_packet_t*)data);
             break;
         case MESSAGE:
             // to handle

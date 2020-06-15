@@ -13,7 +13,7 @@ bool ntwk_init(void) {
         dbg_sprintf(dbgout, "Running in CEmu pipe mode\n");
         mode = &mode_pipe;
     }
-    else mode = &mode_srl;
+    else { mode = &mode_srl; }
 
     return mode->init();
 }
