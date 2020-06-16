@@ -103,7 +103,7 @@ int main(void) {
     if(savefile = ti_Open(settingsappv, "r")){
         ti_Read(&settings, sizeof(settings), 1, savefile);
         ti_Close(savefile);
-    } else set_defaults();
+    } else { set_defaults(); }
 
     if(!ntwk_init()) goto error;
 
@@ -149,7 +149,7 @@ void PlayGame(void){
             }
             else gameflags.loopgame = false;
         }
-        if(key == sk_Stat) debug == true;
+        if(key == sk_Stat) {debug = true;}
         if(key == sk_Yequ)
             screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
         if(key == sk_Window)
@@ -211,16 +211,18 @@ void PlayGame(void){
                 }
             }
         if(gameflags.logged_in){
-            if(!(ticknum % settings.limits.chunk_refresh))
+            if(ticknum % settings.limits.chunk_refresh == 0) {
                 ntwk_send(REQCHUNK,
                     PS_VAL(Ship.rotate.yaw),
                     PS_VAL(Ship.rotate.pitch),
                     PS_VAL(Ship.rotate.roll));
-            if(!(ticknum % settings.limits.entity_refresh))
+            }
+            if(ticknum % settings.limits.entity_refresh == 0) {
                 ntwk_send(REQENTITY,
                     PS_VAL(Ship.rotate.yaw),
                     PS_VAL(Ship.rotate.pitch),
                     PS_VAL(Ship.rotate.roll));
+            }
         }
         ntwk_process();
         gfx_SwapDraw();

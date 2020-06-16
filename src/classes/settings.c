@@ -1,5 +1,6 @@
 
 #include "settings.h"
+#include "player.h"
 #include <stdbool.h>
 #include <fileioc.h>
 
@@ -14,9 +15,11 @@ void set_defaults(void){
 
 bool write_settings(void){
     ti_var_t savefile = ti_Open(settingsappv, "r+");
-    if(!savefile) return false;
+    if(!savefile)
+        if(!(savefile = ti_Open(settingsappv, "w+"))) return false;
     ti_Write(&settings, sizeof(settings), 1, savefile);
     ti_SetArchiveStatus(true, savefile);
     ti_Close(savefile);
     return true;
 }
+

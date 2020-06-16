@@ -1,9 +1,11 @@
 #include <graphx.h>
 #include <stdint.h>
 #include <keypadc.h>
+#include <tice.h>
 #include "../gfx/TrekGFX.h"
 #include "../classes/ships.h"
 #include "../classes/settings.h"
+#include "../classes/player.h"
 #include "../equates.h"
 #include "../network/network.h"
 #include "gui.h"
@@ -105,13 +107,18 @@ uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y
 bool gui_Login(void) {
     uint24_t text_x = 0;
     uint8_t text_y = 0;
+    if(getKey() == sk_Del) memset(&settings.userinfo, 0, sizeof(userinfo_t));
     gfx_ZeroScreen();
     gfx_BlitBuffer();
     if(!settings.userinfo.username[0])
         text_y = prompt_for("Username:", settings.userinfo.username, 24, text_x, text_y, 0);
     if(!settings.userinfo.passwd[0])
         text_y = prompt_for("Password:", settings.userinfo.passwd, 32, text_x, text_y, 1);
-    if(!settings.userinfo.username[0] || !settings.userinfo.passwd[0]) return false;
+    if(!settings.userinfo.username[0] || !settings.userinfo.passwd[0]){
+        // if one or both fields left blank, clear the buffers
+        memset(&settings.userinfo, 0, sizeof(userinfo_t));
+        return false;
+    }
 
     return ntwk_send(LOGIN,
         PS_STR(settings.userinfo.username),

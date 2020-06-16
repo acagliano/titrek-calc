@@ -2,6 +2,8 @@
 #include <stdbool.h>
 #include "../equates.h"
 #include "../errorscreens.h"
+#include "../classes/settings.h"
+#include "../classes/player.h"
 #include "controlcodes.h"
 #include "network.h"
 #include "../gfx-engine/gui.h"
@@ -17,7 +19,10 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case LOGIN:
             if(response == SUCCESS) {gameflags.logged_in = true; break;}
             if((response == MISSING) && (ctl == LOGIN)) gui_Register();
-            else gui_NetworkErrorResponse(ctl, response, true);
+            else {
+                memset(&settings.userinfo, 0, sizeof(userinfo_t));
+                gui_NetworkErrorResponse(ctl, response, true);
+            }
             break;
         case DISCONNECT:
             gameflags.logged_in = false;
