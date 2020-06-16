@@ -164,23 +164,6 @@ void PlayGame(void){
             if((screen == SCRN_MAINS) || (screen == SCRN_TACT))
                 screen = setbits(screen, SCRN_INFO);
         }
-        if(key == sk_Square){
-            char i;
-            char modnum = randInt(0, SYS_MAX - 1);
-            char randnum = randInt(5, 10);
-            for(i = 0; i < MAX_MODULES; i++){
-                module_t *shield = &Ship.system[i];
-                if((shield->techtype == SHIELD) && shield->online){
-                    int health = health_GetHealthPercent(&shield->health);
-                    int drv = shield->data.mod_shields.resistance;
-                    drv = health * drv / 100;
-                    health_DamageModule(&shield->health, -(randnum));
-                    randnum -= drv;
-                }
-            }
-            health_DamageModule(&Ship.hull.health, -(randnum));
-            health_DamageModule(&Ship.system[modnum].health, -(randnum));
-        }
         if(key == sk_Down) {
             char i;
             switch(screen){
