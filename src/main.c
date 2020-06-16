@@ -143,8 +143,10 @@ void PlayGame(void){
         if(!gameflags.logged_in) gui_NetworkErrorResponse(3, 6, false);
         gfx_BlitBuffer();
         if(key == sk_Clear){
-            if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
-            else if(gameflags.logged_in) ntwk_send_nodata(DISCONNECT);
+            if(gameflags.logged_in){
+                if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
+                else ntwk_send_nodata(DISCONNECT);
+            }
             else gameflags.loopgame = false;
         }
         if(key == sk_Stat) debug == true;
@@ -225,16 +227,18 @@ void PlayGame(void){
                     break;
                 }
             }
-        if(!(ticknum % settings.limits.chunk_refresh))
-            ntwk_send(REQCHUNK,
-                PS_VAL(Ship.rotate.yaw),
-                PS_VAL(Ship.rotate.pitch),
-                PS_VAL(Ship.rotate.roll));
-        if(!(ticknum % settings.limits.entity_refresh))
-            ntwk_send(REQENTITY,
-                PS_VAL(Ship.rotate.yaw),
-                PS_VAL(Ship.rotate.pitch),
-                PS_VAL(Ship.rotate.roll));
+        if(gameflags.logged_in){
+            if(!(ticknum % settings.limits.chunk_refresh))
+                ntwk_send(REQCHUNK,
+                    PS_VAL(Ship.rotate.yaw),
+                    PS_VAL(Ship.rotate.pitch),
+                    PS_VAL(Ship.rotate.roll));
+            if(!(ticknum % settings.limits.entity_refresh))
+                ntwk_send(REQENTITY,
+                    PS_VAL(Ship.rotate.yaw),
+                    PS_VAL(Ship.rotate.pitch),
+                    PS_VAL(Ship.rotate.roll));
+        }
         ntwk_process();
         gfx_SwapDraw();
         ticknum++;
