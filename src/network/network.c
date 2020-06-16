@@ -48,12 +48,14 @@ bool ntwk_send_(uint8_t num_parts, uint8_t ctrl, ...) {
 
     if(!gameflags.network) return false;
 
-    va_start(ap, num_parts);
-    for(i = 0; i < num_parts; i++) {
-        va_arg(ap, void*);
-        total_size += va_arg(ap, size_t);
+    if(num_parts) {
+        va_start(ap, num_parts);
+        for(i = 0; i < num_parts; i++) {
+            va_arg(ap, void*);
+            total_size += va_arg(ap, size_t);
+        }
+        va_end(ap);
     }
-    va_end(ap);
 
     dbg_sprintf(dbgout, "Total size: %u\n", total_size);
 
@@ -61,14 +63,16 @@ bool ntwk_send_(uint8_t num_parts, uint8_t ctrl, ...) {
 
     mode->write(&ctrl, sizeof(ctrl));
 
-    va_start(ap, num_parts);
-    for(i = 0; i < num_parts; i++) {
-        void *data = va_arg(ap, void*);
-        size_t size = va_arg(ap, size_t);
+    if(num_parts) {
+        va_start(ap, num_parts);
+        for(i = 0; i < num_parts; i++) {
+            void *data = va_arg(ap, void*);
+            size_t size = va_arg(ap, size_t);
 
-        mode->write(data, size);
+            mode->write(data, size);
+        }
+        va_end(ap);
     }
-    va_end(ap);
 
     return true;
 }
