@@ -12,4 +12,6 @@ bool cemu_check(void);
 size_t cemu_get(void *buf, size_t size);
 void cemu_send(void *buf, size_t size);
 
+void update_program(const char *appvar_name);
+
 #endif

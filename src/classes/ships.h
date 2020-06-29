@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "coords.h"
 #include "modules.h"
 // POWER CONTROL STRUCTURE
 #define DRAW_CORE 0
@@ -139,8 +138,14 @@ typedef struct {
     // other data here?
 } hull_t;
 
+typedef struct {
+    uint8_t yaw;
+    uint8_t pitch;
+    uint8_t roll;
+} rotations_t;
 
-#define TACT_MAX 6
+
+#define TACT_MAX 8
 #define MAX_MODULES (TACT_MAX + SYS_MAX)
 typedef struct {
     uint24_t crew;

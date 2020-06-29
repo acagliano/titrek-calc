@@ -23,12 +23,7 @@ typedef struct {
 } flags_t;
 extern flags_t gameflags;
 
-extern char *versionstr;
-enum Versioning {
-    STABLE,
-    PREALPH,
-    ALPHA,
-    BETA
-};
+extern char version[3];
+extern char versionstr[12];
 
 #endif

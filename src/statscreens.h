@@ -6,6 +6,7 @@
 #define viewer_x 30
 #define viewer_y 20
 
+char *strify_version(char *str, uint8_t *version);
 extern char mainsys_strings[][10];
 
 void Screen_RenderUI(uint24_t screen, selected_t* select);

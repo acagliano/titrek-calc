@@ -29,7 +29,6 @@
 // Game Data Types (Structure Definitions)
 #include "equates.h"
 #include "classes/ships.h"
-#include "classes/coords.h"
 #include "classes/screens.h"
 #include "classes/settings.h"
 #include "statscreens.h"
@@ -53,8 +52,8 @@
 #define resbits(bits, mask) (bits^mask)
 
 char *settingsappv = "TrekSett";
-char version[] = {0, 0, 91, ALPHA};
-char *versionstr = "0.0.91 alpha";
+char version[] = {0, 0, 91};
+char versionstr[12] = {0};
 ship_t Ship = {0};
 selected_t select = {0, 0};
 gfx_rletsprite_t* gfx_sprites;
@@ -111,6 +110,7 @@ int main(void) {
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
+    strify_version(versionstr, version);
     do {
         MainMenu();
     } while(!gameflags.exit);
@@ -210,6 +210,7 @@ void PlayGame(void){
                     break;
                 }
             }
+            /*
         if(gameflags.logged_in){
             if(ticknum % settings.limits.chunk_refresh == 0) {
                 ntwk_send(REQCHUNK,
@@ -224,6 +225,7 @@ void PlayGame(void){
                     PS_VAL(Ship.rotate.roll));
             }
         }
+        */
         ntwk_process();
         gfx_SwapDraw();
         ticknum++;

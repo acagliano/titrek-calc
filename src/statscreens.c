@@ -19,8 +19,8 @@
     gfx_SetColor((color)); \
     gfx_FillRectangle((x1), (y1), (w), (h));
 
-char mains_title[] = "[MAIN SYS]";
-char tact_title[] = "[TACTICAL SYS]";
+char mains_title[] = "[MAIN]";
+char tact_title[] = "[TACT]";
 
 char moduledb[][12] = {
     "LifeSup",
@@ -88,12 +88,12 @@ void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selecte
     unsigned char i, j = 0, cur_y;
     int cur_x;
     gfx_RLETSprite(mains_display, viewer_x, viewer_y - 3);
-    gfx_PrintStringXY(mains_title, viewer_x + 30, viewer_y + 1);
+    gfx_PrintStringXY(mains_title, viewer_x + 26, viewer_y - 1);
     for(i = 0; i < syscount; i++){
         // loop module health display
         module_t* module = &systems[i];
         if(module->modclass == mSystem){
-            cur_y = j * 18 + viewer_y + 14;
+            cur_y = j * 16 + viewer_y + 14;
             cur_x = viewer_x + 40;
             if(selected == i) {
                 gfx_SetColor(230);
@@ -114,9 +114,9 @@ void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selec
     uint24_t shield_health = 0, shield_resist = 0, shield_num = 0;
     bool shields_active = false;
     gfx_RLETSprite(tactical_display, viewer_x, viewer_y - 3);
-    gfx_PrintStringXY(tact_title, viewer_x + 37, viewer_y + 1);
+    gfx_PrintStringXY(tact_title, viewer_x + 26, viewer_y - 1);
     for(i = 0; i < syscount; i++){
-        int temp_y = 18 * j + viewer_y + 14;
+        int temp_y = 16 * j + viewer_y + 14;
         int temp_x = cur_x + 90;
         module_t* module = &systems[i];
         if(module->modclass == mTactical){
@@ -145,7 +145,7 @@ void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selec
             cur_y += shield_icon->height + 10;
             gfx_RLETSprite(icon_shieldinteg, cur_x, cur_y - 1);
             cur_x += 12;
-            stats_DrawHealthBar(shield_health, 60, cur_x, cur_y, 25, 107, 29);
+            stats_DrawHealthBar(shield_health, 60, cur_x, cur_y, 10, 25, 107, 29);
             cur_y += 15; cur_x = viewer_x;
         }
         gfx_RLETSprite(icon_hullinteg, cur_x, cur_y - 1);
@@ -162,7 +162,7 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
     uint8_t bar = (module->techtype < SYS_MAX) ? 77 : 29;
     uint24_t x_space = vWidth - (x + 10);
     uint24_t width = (x_space > 200) ? 200 : x_space;
-    gfx_RectangleColor(229, x, y, width, 16);
+    gfx_RectangleColor(229, x, y, width, 14);
     if(module->modclass){
         uint8_t techtype = module->techtype;
         uint24_t barwidth;
@@ -175,7 +175,7 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
         gfx_FillRectangleColor(0, x+1, y+1, 14, 14);
         gfx_RLETSprite(modicons[techtype], x + 1, y + 1);
         gfx_PrintStringXY(moduledb[techtype], x + 20, y + 5);
-        stats_DrawHealthBar(health, barwidth, x + 80, y + 4, 0, 149, bar);
+        stats_DrawHealthBar(health, barwidth, x + 80, y + 4, 10, 0, 149, bar);
     }
     else {
         gfx_FillRectangleColor(74, x + 1, y + 1, width - 2, 14);
@@ -199,13 +199,13 @@ void Overlay_UIModuleInfo(module_t* module) {
     gfx_PrintStringXY(modulenames[techtype], text_x + 20, text_y + 2);
     text_y += 17;
     gfx_RLETSprite(icon_health, text_x, text_y - 2);
-    stats_DrawHealthBar(health, 130, text_x + 15, text_y, 0, 149, 77);
+    stats_DrawHealthBar(health, 130, text_x + 15, text_y, 10, 0, 149, 77);
     gfx_SetTextXY(text_x + 15 + 135, text_y);
     gfx_PrintUInt(health, 1 + (health > 9) + (health > 99));
     gfx_PrintString("%");
     text_y += 12;
     gfx_RLETSprite(icon_sourcereserve, text_x, text_y - 2);
-    stats_DrawHealthBar(power, 130, text_x + 15, text_y, 0, 149, 77);
+    stats_DrawHealthBar(power, 130, text_x + 15, text_y, 10, 0, 149, 77);
     gfx_SetTextXY(text_x + 15 + 135, text_y);
     gfx_PrintUInt(power, 1 + (power > 9) + (power > 99));
     gfx_PrintString("%");
@@ -235,4 +235,18 @@ void Screen_Background(unsigned char active) {
     gfx_SetTextFGColor(148);
     gfx_PrintStringXY(versionstr, 160 - (7 * strlen(versionstr) / 2), 0);
     gfx_SetTextFGColor(0);
+}
+
+char *strify_version(char *str, uint8_t *version){
+  char buf[12];
+  int len,inx,vi;
+  len=inx=0;
+  for (vi=0; vi<3; vi++){
+    sprintf(&buf,"%d\.",version[vi]);
+    len=strlen(&buf);
+    memcpy(str+inx,&buf,len);
+    inx+=len;
+  }
+  str[inx-1]=0;
+  return str;
 }
