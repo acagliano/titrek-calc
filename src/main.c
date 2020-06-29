@@ -28,16 +28,21 @@
 
 // Game Data Types (Structure Definitions)
 #include "equates.h"
+#include "network/controlcodes.h"
+#include "network/network.h"
+
 #include "classes/ships.h"
 #include "classes/screens.h"
 #include "classes/settings.h"
-#include "statscreens.h"
+
+#include "rendering/screens.h"
+#include "rendering/errors.h"
+#include "rendering/gui.h"
+
 #include "gfx/TrekGFX.h"
-#include "gfx-engine/gui.h"
 #include "gfx/internal.h"
-#include "errorscreens.h"
+
 #include "asm/exposure.h"
-#include "network/controlcodes.h"
 
 // USB Libraries
 #include <usbdrvce.h>
@@ -46,7 +51,6 @@
 #undef NDEBUG
 #include <debug.h>
 
-#include "network/network.h"
 
 #define setbits(bits, mask) (bits|mask)
 #define resbits(bits, mask) (bits^mask)

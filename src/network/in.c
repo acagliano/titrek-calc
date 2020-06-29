@@ -1,12 +1,12 @@
 #include <keypadc.h>
 #include <stdbool.h>
 #include "../equates.h"
-#include "../errorscreens.h"
+#include "../rendering/errors.h"
 #include "../classes/settings.h"
 #include "../classes/player.h"
 #include "controlcodes.h"
 #include "network.h"
-#include "../gfx-engine/gui.h"
+#include "../rendering/gui.h"
 #include "../rendering/engine.h"
 
 void conn_HandleInput(packet_t *in_buff, size_t buff_size) {

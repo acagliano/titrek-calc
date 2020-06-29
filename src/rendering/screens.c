@@ -1,17 +1,20 @@
 
 #include <tice.h>
 #include <string.h>
-#include "classes/ships.h"
-#include "statscreens.h"
-#include "gfx/TrekGFX.h"
-#include "classes/screens.h"
 #include <graphx.h>
 #include <compression.h>
-#include "gfx-engine/gui.h"
-#include "classes/modules.h"
-#include "gfx/moduleicons.h"
-#include "equates.h"
 #include <debug.h>
+#include "../classes/ships.h"
+#include "../classes/screens.h"
+#include "../classes/modules.h"
+
+#include "../gfx/moduleicons.h"
+#include "../gfx/TrekGFX.h"
+#include "../rendering/gui.h"
+
+#include "../equates.h"
+#include "screens.h"
+
 #define gfx_RectangleColor(color, x1, y1, w, h) \
     gfx_SetColor((color)); \
     gfx_Rectangle((x1), (y1), (w), (h));

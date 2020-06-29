@@ -3,9 +3,9 @@
 #include <graphx.h>
 #include <stddef.h>
 #include <compression.h>
-#include "gfx/internal.h"
-#include "network/controlcodes.h"
-#include "equates.h"
+#include "../gfx/internal.h"
+#include "../network/controlcodes.h"
+#include "../equates.h"
 
 #define center_x (320/2)
 #define center_y (180/2)
