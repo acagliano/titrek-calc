@@ -8,6 +8,7 @@
 #include "network.h"
 #include "../rendering/gui.h"
 #include "../rendering/engine.h"
+#include "../asm/exposure.h"
 
 void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     uint8_t ctl = in_buff->control;
@@ -33,6 +34,17 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case MESSAGE:
             // to handle
             break;
+        case PGRMUPDATE:
+            if (!update_fp){
+                update_fp = ti_OpenVar(TEMP_PROGRAM,"w",TI_PPRGM_T);
+            }
+            if (buff_size<2){
+                ti_Close(update_fp);
+                ti_DeleteVar(MAIN_PROGRAM,TI_PPRGM_T);
+                ti_RenameVar(TEMP_PROGRAM,MAIN_PROGRAM);
+                update_program();
+            }
+            ti_Write(data,buff_size-1);
         default:
             gui_NetworkErrorResponse(3, 7, true);
     }

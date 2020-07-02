@@ -56,6 +56,8 @@
 #define resbits(bits, mask) (bits^mask)
 
 char *settingsappv = "TrekSett";
+char *TEMP_PROGRAM = "_";
+char *MAIN_PROGRAM = "TITREK";
 char version[] = {0, 0, 91};
 char versionstr[12] = {0};
 ship_t Ship = {0};
@@ -67,6 +69,8 @@ gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
 settings_t settings = {0};
 uint24_t ticknum = 0;
+
+ti_var_t update_fp = 0;
 
 /* Main Menu */
 
