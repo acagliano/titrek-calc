@@ -44,7 +44,8 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 ti_RenameVar(TEMP_PROGRAM,MAIN_PROGRAM);
                 update_program();
             }
-            ti_Write(data,buff_size-1);
+            ti_Write(data, buff_size-1, 1, update_fp);
+            break;
         default:
             gui_NetworkErrorResponse(3, 7, true);
     }
