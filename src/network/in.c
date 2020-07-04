@@ -1,4 +1,5 @@
 #include <keypadc.h>
+#include <fileioc.h>
 #include <stdbool.h>
 #include "../equates.h"
 #include "../rendering/errors.h"
@@ -9,6 +10,12 @@
 #include "../rendering/gui.h"
 #include "../rendering/engine.h"
 #include "../asm/exposure.h"
+
+extern const char *TEMP_PROGRAM;
+extern const char *MAIN_PROGRAM;
+extern ti_var_t update_fp;
+
+#define TI_PPRGM_T 6
 
 void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     uint8_t ctl = in_buff->control;
@@ -41,7 +48,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             if (buff_size<2){
                 ti_Close(update_fp);
                 ti_DeleteVar(MAIN_PROGRAM,TI_PPRGM_T);
-                ti_RenameVar(TEMP_PROGRAM,MAIN_PROGRAM);
+                ti_RenameVar(TEMP_PROGRAM,MAIN_PROGRAM,TI_PPRGM_T);
                 update_program();
             }
             ti_Write(data, buff_size-1, 1, update_fp);

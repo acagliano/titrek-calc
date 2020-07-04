@@ -9,6 +9,12 @@ extern _gfx_End
 
 public _update_program
 
+_InsertMem     := $020514
+_DelMem        := $020590
+_asm_prgm_size := $D0118C
+_userMem       := $D1A881
+_EnoughMem     := $02051C
+
 ;void update_program(void);
 _update_program:
 	ld a,($E30018)
@@ -42,19 +48,19 @@ jump_data_loc:=$E30800
 jump_data:
 	or a,a
 	sbc hl,hl
-	ld de,(ti.asm_prgm_size)
-	ld (ti.asm_prgm_size),hl
-	ld hl,ti.userMem
-	call ti.DelMem
-	call ti.EnoughMem
+	ld de,(_asm_prgm_size)
+	ld (_asm_prgm_size),hl
+	ld hl,_userMem
+	call _DelMem
+	call _EnoughMem
 	ret c
 	ld hl,0
 datasize:=$-3
-	ld (ti.asm_prgm_size),hl
+	ld (_asm_prgm_size),hl
 	push hl
-	ld de,ti.userMem
+	ld de,_userMem
 	push de
-	call ti.InsertMem
+	call _InsertMem
 	pop de
 	pop bc
 	push de
