@@ -4,10 +4,19 @@
 
 #include <stdint.h>
 #include <graphx.h>
-#include "ships.h"
+#include "health.h"
+#include "power.h"
 
 // Organization for Sprites
-#define MODICONS 14     // define first module icon
+enum ShipZones {
+    FORWARD,
+    STARBOARD,
+    AFT,
+    PORT,
+    DORSAL,
+    VENTRAL,
+    SHIP_ALL
+};
 
 //System Structs
 typedef struct { unsigned char drv; } integ_data_t;
@@ -41,9 +50,11 @@ typedef union ModuleData_t {
 } moduledata_t;
 
 typedef struct ModuleInfo_t {
-    uint8_t state,modclass, modtype, techid;
-    uint8_t perchealth;
-    uint8_t percreserve, percusage;
+    uint8_t state;  // online/offline
+    uint8_t modclass, modtype, techid;
+    uint8_t location;   // see ShipZones
+    health_t health;
+    power_t power;
     moduledata_t info;
 } moduleinfo_t;
 

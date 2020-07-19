@@ -7,6 +7,7 @@ enum ControlCodes {
     DISCONNECT,
     PGRMUPDATE,
     GFXUPDATE,
+    SHIPDATAREQ,
     MODULEINFO,
     MOVESHIP,
     REQCHUNK,

@@ -11,6 +11,8 @@
 #define yStart 14
 #define vWidth 300
 #define vHeight 170
+#define MODICONS 14     // define first module icon
+
 
 
 extern ship_t Ship;

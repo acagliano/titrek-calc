@@ -3,98 +3,14 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-// POWER CONTROL STRUCTURE
+#include "tech.h"
 
-enum TechTypes {
-    LIFESUP,
-    CORE,
-    WARPDR,
-    IMPDR,
-    NAVSENS,
-    TRANS,
-    SYS_MAX,
-    SHIELD = SYS_MAX,
-    ARMOR,
-    PHASER,
-    TORPEDO,
-    TARG_SENS
-};
-
-enum TechClasses {
-    mUnassigned = 0,
-    mSystem,
-    mTactical
-};
-
-
-enum ShipZones {
-    FORWARD,
-    STARBOARD,
-    AFT,
-    PORT,
-    DORSAL,
-    VENTRAL,
-    SHIP_ALL
-};
-// for the moment, these locations are unused, but will be used later to determine what systems to damage based on where they are located
-
-
-
-// for miscellaneous, there is no types, just ids.
-#define SOURCE_CORE 0   // recieve power from warp core
-#define SOURCE_AUX 1    // recieve power from aux generator (requires this module installed)
-#define SOURCE_RESERVE 2    // recieve power from internal reserve (battery)
+// Module QuickRef Structure (Used to Populate GUI)
 
 typedef struct {
-    char priority;          // determines which module draws power first
-    signed int capacity;        // how much power a module can store
-    signed int current;         // the amount of power the module currently has
-    signed int spend;           // power spend per cycle
-    signed int base;           // default power usage
-    bool alwaysUse;          // boolean to specify if the module is always using power when active
-    char source;
-} power_t;
-// Related Functions
-#define POWER_INC 1
-#define POWER_DEC -1
-#define POWSRC_WARP 0
-#define POWSRC_AUX 1
-#define POWSRC_RESERVE 2
-#define power_GetReservePercent(power) ((power)->current * 100 / (power)->capacity)
-#define power_GetUsagePercent(power) ((power)->spend * 100 / (power)->base)
-#define power_SetSpend(power, amount)   (power)->spend = amount
-#define power_SetSource(power, source)  (power)->source = source  // use defines above
-
-// HEALTH MONITORING STRUCTURE
-typedef struct {
-    signed int max;
-    signed int current;
-} health_t;
-// Related Functions
-#define health_GetPercent(health)   (health)->current * 100 / (health)->max
-#define health_SetHealth(health, amount)    (health)->current = amount
-
-
-// Module Online States
-#define STATE_OFFLINE 0
-#define STATE_ONLINE 1
-#define STATE_REPAIR 2
-// Module Set State Error Codes
-#define SETSTATE_SUCCESS 0
-#define SETSTATE_NOPOWER 1
-#define SETSTATE_NOHEALTH 2
-
-// Module Data Struct
-
-typedef struct {
-    bool unlocked,online,typelocked;
-    uint8_t techid;
-    uint8_t modclass;
-    uint8_t techtype;     // locked, determines compatible tech type
-//    unsigned char techclass;    // locked, determines compatible module classes
-    power_t power;          // power control
-    health_t health;        // health monitor
-    uint8_t location;       // see ShipZones above
+    uint8_t techclass, techtype, techid;
+    bool online;
+    uint8_t health, power;   // percentages
 } module_t;
 #define module_GetOnlineState(module)   module->online
 #define module_SetOnline(module)    module->online = STATE_ONLINE
@@ -102,7 +18,7 @@ typedef struct {
 #define module_SetRepairing(module) module->online = STATE_REPAIR
 
 typedef struct {
-    health_t health;
+    uint8_t health;
     uint8_t composite[5];
     // other data here?
 } hull_t;

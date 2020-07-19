@@ -4,6 +4,7 @@
 #include <graphx.h>
 #include <compression.h>
 #include <debug.h>
+#include "../classes/tech.h"
 #include "../classes/ships.h"
 #include "../classes/screens.h"
 #include "../classes/modules.h"
@@ -95,7 +96,7 @@ void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selecte
     for(i = 0; i < syscount; i++){
         // loop module health display
         module_t* module = &systems[i];
-        if(module->modclass == mSystem){
+        if(module->techclass == mSystem){
             cur_y = j * 16 + viewer_y + 14;
             cur_x = viewer_x + 40;
             if(selected == i) {
@@ -122,7 +123,7 @@ void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selec
         int temp_y = 16 * j + viewer_y + 14;
         int temp_x = cur_x + 90;
         module_t* module = &systems[i];
-        if(module->modclass == mTactical){
+        if(module->techclass == mTactical){
             if(selected == i) {
                 gfx_SetColor(230);
                 gfx_FillRectangle(temp_x - 6, temp_y, 6, 16);
@@ -131,7 +132,7 @@ void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selec
             if(module->techtype == SHIELD){
                 if(module->online){
                     shields_active = true;
-                    shield_health += health_GetPercent(&module->health);
+                    shield_health += module->health;
                     shield_num++;
                 }
             }
@@ -160,12 +161,12 @@ void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selec
 
 
 void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
-    int24_t health = health_GetPercent(&module->health);
+    int24_t health = module->health;
     uint8_t bar = (module->techtype < SYS_MAX) ? 77 : 29;
     uint24_t x_space = vWidth - (x + 10);
     uint24_t width = (x_space > 200) ? 200 : x_space;
     gfx_RectangleColor(229, x, y, width, 14);
-    if(module->modclass){
+    if(module->techclass){
         uint8_t techtype = module->techtype;
         uint24_t barwidth;
         x_space -= 90;
@@ -189,8 +190,8 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
 void Overlay_UIModuleInfo(void) {
     uint8_t state = ModuleInfo.state;
     uint8_t techtype = ModuleInfo.modtype;
-    uint8_t health = ModuleInfo.perchealth;
-    uint8_t power = ModuleInfo.percreserve;
+    uint8_t health = health_GetPercent(&ModuleInfo.health);
+    uint8_t power = power_GetReservePercent(&ModuleInfo.power);
     uint24_t x = 60, width = 200;
     uint8_t y = 30, height = 110;
     uint24_t text_x = x + 4;

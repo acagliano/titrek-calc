@@ -179,7 +179,7 @@ void PlayGame(void){
             switch(screen){
                 case SCRN_TACT:
                     for(i = select.tactical + 1; i < (MAX_MODULES - 1); i++){
-                        int type = Ship.system[i].modclass;
+                        int type = Ship.system[i].techclass;
                         if( type == mTactical ){
                             select.tactical = i;
                             break;
@@ -188,7 +188,7 @@ void PlayGame(void){
                     break;
                 case SCRN_MAINS:
                     for(i = select.mains + 1; i < (MAX_MODULES - 1); i++){
-                        int type = Ship.system[i].modclass;
+                        int type = Ship.system[i].techclass;
                         if( type == mSystem ){
                             select.mains = i;
                             break;
@@ -202,7 +202,7 @@ void PlayGame(void){
             switch(screen){
                 case SCRN_TACT:
                     for(i = select.tactical - 1; i >= 0; i--){
-                        int type = Ship.system[i].modclass;
+                        int type = Ship.system[i].techclass;
                         if( type == mTactical ){
                             select.tactical = i;
                             break;
@@ -211,7 +211,7 @@ void PlayGame(void){
                     break;
                 case SCRN_MAINS:
                     for(i = select.mains - 1; i >= 0; i--){
-                        int type = Ship.system[i].modclass;
+                        int type = Ship.system[i].techclass;
                         if( type == mSystem ){
                             select.mains = i;
                             break;
