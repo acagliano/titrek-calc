@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "modules.h"
 // POWER CONTROL STRUCTURE
 
 enum TechTypes {
@@ -61,10 +60,10 @@ typedef struct {
 #define POWSRC_WARP 0
 #define POWSRC_AUX 1
 #define POWSRC_RESERVE 2
-#define power_GetReservePercent(power) (power->current * 100 / power->capacity)
-#define power_GetUsagePercent(power) (power->spend * 100 / power->base)
-#define power_SetSpend(power, amount)   power->spend = amount
-#define power_SetSource(power, source)  power->source = source  // use defines above
+#define power_GetReservePercent(power) ((power)->current * 100 / (power)->capacity)
+#define power_GetUsagePercent(power) ((power)->spend * 100 / (power)->base)
+#define power_SetSpend(power, amount)   (power)->spend = amount
+#define power_SetSource(power, source)  (power)->source = source  // use defines above
 
 // HEALTH MONITORING STRUCTURE
 typedef struct {
@@ -72,8 +71,8 @@ typedef struct {
     signed int current;
 } health_t;
 // Related Functions
-#define health_GetPercent(health)   health->current * 100 / health->max
-#define health_SetHealth(health, amount)    health->current = amount
+#define health_GetPercent(health)   (health)->current * 100 / (health)->max
+#define health_SetHealth(health, amount)    (health)->current = amount
 
 
 // Module Online States

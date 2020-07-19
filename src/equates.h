@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <graphx.h>
 #include "classes/ships.h"
+#include "classes/modules.h"
 
 #define xStart 10
 #define yStart 14
@@ -25,5 +26,6 @@ extern flags_t gameflags;
 
 extern char version[3];
 extern char versionstr[12];
+extern moduleinfo_t ModuleInfo;
 
 #endif

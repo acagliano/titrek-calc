@@ -71,12 +71,12 @@ void Screen_RenderUI(uint24_t screen, selected_t* select){
         case SCRN_TACT:
             Screen_UITacticalStats(Ship.system, MAX_MODULES, select->tactical);
             if(screen > 0xff)
-                Overlay_UIModuleInfo(&Ship.system[select->tactical]);
+                Overlay_UIModuleInfo();
             break;
         case SCRN_MAINS:
             Screen_UISystemStats(Ship.system, MAX_MODULES, select->mains);
             if(screen > 0xff)
-                Overlay_UIModuleInfo(&Ship.system[select->mains]);
+                Overlay_UIModuleInfo();
             break;
         case SCRN_TRANSPORT:
             break;
@@ -131,8 +131,7 @@ void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selec
             if(module->techtype == SHIELD){
                 if(module->online){
                     shields_active = true;
-                    shield_health += health_GetHealthPercent(&module->health);
-                    shield_resist *= module->data.mod_shields.resistance;
+                    shield_health += health_GetPercent(&module->health);
                     shield_num++;
                 }
             }
@@ -161,7 +160,7 @@ void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selec
 
 
 void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
-    int24_t health = health_GetHealthPercent(&module->health);
+    int24_t health = health_GetPercent(&module->health);
     uint8_t bar = (module->techtype < SYS_MAX) ? 77 : 29;
     uint24_t x_space = vWidth - (x + 10);
     uint24_t width = (x_space > 200) ? 200 : x_space;
@@ -187,14 +186,15 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
 }
 
 
-void Overlay_UIModuleInfo(module_t* module) {
-    int24_t health = health_GetHealthPercent(&module->health),
-            power = power_GetBatteryPercent(&module->power);
+void Overlay_UIModuleInfo(void) {
+    uint8_t state = ModuleInfo.state;
+    uint8_t techtype = ModuleInfo.modtype;
+    uint8_t health = ModuleInfo.perchealth;
+    uint8_t power = ModuleInfo.percreserve;
     uint24_t x = 60, width = 200;
     uint8_t y = 30, height = 110;
     uint24_t text_x = x + 4;
     uint8_t text_y = y + 4;
-    uint24_t techtype = module->techtype;
     gfx_SetTextFGColor(0);
     gfx_RenderWindow(x, y, width, height, 139, 205, 3);
     gfx_FillRectangleColor(139, x + 2, y + 2, width - 4, 16);
@@ -214,7 +214,7 @@ void Overlay_UIModuleInfo(module_t* module) {
     gfx_PrintString("%");
     text_y += 12;
     gfx_PrintStringXY("Status: ", text_x + 2, text_y);
-    if(module->online) gfx_PrintString("Online");
+    if(state) gfx_PrintString("Online");
     else gfx_PrintString("Offline");
 }
 

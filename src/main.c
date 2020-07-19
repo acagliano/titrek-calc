@@ -32,6 +32,7 @@
 #include "network/network.h"
 
 #include "classes/ships.h"
+#include "classes/modules.h"
 #include "classes/screens.h"
 #include "classes/settings.h"
 
@@ -69,6 +70,7 @@ gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
 settings_t settings = {0};
 uint24_t ticknum = 0;
+moduleinfo_t ModuleInfo = {};
 
 ti_var_t update_fp = 0;
 
@@ -176,7 +178,7 @@ void PlayGame(void){
             char i;
             switch(screen){
                 case SCRN_TACT:
-                    for(i = select.tactical + 1; i < (TACT_MAX + SYS_MAX - 1); i++){
+                    for(i = select.tactical + 1; i < (MAX_MODULES - 1); i++){
                         int type = Ship.system[i].modclass;
                         if( type == mTactical ){
                             select.tactical = i;
@@ -185,7 +187,7 @@ void PlayGame(void){
                     }
                     break;
                 case SCRN_MAINS:
-                    for(i = select.mains + 1; i < (TACT_MAX + SYS_MAX - 1); i++){
+                    for(i = select.mains + 1; i < (MAX_MODULES - 1); i++){
                         int type = Ship.system[i].modclass;
                         if( type == mSystem ){
                             select.mains = i;

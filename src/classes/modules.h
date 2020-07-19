@@ -4,6 +4,7 @@
 
 #include <stdint.h>
 #include <graphx.h>
+#include "ships.h"
 
 // Organization for Sprites
 #define MODICONS 14     // define first module icon
@@ -23,7 +24,7 @@ typedef struct { int yield; int range; int speed; } phaser_data_t;
 typedef struct { int equipped; unsigned char compatible[10]; } torpedo_data_t;
 // This union combines all tactical modules into 1
 
-typedef union ModuleInfo_t {
+typedef union ModuleData_t {
     // Core System Modules
     trans_data_t mod_transport;
     integ_data_t mod_integ;
@@ -37,6 +38,13 @@ typedef union ModuleInfo_t {
     torpedo_data_t mod_torpedoes;
     phaser_data_t mod_phasers;
     targsens_data_t mod_targsens;
+} moduledata_t;
+
+typedef struct ModuleInfo_t {
+    uint8_t state,modclass, modtype, techid;
+    uint8_t perchealth;
+    uint8_t percreserve, percusage;
+    moduledata_t info;
 } moduleinfo_t;
 
 #endif
