@@ -11,4 +11,9 @@ enum ScreenEquates {
     SCRN_INFO = 0xff00
 };
 
+typedef struct {
+    uint24_t mains;
+    uint24_t tactical;
+} selected_t;
+
 #endif

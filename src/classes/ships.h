@@ -5,11 +5,27 @@
 #include <stdint.h>
 #include "modules.h"
 // POWER CONTROL STRUCTURE
-#define DRAW_CORE 0
-#define DRAW_AUX 1
-#define DRAW_RESERVE 2
 
+enum TechTypes {
+    LIFESUP,
+    CORE,
+    WARPDR,
+    IMPDR,
+    NAVSENS,
+    TRANS,
+    SYS_MAX,
+    SHIELD = SYS_MAX,
+    ARMOR,
+    PHASER,
+    TORPEDO,
+    TARG_SENS
+};
 
+enum TechClasses {
+    mUnassigned = 0,
+    mSystem,
+    mTactical
+};
 
 
 enum ShipZones {
@@ -21,23 +37,14 @@ enum ShipZones {
     VENTRAL,
     SHIP_ALL
 };
+// for the moment, these locations are unused, but will be used later to determine what systems to damage based on where they are located
 
-//System Structs
-typedef struct { unsigned char drv; } integ_data_t;
-typedef struct { int occupancy; } lifesup_data_t;
-typedef struct { int output; } core_data_t;
-typedef struct { int maxspeed; } engine_data_t;
-typedef struct { int maxrange; } navsens_data_t;
-typedef struct { int maxrange; int maxtargets; } trans_data_t;
 
-//Tactical Structs
-typedef struct { int maxrange; char maxtargets; } targsens_data_t;
-typedef struct { unsigned int resistance;  int frequency; int maxhealth; int shieldhealth[SHIP_ALL]; } shield_data_t;
-typedef struct { int yield; int range; int speed; } phaser_data_t;
-typedef struct { int equipped; unsigned char compatible[10]; } torpedo_data_t;
-// This union combines all tactical modules into 1
 
 // for miscellaneous, there is no types, just ids.
+#define SOURCE_CORE 0   // recieve power from warp core
+#define SOURCE_AUX 1    // recieve power from aux generator (requires this module installed)
+#define SOURCE_RESERVE 2    // recieve power from internal reserve (battery)
 
 typedef struct {
     char priority;          // determines which module draws power first
@@ -46,7 +53,7 @@ typedef struct {
     signed int spend;           // power spend per cycle
     signed int base;           // default power usage
     bool alwaysUse;          // boolean to specify if the module is always using power when active
-    char drawFrom;
+    char source;
 } power_t;
 // Related Functions
 #define POWER_INC 1
@@ -54,22 +61,10 @@ typedef struct {
 #define POWSRC_WARP 0
 #define POWSRC_AUX 1
 #define POWSRC_RESERVE 2
-signed int power_GetBatteryPercent(power_t* power); // returns % of battery remain
-signed int power_GetSpendPercent(power_t* power);   // returns power expend/usage
-signed int power_GetPowerSpend(power_t* power);
-void power_ChangeSpend(power_t* power, char amount);
-signed int power_GetPowerDraw(power_t* power);
-//bool power_ExpendThisCycle(power_t* power);     // returns if module should use power
-//bool power_ReserveThisCycle(power_t* power);      // returns if module should recieve power
-void power_SetDrawSource(power_t* power, char source);
-char power_GetDrawSource(power_t* power);
-/*#define power_SetDrawCore(power_t* power) \
-power_SetDraw(power_t* power, DRAW_CORE)    // set module to draw from warp core
-#define power_SetDrawAux(power_t* power) \
-power_SetDraw(power_t* power, DRAW_AUX)     // set module to draw from auxiliary power
-#define power_SetDrawReserve(power_t* power) \
-power_SetDraw(power_t* power, DRAW_RESERVE) // set module to draw from reserve power */
-
+#define power_GetReservePercent(power) (power->current * 100 / power->capacity)
+#define power_GetUsagePercent(power) (power->spend * 100 / power->base)
+#define power_SetSpend(power, amount)   power->spend = amount
+#define power_SetSource(power, source)  power->source = source  // use defines above
 
 // HEALTH MONITORING STRUCTURE
 typedef struct {
@@ -77,60 +72,35 @@ typedef struct {
     signed int current;
 } health_t;
 // Related Functions
-signed int health_GetHealthPercent(health_t* health);
-void health_DamageModule(health_t* health, int amount);
+#define health_GetPercent(health)   health->current * 100 / health->max
+#define health_SetHealth(health, amount)    health->current = amount
 
 
 // Module Online States
 #define STATE_OFFLINE 0
 #define STATE_ONLINE 1
-#define STATE_REPAIRING 2
+#define STATE_REPAIR 2
 // Module Set State Error Codes
 #define SETSTATE_SUCCESS 0
 #define SETSTATE_NOPOWER 1
 #define SETSTATE_NOHEALTH 2
-// Module Effectiveness Step Values
-#define STEP_DEFAULT 20
-#define STEP_MID 10
-#define STEP_LOW 5
 
 // Module Data Struct
-typedef union Data_t {
-    // Core System Modules
-    trans_data_t mod_transport;
-    integ_data_t mod_integ;
-    lifesup_data_t mod_lifesupport;
-    core_data_t mod_core;
-    engine_data_t mod_engine;
-    navsens_data_t mod_navsens;
-    // Shield Modules
-    shield_data_t mod_shields;
-    // Weapons Modules
-    torpedo_data_t mod_torpedoes;
-    phaser_data_t mod_phasers;
-    targsens_data_t mod_targsens;
-} data_t;
 
 typedef struct {
-    bool unlocked;
+    bool unlocked,online,typelocked;
+    uint8_t techid;
     uint8_t modclass;
-    unsigned char techid;
-    unsigned char techtype;     // locked, determines compatible tech type
+    uint8_t techtype;     // locked, determines compatible tech type
 //    unsigned char techclass;    // locked, determines compatible module classes
-    bool online, typelocked;            // is module online
     power_t power;          // power control
     health_t health;        // health monitor
-    data_t data;
+    uint8_t location;       // see ShipZones above
 } module_t;
-char module_GetOnlineState(module_t* module);   // return online, offline, or repairing
-char module_SetOnlineState(module_t* module, char state);   // set module state or return no power or no health
-//int module_GetEffectiveness(module_t* module, char steps);  // get % effectiveness of module
-    // steps indicate how quickly changes to health or power of a module effect performance.
-    // more steps equal greater sensitivity, but less fluctuation in performance
-    // less steps equal lower sensitivity, but more fluctuation in performance
-    // function return value will be based on sensitivity.
-// EX: 73% of STEP_NORMAL might return 73% of 20 (16), or 70% effectiveness.
-// EX: 73% of STEP_LOW would return 73% of 5 (3), or 60% effectiveness.
+#define module_GetOnlineState(module)   module->online
+#define module_SetOnline(module)    module->online = STATE_ONLINE
+#define module_SetOffline(module)   module->online = STATE_OFFLINE
+#define module_SetRepairing(module) module->online = STATE_REPAIR
 
 typedef struct {
     health_t health;
@@ -145,8 +115,8 @@ typedef struct {
 } rotations_t;
 
 
-#define TACT_MAX 8
-#define MAX_MODULES (TACT_MAX + SYS_MAX)
+#define MAX_MODULES 15
+// we may need to change this if there's no room on screen for 9 tactical modules
 typedef struct {
     uint24_t crew;
     rotations_t rotate;
@@ -154,13 +124,5 @@ typedef struct {
     module_t system[MAX_MODULES];
 } ship_t;
 // Core system defines
-
-typedef struct {
-    uint24_t mains;
-    uint24_t tactical;
-} selected_t;
-
-void module_SetHealthMax(health_t* health, int max);
-void module_SetPowerMax(power_t* power);
 
 #endif
