@@ -7,15 +7,25 @@
 
 // Module QuickRef Structure (Used to Populate GUI)
 
+enum StatusFlags {
+    ONLINE,
+    LOW_POWER,
+    LOW_HEALTH,
+    CRIT_HEALTH,
+    OVERCHARGE
+};
+
+
 typedef struct {
-    uint8_t techclass, techtype, techid;
-    bool online;
-    uint8_t health, power;   // percentages
+    uint8_t techclass, techtype;
+    uint8_t health;   // percentages
+    uint8_t status_flags;
 } module_t;
-#define module_GetOnlineState(module)   module->online
-#define module_SetOnline(module)    module->online = STATE_ONLINE
-#define module_SetOffline(module)   module->online = STATE_OFFLINE
-#define module_SetRepairing(module) module->online = STATE_REPAIR
+#define module_OnlineState(module)   ((module->status_flags >> ONLINE) & 1)
+#define module_PowerWarn(module)     ((module->status_flags >> LOW_POWER) & 1)
+#define module_HeathWarn(module)        ((module->status_flags >> LOW_HEALTH) & 1)
+#define module_HealthWarnCrit(module)   ((module->status_flags >> CRIT_HEALTH) & 1)
+#define module_Overcharge(module)       ((module->status_flags >> OVERCHARGE) & 1)
 
 typedef struct {
     uint8_t health;

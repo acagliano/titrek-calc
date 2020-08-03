@@ -149,3 +149,7 @@ bool gui_Register(void) {
         PS_ARR(version)
     );
 }
+
+bool gui_NewGame(void) {
+    return ntwk_send_nodata(REQNEWGAME);
+}

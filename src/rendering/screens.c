@@ -130,7 +130,7 @@ void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selec
             }
             module_RenderGeneral(module, temp_x, temp_y);
             if(module->techtype == SHIELD){
-                if(module->online){
+                if(module_OnlineState(module)){
                     shields_active = true;
                     shield_health += module->health;
                     shield_num++;
@@ -171,7 +171,7 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
         uint24_t barwidth;
         x_space -= 90;
         barwidth = (x_space > 100) ? 100 : x_space;
-        if(module->online){
+        if(module_OnlineState(module)){
             gfx_FillRectangleColor(3, x + 1, y + 1, width - 2, 14);}
         else{
             gfx_FillRectangleColor(96, x + 1, y + 1, width - 2, 14);}

@@ -11,7 +11,7 @@ typedef struct {
     signed int current;
 } health_t;
 // Related Functions
-#define health_GetPercent(health)   (health)->current * 100 / (health)->max
+#define health_GetPercent(health)   ((health)->current * 100 / (health)->max)
 #define health_SetHealth(health, amount)    (health)->current = amount
 
 #endif

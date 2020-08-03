@@ -7,6 +7,10 @@ typedef struct {
     char passwd[32];
 } userinfo_t;
 
-
+typedef struct {
+    uint24_t credits;
+    uint8_t faction;
+    
+} playersave_t;
 
 #endif

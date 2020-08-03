@@ -5,6 +5,7 @@
 #include "../rendering/errors.h"
 #include "../classes/settings.h"
 #include "../classes/player.h"
+#include "../classes/ships.h"
 #include "controlcodes.h"
 #include "network.h"
 #include "../rendering/gui.h"
@@ -52,6 +53,9 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 update_program();
             }
             ti_Write(data, buff_size-1, 1, update_fp);
+            break;
+        case LOADSHIP:
+            memcpy(&Ship, data, sizeof(ship_t));
             break;
         default:
             gui_NetworkErrorResponse(3, 7, true);
