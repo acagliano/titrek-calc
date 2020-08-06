@@ -97,8 +97,19 @@ void MainMenu(void) {
             gfx_PrintStringXY("(c) 2019, Project TI-Trek", 5, 230);
             gfx_BlitBuffer();
             while(!kb_IsDown(kb_KeyClear)) kb_Scan();
+            while(kb_IsDown(kb_KeyClear)) kb_Scan();
+            opt = 0;
         }
-        if(opt == OPT_SETTINGS){}
+        if(opt == OPT_SETTINGS){
+            gfx_ZeroScreen();
+            gfx_SetColor(239);
+            gfx_PrintStringXY("Unimplemented", 5, 5);
+            gfx_PrintStringXY("- Press any key -", 10, 20);
+            gfx_BlitBuffer();
+            while(!kb_AnyKey()) kb_Scan();
+            while(kb_AnyKey()) kb_Scan();
+            opt = 0;
+        }
     }
 }
 
