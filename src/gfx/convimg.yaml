@@ -1,0 +1,49 @@
+
+converts:
+    - name: internal
+      palette: xlibc
+      transparent-color-index: 0
+      compression: zx7
+      style: rlet
+      images:
+        - splash.png
+        - icon_internalerr.png
+
+converts:
+    - name: guiicons
+      palette: xlibc
+      transparent-color-index: 0
+      compression: zx7
+      style: rlet
+      images:
+        - gui-items/*.png
+
+converts:
+    - name: moduleicons
+      palette: xlibc
+      transparent-color-index: 0
+      compression: zx7
+      style: rlet
+      images:
+        - modules/*.png
+
+#outputs:
+#    - type: c
+#      include-file: TrekGFX.h
+#      converts:
+#        - internal
+#        - guiicons
+#        - moduleicons
+
+outputs:
+    - type: appvar
+      name: TrekGFX
+      source-format: c
+      include-file: TrekGFX.h
+      lut-entries: true
+      archived: true
+      converts:
+        - internal
+        - guiicons
+        - moduleicons
+
