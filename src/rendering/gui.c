@@ -73,6 +73,8 @@ uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash) {
         if(gameflags.network) {
             gfx_SetColor(0);
             gfx_FillRectangle_NoClip(text_x + 100, text_y + 45, gfx_GetStringWidth("Networking disabled!"), 10);
+            gfx_SetTextFGColor(6);
+            gfx_PrintStringXY("Serial connected!", text_x + 100, text_y + 45);
         } else {
             gfx_SetTextFGColor(224);
             gfx_PrintStringXY("Networking disabled!", text_x + 100, text_y + 45);

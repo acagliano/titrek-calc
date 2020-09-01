@@ -64,9 +64,9 @@ char versionstr[12] = {0};
 ship_t Ship = {0};
 selected_t select = {0, 0};
 gfx_rletsprite_t* gfx_sprites;
+gfx_UninitedRLETSprite(splash, splash_height * splash_width + 2);
+gfx_UninitedRLETSprite(err_icon, icon_internalerr_height * icon_internalerr_width + 2);
 bool debug = 0;
-gfx_UninitedRLETSprite(splash, splash_size);
-gfx_UninitedRLETSprite(err_icon, icon_internalerr_size);
 flags_t gameflags = {0};
 settings_t settings = {0};
 uint24_t ticknum = 0;
@@ -118,13 +118,13 @@ int main(void) {
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
-    zx7_Decompress(splash, splash_compressed);
-    zx7_Decompress(err_icon, icon_internalerr_compressed);
     if(savefile = ti_Open(settingsappv, "r")){
         ti_Read(&settings, sizeof(settings), 1, savefile);
         ti_Close(savefile);
     } else { set_defaults(); }
 
+    zx7_Decompress(err_icon, icon_internalerr_compressed);
+    zx7_Decompress(splash, splash_compressed);
     if(!ntwk_init()) goto error;
 
     gfx_SetDefaultPalette(gfx_8bpp);
