@@ -59,7 +59,7 @@
 char *settingsappv = "TrekSett";
 char *TEMP_PROGRAM = "_";
 char *MAIN_PROGRAM = "TITREK";
-char version[] = {0, 0, 91};
+char version[] = {0, 0, 92};
 char versionstr[12] = {0};
 ship_t Ship = {0};
 selected_t select = {0, 0};

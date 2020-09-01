@@ -31,14 +31,14 @@ void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y
 }
 
 void gfx_InitModuleIcons(void){
-    uint24_t src = MODICON_START, ct = TrekGFX_num - MODICON_START, i;
+    uint24_t src = MODICON_START, ct = 28 - MODICON_START, i;
     
     for(i = 0; i < ct; i++){
-        modicons[i] = ((gfx_rletsprite_t*)TrekGFX[src++]);
+        modicons[i] = ((gfx_rletsprite_t*)TrekGFX_appvar[src++]);
     }
 }
 
-uint8_t gfx_RenderSplash(gfx_rletsprite_t *splash) {
+uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash) {
     uint24_t text_x = 60;
     uint8_t text_y = 140;
     uint8_t selected = 0;
@@ -122,8 +122,7 @@ bool gui_Login(void) {
 
     return ntwk_send(LOGIN,
         PS_STR(settings.userinfo.username),
-        PS_STR(settings.userinfo.passwd),
-        PS_ARR(version)
+        PS_STR(settings.userinfo.passwd)
     );
 }
 
@@ -145,8 +144,7 @@ bool gui_Register(void) {
     return ntwk_send(REGISTER,
         PS_STR(settings.userinfo.username),
         PS_STR(settings.userinfo.passwd),
-        PS_STR(email),
-        PS_ARR(version)
+        PS_STR(email)
     );
 }
 

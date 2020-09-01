@@ -19,6 +19,7 @@ enum ControlCodes {
     REQENTITY,      // request entity framedata
     REQSENSOR,  // Ask server for (1) position, (2) rotation matrix, (3) sensor data
     REQNEWGAME,
+    VERSION = 0xf0,
     PING = 0xfc,
     MESSAGE = 0xfd,
     DEBUG = 0xfe,

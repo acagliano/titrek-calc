@@ -26,7 +26,11 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     switch(ctl){
         case REGISTER:
         case LOGIN:
-            if(response == SUCCESS) {gameflags.logged_in = true; break;}
+            if(response == SUCCESS) {
+                gameflags.logged_in = true;
+                ntwk_send(VERSION, PS_ARR(version));
+                break;
+            }
             if((response == MISSING) && (ctl == LOGIN)) gui_Register();
             else {
                 memset(&settings.userinfo, 0, sizeof(userinfo_t));
