@@ -31,6 +31,7 @@ void ntwk_process(void) {
         /* Handle input */
         if(packet_size) {
             if(mode->read_to_size(packet_size)) {
+                ntwk_inactive_clock = 0;
                 conn_HandleInput((packet_t *) &net_buf, packet_size);
                 packet_size = 0;
             } else break;

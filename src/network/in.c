@@ -28,7 +28,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case LOGIN:
             if(response == SUCCESS) {
                 gameflags.logged_in = true;
-                ntwk_send(VERSION, PS_ARR(version));
+                ntwk_send_nodata(LOADSHIP);
                 break;
             }
             if((response == MISSING) && (ctl == LOGIN)) gui_Register();

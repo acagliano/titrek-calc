@@ -22,13 +22,14 @@ char ctl_codes[][12] = {
 };
 
 char err_codes[][32] = {
-    "Auth Invalid",
+    "Login Invalid",
     "Duplicate",
     "Missing",      // placeholder
-    "Banned",
-    "Version Err",
+    "User Banned",
+    "Incompatible Version",
     "Logging you in...",
-    "Packet Format Err"
+    "Packet Format Err",
+    "Network Timeout"
 };
 
 debug_type[][10] = {

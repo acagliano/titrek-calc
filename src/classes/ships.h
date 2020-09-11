@@ -29,7 +29,7 @@ typedef struct {
 
 typedef struct {
     uint8_t health;
-    uint8_t composite[5];
+    //uint8_t composite[5];
     // other data here?
 } hull_t;
 
@@ -44,7 +44,6 @@ typedef struct {
 // we may need to change this if there's no room on screen for 9 tactical modules
 typedef struct {
     uint24_t crew;
-    rotations_t rotate;
     hull_t hull;
     module_t system[MAX_MODULES];
 } ship_t;

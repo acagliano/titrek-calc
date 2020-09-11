@@ -5,8 +5,13 @@ converts:
       compression: zx7
       style: rlet
       images:
-        - splash.png
-        - icon_internalerr.png
+        - internal/*.png
+    - name: ship
+      palette: xlibc
+      transparent-color-index: 0
+      style: rlet
+      images:
+        - ship/*.png
     - name: guiicons
       palette: xlibc
       transparent-color-index: 0
@@ -41,6 +46,8 @@ outputs:
       include-file: TrekGFX.h
       lut-entries: true
       archived: true
+      header-string: "\x01\x03"
       converts:
         - guiicons
+        - ship
         - moduleicons

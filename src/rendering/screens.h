@@ -2,6 +2,7 @@
 #define statscreens_h
 
 #include <graphx.h>
+#include "../classes/screens.h"
 #define lcars_texty 223
 #define viewer_x 30
 #define viewer_y 20
@@ -9,9 +10,10 @@
 char *strify_version(char *str, uint8_t *version);
 extern char mainsys_strings[][10];
 
+int num_GetLength(int number);
 void Screen_RenderUI(uint24_t screen, selected_t* select);
 void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selected);
-void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selected);
+void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, uint24_t selected);
 void Screen_UIViewer(void);
 void Screen_UIInventory(void);
 void Screen_UITransporter(void);

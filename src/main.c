@@ -59,18 +59,24 @@
 char *settingsappv = "TrekSett";
 char *TEMP_PROGRAM = "_";
 char *MAIN_PROGRAM = "TITREK";
-char version[] = {0, 0, 92};
+uint8_t version[] = {0, 0, 94};
 char versionstr[12] = {0};
+uint8_t gfx_version[2] = {0};
+uint8_t gfx_reqd[2] = {1, 3};
+uint8_t gfx_custom[2] = {0xff, 0xff};
 ship_t Ship = {0};
 selected_t select = {0, 0};
 gfx_rletsprite_t* gfx_sprites;
-gfx_UninitedRLETSprite(splash, splash_height * splash_width + 2);
-gfx_UninitedRLETSprite(err_icon, icon_internalerr_height * icon_internalerr_width + 2);
+gfx_UninitedRLETSprite(splash, splash_size);
+gfx_UninitedRLETSprite(err_icon, icon_error_size);
+gfx_UninitedRLETSprite(icon_netup, icon_networkup_size);
+gfx_UninitedRLETSprite(icon_netdown, icon_networkdown_size);
 bool debug = 0;
 flags_t gameflags = {0};
 settings_t settings = {0};
 uint24_t ticknum = 0;
 moduleinfo_t ModuleInfo = {};
+uint24_t ntwk_inactive_clock = 0;
 
 ti_var_t update_fp = 0;
 
@@ -101,12 +107,24 @@ void MainMenu(void) {
             opt = 0;
         }
         if(opt == OPT_SETTINGS){
-            gfx_ZeroScreen();
-            gfx_SetColor(239);
-            gfx_PrintStringXY("Unimplemented", 5, 5);
-            gfx_PrintStringXY("- Press any key -", 10, 20);
-            gfx_BlitBuffer();
-            while(!kb_AnyKey()) kb_Scan();
+            uint24_t start_x = 20, start_y = 20, i, sel = 0;
+            bool firstrender = true;
+            sk_key_t key;
+            do {
+                key = getKey();
+                if(key == sk_Down) sel = sel + (sel < (num_settings-1));
+                if(key == sk_Up) sel = sel - (sel > 0);
+                if(key == sk_Left) gfx_AlterSettingOpt(sel, -1);
+                if(key == sk_Right) gfx_AlterSettingOpt(sel, 1);
+                if(key || firstrender){
+                    gfx_ZeroScreen();
+                    for(i = 0; i < num_settings; i++)
+                        gfx_RenderSettingOpt(i, sel, start_x, i * 16 + start_y);
+                    gfx_BlitBuffer();
+                    firstrender = false;
+                }
+    
+            } while (key != sk_Clear);
             while(kb_AnyKey()) kb_Scan();
             opt = 0;
         }
@@ -123,10 +141,15 @@ int main(void) {
         ti_Close(savefile);
     } else { set_defaults(); }
 
-    zx7_Decompress(err_icon, icon_internalerr_compressed);
+    zx7_Decompress(err_icon, icon_error_compressed);
     zx7_Decompress(splash, splash_compressed);
+    zx7_Decompress(icon_netup, icon_networkup_compressed);
+    zx7_Decompress(icon_netdown, icon_networkdown_compressed);
     if(!ntwk_init()) goto error;
-
+    
+    gfx_GetVersion();
+    gfx_VersionCheck();
+    
     gfx_SetDefaultPalette(gfx_8bpp);
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
@@ -135,6 +158,7 @@ int main(void) {
     do {
         MainMenu();
     } while(!gameflags.exit);
+    if(!settings.savelogin) memset(&settings.userinfo, 0, sizeof(userinfo_t));
 error:
     usb_Cleanup();
     write_settings();
@@ -147,12 +171,13 @@ error:
 void PlayGame(void){
     uint16_t screen = 0;
     if(!gameflags.network) return;
-    if(!gui_Login()) {
-        dbg_sprintf(dbgout, "Failed to login\n");
-        return;
-    }
+    if(gameflags.gfx_error) return;
     if(!TrekGFX_init()) {
         dbg_sprintf(dbgout, "Failed to init graphics\n");
+        return;
+    }
+    if(!gui_Login()) {
+        dbg_sprintf(dbgout, "Failed to login\n");
         return;
     }
     gfx_InitModuleIcons();
@@ -162,6 +187,7 @@ void PlayGame(void){
         sk_key_t key = getKey();
         Screen_RenderUI(screen, &select);
         if(!gameflags.logged_in) gui_NetworkErrorResponse(3, 6, false);
+        if(!gameflags.network) break;
         gfx_BlitBuffer();
         if(key == sk_Clear){
             if(gameflags.logged_in){
@@ -250,6 +276,11 @@ void PlayGame(void){
         ntwk_process();
         gfx_SwapDraw();
         ticknum++;
+        if(ntwk_inactive_clock >= settings.limits.network_timeout){
+            gui_NetworkErrorResponse(3, 8, true);
+            gameflags.network = false;
+        }
+        ntwk_inactive_clock++;
     } while(gameflags.loopgame && gameflags.network);
     dbg_sprintf(dbgout, "%u%u\n", gameflags.loopgame, gameflags.network);
 }

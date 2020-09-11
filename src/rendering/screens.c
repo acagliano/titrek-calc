@@ -61,6 +61,8 @@ int num_GetLength(int number){
     return 1 + (number >= 10) + (number >= 100);
 }
 
+
+
 void Screen_RenderUI(uint24_t screen, selected_t* select){
     Screen_Background(screen);
     gfx_SetTextFGColor(255);
@@ -70,7 +72,7 @@ void Screen_RenderUI(uint24_t screen, selected_t* select){
         case SCRN_SENS:
             break;
         case SCRN_TACT:
-            Screen_UITacticalStats(Ship.system, MAX_MODULES, select->tactical);
+            Screen_UITacticalStats(Ship.hull, Ship.system, MAX_MODULES, select->tactical);
             if(screen > 0xff)
                 Overlay_UIModuleInfo();
             break;
@@ -112,8 +114,8 @@ void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selecte
     return;
 }
 
-void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selected){
-    unsigned char i, j=0, cur_y = viewer_y + 20;
+void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, uint24_t selected){
+    unsigned char i, j=0, cur_y = viewer_y + 30;
     int cur_x = viewer_x;
     uint24_t shield_health = 0, shield_resist = 0, shield_num = 0;
     bool shields_active = false;
@@ -139,21 +141,13 @@ void Screen_UITacticalStats(module_t* systems, uint24_t syscount, uint24_t selec
             j++;
         }
     }
-        if(shields_active) {
-            gfx_rletsprite_t* shield_icon = icon_shieldsstable;
-            shield_health /= shield_num;
-            if(shield_health <= 50) shield_icon = icon_shieldscollapse;
-            if(shield_health <= 25) shield_icon = icon_shieldsfail;
-            gfx_RLETSprite(shield_icon, cur_x + 5, cur_y + 5);
-            cur_y += shield_icon->height + 10;
-            gfx_RLETSprite(icon_shieldinteg, cur_x, cur_y - 1);
-            cur_x += 12;
-            stats_DrawHealthBar(shield_health, 60, cur_x, cur_y, 10, 25, 107, 29);
-            cur_y += 15; cur_x = viewer_x;
-        }
-        gfx_RLETSprite(icon_hullinteg, cur_x, cur_y - 1);
-        cur_x += 12;
-     //   stats_DrawHealthBar(health_GetHealthPercent(&systems[TACT_MAX].health), 60, cur_x, cur_y, 33, 107, 74);
+    shield_health /= shield_num;
+    gfx_DrawShieldDisp(shields_active, shield_health, top, cur_x, cur_y - 1);
+    gfx_DrawShieldDisp(shields_active, shield_health, side, cur_x + 40, cur_y - 1);
+    cur_y += 42;
+    gfx_RLETSprite(icon_hullinteg, cur_x, cur_y - 1);
+    cur_x += 12;
+    stats_DrawHealthBar(hull.health, 60, cur_x, cur_y, 10, 33, 107, 74);
 }
 
 
@@ -165,7 +159,7 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
     uint8_t bar = (module->techtype < SYS_MAX) ? 77 : 29;
     uint24_t x_space = vWidth - (x + 10);
     uint24_t width = (x_space > 200) ? 200 : x_space;
-    gfx_RectangleColor(229, x, y, width, 14);
+    gfx_RectangleColor(229, x, y, width, 16);
     if(module->techclass){
         uint8_t techtype = module->techtype;
         uint24_t barwidth;
@@ -237,7 +231,7 @@ void Screen_Background(unsigned char active) {
     gfx_PrintStringXY("Repair", 200, lcars_texty);
     gfx_PrintStringXY("Cargo", 268, lcars_texty);
     gfx_SetTextFGColor(148);
-    gfx_PrintStringXY(versionstr, 160 - (7 * strlen(versionstr) / 2), 0);
+    gfx_PrintStringXY(versionstr, 160 - (7 * strlen(versionstr) / 2), 1);
     gfx_SetTextFGColor(0);
 }
 
