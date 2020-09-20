@@ -2,51 +2,60 @@
 #define controlcodes_h
 
 enum ControlCodes {
-    // network handling
-    REGISTER,       // attempt to create new account
-    LOGIN,          // attempt to join existing account
-    DISCONNECT,     // attempt to disconnect from the server
-    // autoupdater
-    PGRMUPDATE,     // data segment for client self-update
-    GFXUPDATE,      // data segment for graphics update
-    // load game data
-    LOADSHIP,       // receive necessary data to render GUI (ship_t)
-    // no need for a SAVEGAME because everything is server-side anyway
-    // in-game stuff
-    MODULEINFO,     // request all module information (instead of abbreviated)
-    MODULEUPDATE,   // used by server to send info to client. Also used by client at times.
-    REQCHUNK,       // request chunk framedata
-    REQENTITY,      // request entity framedata
-    REQSENSOR,  // Ask server for (1) position, (2) rotation matrix, (3) sensor data
-    REQNEWGAME,
+    // CONNECTION/ADMIN
+    // 0 - 9
+    REGISTER,
+    LOGIN,
+    DISCONNECT,
+    VERSION_MISMATCH,
+    // This is for the client not up to date response , See response codes. VERSION_* must be the second byte of packet
+       
+    // GAMEPLAY
+    // Map Interfacing: 10 - 19
+    FRAMEDATA_REQUEST = 10,
+    SENSOR_DATA_REQUEST,     // May add REQPOSITION if needed
     PLAYER_MOVE,
-    VERSION = 0xf0,
+    POSITION_REQUEST,
+       
+    // Ship Interfacing: 20 - 29
+    LOAD_SHIP = 20,
+    MODULE_INFO_REQUEST,
+    MODULE_STATE_CHANGE,
+    NEW_GAME_REQUEST,
+       
+    // File Streaming: 90 - 91
+    PRGMUPDATE = 90,
+    GFXUPDATE,
+       
+    // DEBUG: 0xf*
     PING = 0xfc,
-    MESSAGE = 0xfd,
-    DEBUG = 0xfe,
-    SERVINFO = 0xff
+    MESSAGE,
+    DEBUG,
+    SERVINFO
 };
 
 //returned from some routines
-enum ResponseCodes {
+enum _connection_response {
     SUCCESS = 0,
     INVALID,
     DUPLICATE,
     MISSING,
     BANNED,
-    VERSION_MISMATCH
+    VERSION_ERROR,
+    VERSION_OUTDATED,
+    BAD_MESSAGE_CONTENT
 };
 
 /*
     Module Update Notes
     MODULEUPDATE
 */
-enum ModuleUpdateCodes {
+enum _module_state_change_response {
 // for inbound (server->client)
-    UPD_STATUS,     // update online/offline state
-    UPD_HEALTH,     // update saved health %
-    UPD_POWER,    // update saved power %
-    UPD_REASSIGN // change entire module (usually replacing with new tech)
+    CHANGE_STATUS,     // update online/offline state
+    CHANGE_HEALTH,     // update saved health %
+    CHANGE_POWER,    // update saved power %
+    CHANGE_TECH // change entire module (usually replacing with new tech)
 };
 // client may also send a MODULEUPDATE request when "purchasing" an upgrade.
 // We may wind up storing upgrades that enhance existing modules (instead of be their own tech) in their own database, such that they may be requested by sending a MODULEUPDATE with the id.

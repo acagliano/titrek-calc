@@ -269,5 +269,5 @@ bool gui_Register(void) {
 }
 
 bool gui_NewGame(void) {
-    return ntwk_send_nodata(REQNEWGAME);
+    return ntwk_send_nodata(NEW_GAME_REQUEST);
 }

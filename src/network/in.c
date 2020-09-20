@@ -28,7 +28,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case LOGIN:
             if(response == SUCCESS) {
                 gameflags.logged_in = true;
-                ntwk_send_nodata(LOADSHIP);
+                ntwk_send_nodata(LOAD_SHIP);
                 break;
             }
             if((response == MISSING) && (ctl == LOGIN)) gui_Register();
@@ -40,13 +40,13 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case DISCONNECT:
             gameflags.logged_in = false;
             break;
-        case REQCHUNK:
+        case FRAMEDATA_REQUEST:
             renderFrame((body_packet_t*)data);
             break;
         case MESSAGE:
             // to handle
             break;
-        case PGRMUPDATE:
+        case PRGMUPDATE:
             if (!update_fp){
                 update_fp = ti_OpenVar(TEMP_PROGRAM,"w",TI_PPRGM_T);
             }
@@ -58,8 +58,17 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             }
             ti_Write(data, buff_size-1, 1, update_fp);
             break;
-        case LOADSHIP:
+        case LOAD_SHIP:
             memcpy(&Ship, data, sizeof(ship_t));
+            break;
+        case MODULE_STATE_CHANGE:
+            {
+                module_t* thismodule = &Ship.system[*data++];
+                uint8_t action = *data++;
+                uint8_t* target = (action == CHANGE_HEALTH) ? &thismodule->health : NULL;
+                if(!target) return;
+                *target = *data;
+            }
             break;
         default:
             gui_NetworkErrorResponse(3, 7, true);

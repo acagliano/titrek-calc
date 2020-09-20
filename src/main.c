@@ -39,6 +39,7 @@
 #include "rendering/screens.h"
 #include "rendering/errors.h"
 #include "rendering/gui.h"
+#include "rendering/imgcaching.h"
 
 #include "gfx/TrekGFX.h"
 #include "gfx/internal.h"
@@ -163,6 +164,7 @@ error:
     usb_Cleanup();
     write_settings();
     gfx_End();
+    cache_purge();
     pgrm_CleanUp();
     return 0;
 }
@@ -197,6 +199,7 @@ void PlayGame(void){
             else gameflags.loopgame = false;
         }
         if(key == sk_Stat) {debug = true;}
+        if(key == sk_2nd) {}
         if(key == sk_Yequ)
             screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
         if(key == sk_Window)
