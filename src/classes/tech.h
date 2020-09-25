@@ -16,7 +16,8 @@ enum TechTypes {
     ARMOR,
     PHASER,
     TORPEDO,
-    TARG_SENS
+    TARG_SENS,
+    HULL = 0xf0
 };
 
 enum TechClasses {

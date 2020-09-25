@@ -6,6 +6,7 @@
 #include <graphx.h>
 #include "classes/ships.h"
 #include "classes/modules.h"
+#include "classes/screens.h"
 
 #define xStart 10
 #define yStart 14
@@ -29,6 +30,7 @@ typedef struct {
 } flags_t;
 extern flags_t gameflags;
 
+extern selected_t select;
 extern uint8_t version[3];
 extern char versionstr[12];
 extern uint8_t gfx_version[2];

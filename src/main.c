@@ -76,7 +76,7 @@ bool debug = 0;
 flags_t gameflags = {0};
 settings_t settings = {0};
 uint24_t ticknum = 0;
-moduleinfo_t ModuleInfo = {};
+moduleinfo_t ModuleInfo = {0};
 uint24_t ntwk_inactive_clock = 0;
 
 ti_var_t update_fp = 0;
@@ -161,10 +161,10 @@ int main(void) {
     } while(!gameflags.exit);
     if(!settings.savelogin) memset(&settings.userinfo, 0, sizeof(userinfo_t));
 error:
-    usb_Cleanup();
+    //cache_purge();
     write_settings();
     gfx_End();
-    cache_purge();
+    usb_Cleanup();
     pgrm_CleanUp();
     return 0;
 }
@@ -187,7 +187,7 @@ void PlayGame(void){
         /* A buffer to store bytes read by the serial library */
         size_t bytes_read;
         sk_key_t key = getKey();
-        Screen_RenderUI(screen, &select);
+        Screen_RenderUI(screen);
         if(!gameflags.logged_in) gui_NetworkErrorResponse(3, 6, false);
         if(!gameflags.network) break;
         gfx_BlitBuffer();
@@ -211,8 +211,17 @@ void PlayGame(void){
         if(key == sk_Graph)
             screen = (screen == SCRN_CARGO) ? SCRN_OFF : SCRN_CARGO;
         if(key == sk_Enter){
-            if((screen == SCRN_MAINS) || (screen == SCRN_TACT))
+            if((screen == SCRN_MAINS) || (screen == SCRN_TACT)){
+                uint8_t slot = (screen == SCRN_MAINS) ? select.mains : select.tactical;
+                ntwk_send(MODULE_INFO_REQUEST, PS_VAL(slot));
                 screen = setbits(screen, SCRN_INFO);
+            }
+        }
+        if(key == sk_Mode){
+            if((screen == SCRN_MAINS) || (screen == SCRN_TACT)){
+                uint8_t slot = (screen == SCRN_MAINS) ? select.mains : select.tactical;
+                ntwk_send(MODULE_STATE_CHANGE, PS_VAL(slot), PS_VAL(CHANGE_ONLINE_STATE));
+            }
         }
         if(key == sk_Down) {
             char i;
@@ -263,13 +272,7 @@ void PlayGame(void){
             /*
         if(gameflags.logged_in){
             if(ticknum % settings.limits.chunk_refresh == 0) {
-                ntwk_send(REQCHUNK,
-                    PS_VAL(Ship.rotate.yaw),
-                    PS_VAL(Ship.rotate.pitch),
-                    PS_VAL(Ship.rotate.roll));
-            }
-            if(ticknum % settings.limits.entity_refresh == 0) {
-                ntwk_send(REQENTITY,
+                ntwk_send(FRAMEDATA_REQUEST,
                     PS_VAL(Ship.rotate.yaw),
                     PS_VAL(Ship.rotate.pitch),
                     PS_VAL(Ship.rotate.roll));

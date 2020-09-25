@@ -26,12 +26,15 @@ bool cache_insert(gfx_rletsprite_t* data, uint8_t slot, size_t size){
 
 void cache_remove(uint8_t slot){
     cache_entry_t* cache = &spritecache[slot];
-    free(cache->sprite);
-    cache->sprite = NULL;
+    if(cache->sprite){
+        free(cache->sprite);
+        cache->sprite = NULL;
+    }
 }
 
 void cache_purge(void){
-    uint8_t i;
-    for(i = 0; i < 256; i++)
+    uint24_t i = 0;
+    do {
         cache_remove(i);
+    } while( i++ < 255 );
 }

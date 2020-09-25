@@ -63,7 +63,7 @@ int num_GetLength(int number){
 
 
 
-void Screen_RenderUI(uint24_t screen, selected_t* select){
+void Screen_RenderUI(uint24_t screen){
     Screen_Background(screen);
     gfx_SetTextFGColor(255);
     switch(screen & 0xff){
@@ -72,12 +72,12 @@ void Screen_RenderUI(uint24_t screen, selected_t* select){
         case SCRN_SENS:
             break;
         case SCRN_TACT:
-            Screen_UITacticalStats(Ship.hull, Ship.system, MAX_MODULES, select->tactical);
+            Screen_UITacticalStats(Ship.hull, Ship.system, MAX_MODULES, select.tactical);
             if(screen > 0xff)
                 Overlay_UIModuleInfo();
             break;
         case SCRN_MAINS:
-            Screen_UISystemStats(Ship.system, MAX_MODULES, select->mains);
+            Screen_UISystemStats(Ship.system, MAX_MODULES, select.mains);
             if(screen > 0xff)
                 Overlay_UIModuleInfo();
             break;
@@ -182,10 +182,6 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
 
 
 void Overlay_UIModuleInfo(void) {
-    uint8_t state = ModuleInfo.state;
-    uint8_t techtype = ModuleInfo.modtype;
-    uint8_t health = health_GetPercent(&ModuleInfo.health);
-    uint8_t power = power_GetReservePercent(&ModuleInfo.power);
     uint24_t x = 60, width = 200;
     uint8_t y = 30, height = 110;
     uint24_t text_x = x + 4;
@@ -193,6 +189,15 @@ void Overlay_UIModuleInfo(void) {
     gfx_SetTextFGColor(0);
     gfx_RenderWindow(x, y, width, height, 139, 205, 3);
     gfx_FillRectangleColor(139, x + 2, y + 2, width - 4, 16);
+    if(!ModuleInfo.modclass) {
+        gfx_PrintStringXY("No Module Info Loaded", text_x + 20, text_y + 2);
+        return;
+    }
+    uint8_t state = ModuleInfo.state;
+    uint8_t techtype = ModuleInfo.modtype;
+    uint8_t health = health_GetPercent(&ModuleInfo.health);
+    uint8_t power = power_GetReservePercent(&ModuleInfo.power);
+    
     gfx_RLETSprite(modicons[techtype], text_x + 2, y + 2);
     gfx_PrintStringXY(modulenames[techtype], text_x + 20, text_y + 2);
     text_y += 17;

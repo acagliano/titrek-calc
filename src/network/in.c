@@ -41,7 +41,20 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             gameflags.logged_in = false;
             break;
         case FRAMEDATA_REQUEST:
-            renderFrame((body_packet_t*)data);
+            {
+                uint8_t packet_len = data[0]*8 + 1;
+                int x;
+                uint8_t y, r;
+                for (int i=1; i<packet_len; i+=8){
+                    x = 160 + (signed)data[i];
+                    y = 120 + (signed)data[i+1];
+                    r = data[i+2];
+                    gfx_SetColor(data[i+3]);
+                    gfx_FillCircle(x, y, r);
+                    gfx_SetColor(data[i+4]);
+                    gfx_Circle(x, y, r);
+                }
+            }
             break;
         case MESSAGE:
             // to handle
@@ -59,15 +72,40 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             ti_Write(data, buff_size-1, 1, update_fp);
             break;
         case LOAD_SHIP:
-            memcpy(&Ship, data, sizeof(ship_t));
+            {
+                uint24_t i;
+                bool main_set = false, tact_set = false;
+                memcpy(&Ship, data, sizeof(ship_t));
+                for(i = 0; i < MAX_MODULES; i++){
+                    module_t *m = &Ship.system[i];
+                    if(m->techclass == mSystem) { select.mains = i; main_set = true;}
+                    if(m->techclass == mTactical) { select.tactical = i; tact_set = true;}
+                    if(main_set && tact_set) break;
+                }
+            }
             break;
         case MODULE_STATE_CHANGE:
             {
-                module_t* thismodule = &Ship.system[*data++];
-                uint8_t action = *data++;
-                uint8_t* target = (action == CHANGE_HEALTH) ? &thismodule->health : NULL;
-                if(!target) return;
-                *target = *data;
+                struct {
+                    uint8_t slot;
+                    uint8_t action;
+                    uint8_t value;
+                } *packet = (void*)data;
+                module_t* thismodule = &Ship.system[packet->slot];
+                uint8_t* target = (packet->action == CHANGE_HEALTH) ? &thismodule->health
+                    : (packet->action == CHANGE_STATUS_FLAGS) ? &thismodule->status_flags
+                    : NULL;
+                if(!target) break;
+                *target = packet->value;
+            }
+            break;
+        case MODULE_INFO_REQUEST:
+            {
+                struct {
+                    uint8_t slot;
+                    moduleinfo_t info;
+                } *packet = (void*)data;
+                memcpy(&ModuleInfo, &packet->info, sizeof(ModuleInfo));
             }
             break;
         default:

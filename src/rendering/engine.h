@@ -3,6 +3,7 @@
 #define engine_h
 
 #define gfx_ResetClip() gfx_SetClipRegion((0),(0),(320),(240))
+
 typedef struct {
     int8_t x,y;
     uint8_t radius;
@@ -30,7 +31,7 @@ typedef struct {
 } sensor_packet_t;
 
 
-
+void renderFrame(body_packet_t* frame);
 
 
 

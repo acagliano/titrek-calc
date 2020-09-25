@@ -11,7 +11,7 @@ char *strify_version(char *str, uint8_t *version);
 extern char mainsys_strings[][10];
 
 int num_GetLength(int number);
-void Screen_RenderUI(uint24_t screen, selected_t* select);
+void Screen_RenderUI(uint24_t screen);
 void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selected);
 void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, uint24_t selected);
 void Screen_UIViewer(void);

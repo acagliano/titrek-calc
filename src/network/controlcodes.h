@@ -52,10 +52,10 @@ enum _connection_response {
 */
 enum _module_state_change_response {
 // for inbound (server->client)
-    CHANGE_STATUS,     // update online/offline state
+    CHANGE_STATUS_FLAGS,     // edit status flags
     CHANGE_HEALTH,     // update saved health %
-    CHANGE_POWER,    // update saved power %
-    CHANGE_TECH // change entire module (usually replacing with new tech)
+// for outbound (client->server)
+    CHANGE_ONLINE_STATE = 10
 };
 // client may also send a MODULEUPDATE request when "purchasing" an upgrade.
 // We may wind up storing upgrades that enhance existing modules (instead of be their own tech) in their own database, such that they may be requested by sending a MODULEUPDATE with the id.
