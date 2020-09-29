@@ -5,6 +5,17 @@
 #include <stddef.h>
 
 void gui_NetworkErrorResponse(uint8_t controlcode, uint8_t responsecode, bool blocking);
-void gui_DebugMsg(char type, char data);
+void gui_SetLog(uint8_t type, const char* msg);
+void gui_ShowLog(void);
+
+enum LogType {
+    LOG_ERROR,
+    LOG_INFO,
+    LOG_DEBUG,
+    LOG_SERVER
+};
+extern char log_msg[4][50];
+extern gfx_rletsprite_t* icon[4];
+extern uint24_t log_display[4];
 
 #endif

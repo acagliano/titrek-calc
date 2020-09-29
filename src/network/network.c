@@ -26,7 +26,7 @@ void ntwk_process(void) {
         if(mode->process) mode->process();
 
         /* If the device was disconnected, exit */
-        if(!gameflags.network) return;
+        if(!netflags.network_up) return;
 
         /* Handle input */
         if(packet_size) {
@@ -47,7 +47,7 @@ bool ntwk_send_(uint8_t num_parts, uint8_t ctrl, ...) {
     va_list ap;
     size_t total_size = 1;
 
-    if(!gameflags.network) return false;
+    if(!netflags.network_up) return false;
 
     if(num_parts) {
         va_start(ap, num_parts);
@@ -77,3 +77,4 @@ bool ntwk_send_(uint8_t num_parts, uint8_t ctrl, ...) {
 
     return true;
 }
+

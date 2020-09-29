@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "player.h"
 
-#define num_settings 5
+#define num_settings 6
 extern char *settingsappv;
 
 typedef struct {
@@ -13,6 +13,7 @@ typedef struct {
     uint8_t entity_refresh; // .. .. entity data
     uint8_t packet_limit;   // max # of packets to recv() per tick
     uint24_t network_timeout;
+    uint24_t log_limit;
 } limiter_t;
 
 
@@ -20,6 +21,7 @@ typedef struct {
     bool savelogin;
     userinfo_t userinfo;
     limiter_t limits;
+    char servers[10][50];
 } settings_t;
 extern settings_t settings;
 
@@ -31,7 +33,8 @@ enum SettingOpt {
     CHUNK_REF,
     ENTITY_REF,
     PACKET_LIMIT,
-    NTWK_TIMEOUT
+    NTWK_TIMEOUT,
+    LOG_TIME
 };
 
 

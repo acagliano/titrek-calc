@@ -12,7 +12,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 
 bool init_usb(void) {
     usb_error_t usb_error;
-    gameflags.network = false;
+    netflags.network_up = false;
     usb_error = usb_Init(handle_usb_event, NULL, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
     return !usb_error;
 }
@@ -28,14 +28,14 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
         if(!srl_error) srl_SetRate(&srl, 115200);
         if(!srl_error) srl_Read(&srl, &dummy, 1);
         if(!srl_error) {
-            gameflags.network = true;
+            netflags.network_up = true;
         }
     }
 
     /* When a device is disconnected */
     if(event == USB_DEVICE_DISCONNECTED_EVENT) {
-        gameflags.network = false;
-        gameflags.logged_in = false;
+        netflags.network_up = false;
+        netflags.logged_in = false;
     }
 
     return USB_SUCCESS;

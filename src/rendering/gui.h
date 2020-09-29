@@ -17,4 +17,10 @@ void gfx_RenderWindow(uint24_t x, uint8_t y, uint24_t width, uint8_t height, uin
 bool gui_Login(void);
 bool gui_Register(void);
 
+void gfx_RenderMenu(char menutext[][50], uint8_t menucount, uint8_t selected, uint24_t x, uint8_t y, uint24_t w, uint8_t h);
+void gfx_RenderMenuOpt(bool active, const char* string, uint24_t x, uint8_t y, uint24_t w, uint8_t h);
+#define gfx_RenderVersion(x, y) gfx_RenderMenuTitle((versionstr), (x), (y))
+
+uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y, uint8_t flags);
+
 #endif

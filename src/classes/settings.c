@@ -1,6 +1,7 @@
 
 #include "settings.h"
 #include "player.h"
+#include <string.h>
 #include <stdbool.h>
 #include <fileioc.h>
 
@@ -11,7 +12,8 @@ char settingtext[][20] = {
     "Chunk Refresh Rate",
     "Entity Refresh Rate",
     "Packet Limit",
-    "Ntwk Timeout Limit"
+    "Ntwk Timeout Limit",
+    "Log Display Length"
 };
 
 char settinginfo[][70] = {
@@ -19,7 +21,8 @@ char settinginfo[][70] = {
     "How often to request chunk data from server.",
     "How often to request entity data from server.",
     "Max number of packets to process per tick.",
-    "Ticks w/o net activity triggering timeout."
+    "Ticks w/o net activity triggering timeout.",
+    "How long to display log lines for."
 };
 
 void set_defaults(void){
@@ -30,6 +33,8 @@ void set_defaults(void){
     settings.limits.entity_refresh = 1;
     settings.limits.packet_limit = 5;
     settings.limits.network_timeout = DEFAULT_NET_TIMEOUT;
+    settings.limits.log_limit = 100;
+    strcpy(settings.servers[0], "play.titrek.us");
 }
 
 bool write_settings(void){
@@ -76,6 +81,10 @@ gfx_RenderSettingOpt(uint8_t index, uint8_t selected, uint24_t x, uint8_t y){
             val = settings.limits.network_timeout;
             gfx_PrintUInt(val, num_GetLength(val));
             break;
+        case LOG_TIME:
+            val = settings.limits.log_limit;
+            gfx_PrintUInt(val, num_GetLength(val));
+            break;
             
     }
 }
@@ -96,6 +105,9 @@ void gfx_AlterSettingOpt(uint8_t selected, int8_t direction){
             break;
         case NTWK_TIMEOUT:
             settings.limits.network_timeout += (direction * 20);
+            break;
+        case LOG_TIME:
+            settings.limits.log_limit += (direction * 10);
             break;
     }
 

@@ -63,7 +63,7 @@ int num_GetLength(int number){
 
 
 
-void Screen_RenderUI(uint24_t screen){
+void Screen_RenderUI(void){
     Screen_Background(screen);
     gfx_SetTextFGColor(255);
     switch(screen & 0xff){
@@ -218,7 +218,7 @@ void Overlay_UIModuleInfo(void) {
     else gfx_PrintString("Offline");
 }
 
-void Screen_Background(unsigned char active) {
+void Screen_Background(uint8_t active) {
     int i;
     gfx_SetTextFGColor(255);
     gfx_ZeroScreen();

@@ -26,6 +26,10 @@ typedef struct {
     void (*write)(void *data, size_t size);
 } net_mode_t;
 
+typedef struct {
+    uint8_t server;
+} bridge_config_t;
+
 extern net_mode_t mode_srl;
 extern net_mode_t mode_pipe;
 

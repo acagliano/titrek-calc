@@ -23,12 +23,17 @@ gfx_rletsprite_t* modicons[TARG_SENS + 1] = {
     0
 };
 
-char options[][12] = {
+char options[][50] = {
     "Play Game",
     "Settings",
     "About Game",
     "Exit Game"
 };
+
+uint8_t gfx_VCenterText(uint8_t y, uint8_t box_height, uint8_t font_height){
+    uint8_t padding = box_height-font_height;
+    return padding/2+y;
+}
 
 void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y, uint8_t height, uint8_t border, uint8_t bg, uint8_t bar){
     gfx_SetColor(border);
@@ -116,35 +121,34 @@ void gfx_SplashNetIndicator(bool status, uint24_t x, uint8_t y){
     gfx_PrintStringXY("NET", x - 30, y + 5);
 }
 
-void gfx_RenderMenuOpt(bool active, const char* string, uint24_t x, uint8_t y){
+void gfx_RenderMenuOpt(bool active, const char* string, uint24_t x, uint8_t y, uint24_t w, uint8_t h){
     gfx_SetColor(0);
-    gfx_Rectangle(x, y, MENU_W, MENU_H/4);
+    gfx_Rectangle(x, y, w, h);
     gfx_SetColor(74);
     gfx_SetTextFGColor(255);
     if(active) {
         gfx_SetColor(181);
         gfx_SetTextFGColor(0);
     }
-    gfx_FillRectangle(x+1, y+1, MENU_W-2, (MENU_H/4)-2);
-    gfx_PrintStringXY(string, x+10, y+7);
+    gfx_FillRectangle(x+1, y+1, w-2, h-2);
+    gfx_PrintStringXY(string, x+10, gfx_VCenterText(y, h, 8));
 }
 
-void gfx_RenderMenu(uint8_t selected, uint24_t x, uint8_t y){
+void gfx_RenderMenu(char menutext[][50], uint8_t menucount, uint8_t selected, uint24_t x, uint8_t y, uint24_t w, uint8_t h){
     uint8_t i = 0;
     gfx_SetColor(195);
-    gfx_Rectangle(x-2, y-2, MENU_W+4, MENU_H+4);
-    gfx_Rectangle(x-1, y-1, MENU_W+2, MENU_H+2);
-    for(i; i<4; i++)
-        gfx_RenderMenuOpt((selected == i), options[i], x, MENU_H / 4 * i + y);
+    gfx_Rectangle(x-2, y-2, w+4, h+4);
+    gfx_Rectangle(x-1, y-1, w+2, h+2);
+    for(i; i<menucount; i++)
+        gfx_RenderMenuOpt((selected == i), menutext[i], x, h / menucount * i + y, w, h/menucount);
 }
 
-void gfx_RenderVersion(uint24_t x, uint8_t y){
+void gfx_RenderMenuTitle(const char* title, uint24_t x, uint8_t y){
     gfx_SetColor(195);
     gfx_SetTextFGColor(0);
-    gfx_FillRectangle(x, y, 65, 15);
+    gfx_FillRectangle(x, y, gfx_GetStringWidth(title) + 10, 15);
     gfx_SetTextXY(x+5, y+3);
-    gfx_PrintString("v ");
-    gfx_PrintString(versionstr);
+    gfx_PrintString(title);
 }
 
 uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash) {
@@ -173,12 +177,12 @@ uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash) {
         }
         if(key || firstrun){
             gfx_RenderVersion(text_x - 2, text_y-15);
-            gfx_RenderMenu(selected, text_x, text_y);
+            gfx_RenderMenu(options, 4, selected, text_x, text_y, MENU_W, MENU_H);
             firstrun = false;
         }
         if(gameflags.gfx_error)
             gfx_SplashGFXError(text_x + 140, text_y + 50);
-        gfx_SplashNetIndicator(gameflags.network, 320 - 25, 215);
+        gfx_SplashNetIndicator(netflags.network_up, 320 - 25, 215);
         gfx_BlitBuffer();
         ntwk_process();
     } while(key != sk_Enter);
@@ -240,16 +244,14 @@ bool gui_Login(void) {
 
     return ntwk_send(LOGIN,
         PS_STR(settings.userinfo.username),
-        PS_STR(settings.userinfo.passwd),
-        PS_ARR(version),
-        PS_ARR(gfx_version)
+        PS_STR(settings.userinfo.passwd)
     );
 }
 
 bool gui_Register(void) {
 // input = pointer to preserved username/password data from login function
     char email[64];
-    if(!gameflags.network) return false;
+    if(!netflags.network_up) return false;
 
     gfx_ZeroScreen();
     gfx_SetTextFGColor(255);

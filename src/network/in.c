@@ -24,10 +24,30 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     uint8_t* data = &in_buff->data[0];      // for handlers needing arbitrary data
     
     switch(ctl){
+        case CONNECT:
+            netflags.bridge_up = true;
+            gui_SetLog(LOG_INFO, "bridge connect successful");
+            ntwk_send(VERSION_CHECK,
+                PS_ARR(version),
+                PS_ARR(gfx_version)
+                );
+            break;
+        case DISCONNECT:
+            netflags.bridge_up = false;
+            netflags.logged_in = false;
+            gameflags.loopgame = false;
+            break;
+        case BRIDGE_ERROR:
+            netflags.bridge_error = true;
+            break;
+        case VERSION_CHECK:
+            if(response == VERSION_OK) netflags.client_version_ok = true;
+            else gui_SetLog(LOG_SERVER, "client outdated");
+            break;
         case REGISTER:
         case LOGIN:
             if(response == SUCCESS) {
-                gameflags.logged_in = true;
+                netflags.logged_in = true;
                 ntwk_send_nodata(LOAD_SHIP);
                 break;
             }
@@ -36,9 +56,6 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 memset(&settings.userinfo, 0, sizeof(userinfo_t));
                 gui_NetworkErrorResponse(ctl, response, true);
             }
-            break;
-        case DISCONNECT:
-            gameflags.logged_in = false;
             break;
         case FRAMEDATA_REQUEST:
             {
@@ -57,7 +74,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             }
             break;
         case MESSAGE:
-            // to handle
+            gui_SetLog(LOG_SERVER, data);
             break;
         case PRGMUPDATE:
             if (!update_fp){
@@ -108,8 +125,11 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 memcpy(&ModuleInfo, &packet->info, sizeof(ModuleInfo));
             }
             break;
+        case PING:
+            ntwk_inactive_clock = 0;
+            break;
         default:
-            gui_NetworkErrorResponse(3, 7, true);
+            gui_SetLog(LOG_ERROR, "unknown packet received");
     }
 }
 

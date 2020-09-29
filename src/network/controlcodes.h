@@ -4,10 +4,11 @@
 enum ControlCodes {
     // CONNECTION/ADMIN
     // 0 - 9
+    CONNECT,
+    DISCONNECT,
     REGISTER,
     LOGIN,
-    DISCONNECT,
-    VERSION_MISMATCH,
+    VERSION_CHECK,
     // This is for the client not up to date response , See response codes. VERSION_* must be the second byte of packet
        
     // GAMEPLAY
@@ -28,6 +29,7 @@ enum ControlCodes {
     GFXUPDATE,
        
     // DEBUG: 0xf*
+    BRIDGE_ERROR = 0xf0,
     PING = 0xfc,
     MESSAGE,
     DEBUG,
@@ -41,9 +43,14 @@ enum _connection_response {
     DUPLICATE,
     MISSING,
     BANNED,
-    VERSION_ERROR,
-    VERSION_OUTDATED,
+    UNVERIFIED,
     BAD_MESSAGE_CONTENT
+};
+
+enum _versioncheck_response {
+    VERSION_OK,
+    VERSION_OUTDATED,
+    VERSION_ERROR
 };
 
 /*

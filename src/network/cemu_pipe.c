@@ -8,7 +8,7 @@ char net_buf[1024];
 size_t net_buf_size = 0;
 
 bool pipe_init() {
-    gameflags.network = true;
+    netflags.network_up = true;
     return true;
 }
 
