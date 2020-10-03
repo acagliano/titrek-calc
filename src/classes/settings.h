@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include "player.h"
 
-#define num_settings 6
+#define num_settings 7
 extern char *settingsappv;
 
 typedef struct {
@@ -17,8 +17,10 @@ typedef struct {
 } limiter_t;
 
 
+
 typedef struct {
     bool savelogin;
+    bool ssl_prefer;
     userinfo_t userinfo;
     limiter_t limits;
     char servers[10][50];
@@ -30,6 +32,7 @@ bool write_settings(void);
 
 enum SettingOpt {
     SAVE_CREDS,
+    SSL_PREFER,
     CHUNK_REF,
     ENTITY_REF,
     PACKET_LIMIT,

@@ -46,6 +46,7 @@ typedef struct {
     uint24_t crew;
     hull_t hull;
     module_t system[MAX_MODULES];
+    rotations_t rot;
 } ship_t;
 // Core system defines
 

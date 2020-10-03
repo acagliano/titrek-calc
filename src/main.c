@@ -180,9 +180,12 @@ int main(void) {
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
-    if(savefile = ti_Open(settingsappv, "r")){
+    if((savefile = ti_Open(settingsappv, "r")) && (ti_GetSize(savefile) == sizeof(settings))){
         ti_Read(&settings, sizeof(settings), 1, savefile);
         ti_Close(savefile);
+    }
+    if(savefile = ti_Open(settingsappv, "r")){
+        
     } else { set_defaults(); }
 
     zx7_Decompress(err_icon, icon_error_compressed);
@@ -216,87 +219,6 @@ error:
     return 0;
 }
 
-void tick_KeyInput(sk_key_t key){
-    if(key == sk_Clear){
-        if(netflags.logged_in){
-            if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
-            else ntwk_send_nodata(DISCONNECT);
-        }
-        else gameflags.loopgame = false;
-    }
-    if(key == sk_Stat) {debug = true;}
-    if(key == sk_2nd) {}
-    if(key == sk_Yequ)
-        screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
-    if(key == sk_Window)
-        screen = (screen == SCRN_TACT) ? SCRN_OFF : SCRN_TACT;
-    if(key == sk_Zoom)
-        screen = (screen == SCRN_MAINS) ? SCRN_OFF : SCRN_MAINS;
-    if(key == sk_Trace)
-        screen = (screen == SCRN_TRANSPORT) ? SCRN_OFF : SCRN_TRANSPORT;
-    if(key == sk_Graph)
-        screen = (screen == SCRN_CARGO) ? SCRN_OFF : SCRN_CARGO;
-    if(key == sk_Enter){
-        if((screen == SCRN_MAINS) || (screen == SCRN_TACT)){
-            uint8_t slot = (screen == SCRN_MAINS) ? select.mains : select.tactical;
-            ntwk_send(MODULE_INFO_REQUEST, PS_VAL(slot));
-            screen = setbits(screen, SCRN_INFO);
-        }
-    }
-    if(key == sk_Mode){
-        if((screen == SCRN_MAINS) || (screen == SCRN_TACT)){
-            uint8_t slot = (screen == SCRN_MAINS) ? select.mains : select.tactical;
-            ntwk_send(MODULE_STATE_CHANGE, PS_VAL(slot), PS_VAL(CHANGE_ONLINE_STATE));
-        }
-    }
-    if(key == sk_Down) {
-        char i;
-        switch(screen){
-            case SCRN_TACT:
-                for(i = select.tactical + 1; i < (MAX_MODULES - 1); i++){
-                    int type = Ship.system[i].techclass;
-                    if( type == mTactical ){
-                        select.tactical = i;
-                        break;
-                    }
-                }
-                break;
-            case SCRN_MAINS:
-                for(i = select.mains + 1; i < (MAX_MODULES - 1); i++){
-                    int type = Ship.system[i].techclass;
-                    if( type == mSystem ){
-                        select.mains = i;
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-    if(key == sk_Up){
-        char i;
-        switch(screen){
-            case SCRN_TACT:
-                for(i = select.tactical - 1; i >= 0; i--){
-                    int type = Ship.system[i].techclass;
-                    if( type == mTactical ){
-                        select.tactical = i;
-                        break;
-                    }
-                }
-                break;
-            case SCRN_MAINS:
-                for(i = select.mains - 1; i >= 0; i--){
-                    int type = Ship.system[i].techclass;
-                    if( type == mSystem ){
-                        select.mains = i;
-                        break;
-                    }
-                }
-                break;
-            }
-        }
-}
-
 uint24_t arr_sum(uint24_t arr[], uint24_t ct){
     uint24_t i, sum=0;
     for(i=0;i<ct;i++)
@@ -304,34 +226,128 @@ uint24_t arr_sum(uint24_t arr[], uint24_t ct){
     return sum;
 }
 
-void tick_DrawScreen(void){
+void tick_ThisTick(sk_key_t* key){
+
+    // PROCESS KEY INPUT
+    *key = getKey();
+    switch(*key){
+        case sk_Clear:
+            if(netflags.logged_in){
+                if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
+                else ntwk_send_nodata(DISCONNECT);
+            }
+            else gameflags.loopgame = false;
+            break;
+        case sk_Stat:
+            debug = !debug;
+            break;
+        case sk_Yequ:
+            screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
+            break;
+        case sk_Window:
+            screen = (screen == SCRN_TACT) ? SCRN_OFF : SCRN_TACT;
+            break;
+        case sk_Zoom:
+            screen = (screen == SCRN_MAINS) ? SCRN_OFF : SCRN_MAINS;
+            break;
+        case sk_Trace:
+            screen = (screen == SCRN_TRANSPORT) ? SCRN_OFF : SCRN_TRANSPORT;
+            break;
+        case sk_Graph:
+            screen = (screen == SCRN_CARGO) ? SCRN_OFF : SCRN_CARGO;
+            break;
+        case sk_Enter:
+            if((screen == SCRN_MAINS) || (screen == SCRN_TACT)){
+                uint8_t slot = (screen == SCRN_MAINS) ? select.mains : select.tactical;
+                ntwk_send(MODULE_INFO_REQUEST, PS_VAL(slot));
+                screen = setbits(screen, SCRN_INFO);
+            }
+            break;
+        case sk_Mode:
+            if((screen == SCRN_MAINS) || (screen == SCRN_TACT)){
+                uint8_t slot = (screen == SCRN_MAINS) ? select.mains : select.tactical;
+                ntwk_send(MODULE_STATE_CHANGE, PS_VAL(slot), PS_VAL(CHANGE_ONLINE_STATE));
+            }
+            break;
+        case sk_Down:
+        {
+            char i;
+            switch(screen){
+                case SCRN_TACT:
+                    for(i = select.tactical + 1; i < (MAX_MODULES - 1); i++){
+                        int type = Ship.system[i].techclass;
+                        if( type == mTactical ){
+                            select.tactical = i;
+                            break;
+                        }
+                    }
+                    break;
+                case SCRN_MAINS:
+                    for(i = select.mains + 1; i < (MAX_MODULES - 1); i++){
+                        int type = Ship.system[i].techclass;
+                        if( type == mSystem ){
+                            select.mains = i;
+                            break;
+                        }
+                    }
+                    break;
+                }
+        }
+            break;
+        case sk_Up:
+        {
+            char i;
+                  switch(screen){
+                      case SCRN_TACT:
+                          for(i = select.tactical - 1; i >= 0; i--){
+                              int type = Ship.system[i].techclass;
+                              if( type == mTactical ){
+                                  select.tactical = i;
+                                  break;
+                              }
+                          }
+                          break;
+                      case SCRN_MAINS:
+                          for(i = select.mains - 1; i >= 0; i--){
+                              int type = Ship.system[i].techclass;
+                              if( type == mSystem ){
+                                  select.mains = i;
+                                  break;
+                              }
+                          }
+                          break;
+                  }
+
+        }
+            break;
+    }
+    
+    // RENDER BACKGROUND, MENUS, and LOG
     Screen_RenderUI();
     if(arr_sum(log_display,4)) gui_ShowLog();
-   // gfx_BlitBuffer();
+    // gfx_BlitBuffer();
     gfx_SwapDraw();
+    ntwk_process();
+    
+    // PROCESS TICK COUNT, TIMINGS, TIMEOUTS
+    if(netflags.logged_in){
+        if(ticknum % 20 == 0) {
+            ntwk_send(FRAMEDATA_REQUEST,
+                PS_VAL(Ship.rot.yaw),
+                PS_VAL(Ship.rot.pitch),
+                PS_VAL(Ship.rot.roll));
+             }
+         }
+      if(ntwk_inactive_clock == settings.limits.network_timeout)  ntwk_send_nodata(PING);
+      if(ntwk_inactive_clock >= ntwk_inactive_disconnect){
+          gui_NetworkErrorResponse(1, 8, true);
+          gameflags.loopgame = false;
+          return;
+      }
+      ticknum++;
+      ntwk_inactive_clock++;
 }
 
-void tick_NextTick(void){
-    if(!gameflags.loopgame) return;
-    /*
-       if(gameflags.logged_in){
-           if(ticknum % settings.limits.chunk_refresh == 0) {
-               ntwk_send(FRAMEDATA_REQUEST,
-                   PS_VAL(Ship.rotate.yaw),
-                   PS_VAL(Ship.rotate.pitch),
-                   PS_VAL(Ship.rotate.roll));
-           }
-       }
-       */
-    if(ntwk_inactive_clock == settings.limits.network_timeout)  ntwk_send_nodata(PING);
-    if(ntwk_inactive_clock >= ntwk_inactive_disconnect){
-        gui_NetworkErrorResponse(1, 8, true);
-        gameflags.loopgame = false;
-        return;
-    }
-    ticknum++;
-    ntwk_inactive_clock++;
-}
 
 void PlayGame(void){
     sk_key_t key = 0;
@@ -339,6 +355,7 @@ void PlayGame(void){
     if(!netflags.network_up) return;
     ntwk_inactive_disconnect = settings.limits.network_timeout * 11 / 10;
     gameflags.loopgame = true;
+    netflags.bridge_error = false;
     if(!TrekGFX_init()) {
         dbg_sprintf(dbgout, "Failed to init graphics\n");
         return;
@@ -368,24 +385,12 @@ void PlayGame(void){
                 && netflags.network_up
                 && netflags.bridge_up
                 && gameflags.loopgame){
-                key = getKey();
-                tick_KeyInput(key);
-                tick_DrawScreen();
-                ntwk_process();
-                tick_NextTick();
+                tick_ThisTick(&key);
             }
             // log log out
-            key = getKey();
-            tick_KeyInput(key);
-            tick_DrawScreen();
-            ntwk_process();
-            tick_NextTick();
+            tick_ThisTick(&key);
         }
     // log disconnect
-    key = getKey();
-    tick_KeyInput(key);
-    tick_DrawScreen();
-    ntwk_process();
-    tick_NextTick();
+    tick_ThisTick(&key);
     }
 }

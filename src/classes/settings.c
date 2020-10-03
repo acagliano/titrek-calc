@@ -9,6 +9,7 @@
 
 char settingtext[][20] = {
     "Save Login Info",
+    "Prefer SSL",
     "Chunk Refresh Rate",
     "Entity Refresh Rate",
     "Packet Limit",
@@ -18,6 +19,7 @@ char settingtext[][20] = {
 
 char settinginfo[][70] = {
     "Whether program should save login info.",
+    "Always use SSL if available",
     "How often to request chunk data from server.",
     "How often to request entity data from server.",
     "Max number of packets to process per tick.",
@@ -51,7 +53,7 @@ gfx_RenderSettingOpt(uint8_t index, uint8_t selected, uint24_t x, uint8_t y){
     uint24_t val;
     gfx_SetTextFGColor(230);
     gfx_PrintStringXY(settingtext[index], x, y + 4);
-    gfx_PrintStringXY(settinginfo[selected], 5, 120);
+    gfx_PrintStringXY(settinginfo[selected], 5, num_settings*16+45);
     gfx_SetColor(230);
     if(selected == index) gfx_FillCircle(x - 12, y + 7, 3);
     gfx_Rectangle(x + 150, y, 100, 12);
@@ -62,6 +64,11 @@ gfx_RenderSettingOpt(uint8_t index, uint8_t selected, uint24_t x, uint8_t y){
     switch(index){
         case SAVE_CREDS:
             val = settings.savelogin;
+            if(val) gfx_PrintString("true");
+            else gfx_PrintString("false");
+            break;
+        case SSL_PREFER:
+            val = settings.ssl_prefer;
             if(val) gfx_PrintString("true");
             else gfx_PrintString("false");
             break;
@@ -93,6 +100,9 @@ void gfx_AlterSettingOpt(uint8_t selected, int8_t direction){
     switch(selected){
         case SAVE_CREDS:
             settings.savelogin = !settings.savelogin;
+            break;
+        case SSL_PREFER:
+            settings.ssl_prefer = !settings.ssl_prefer;
             break;
         case CHUNK_REF:
             settings.limits.chunk_refresh += direction;
