@@ -18,6 +18,12 @@ converts:
       style: rlet
       images:
        - gui-items/*.png
+    - name: particles
+      palette: xlibc
+      transparent-color-index: 0
+      style: rlet
+      images:
+        - particles/*.png
     - name: moduleicons
       palette: xlibc
       transparent-color-index: 0
@@ -25,8 +31,9 @@ converts:
       images:
         - modules/lifesupport
         - modules/core
-        - modules/warpdrive
+        - modules/thrusters
         - modules/engines
+        - modules/warpdrive
         - modules/navsens
         - modules/transporter
         - modules/shields
@@ -46,8 +53,9 @@ outputs:
       include-file: TrekGFX.h
       lut-entries: true
       archived: true
-      header-string: "\x01\x03"
+      header-string: "\x01\x05"
       converts:
         - guiicons
+        - particles
         - ship
         - moduleicons

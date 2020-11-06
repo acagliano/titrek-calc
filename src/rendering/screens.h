@@ -3,17 +3,23 @@
 
 #include <graphx.h>
 #include "../classes/screens.h"
+#include "../classes/ships.h"
 #define lcars_texty 223
 #define viewer_x 30
 #define viewer_y 20
 
-char *strify_version(char *str, uint8_t *version);
+typedef struct {
+    uint24_t x, width;
+    uint8_t y, height;
+} window_data_t;
+
 extern char mainsys_strings[][10];
 
 int num_GetLength(int number);
 void Screen_RenderUI(void);
 void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selected);
 void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, uint24_t selected);
+void LCARS_RenderModuleList(module_t* systems, uint24_t syscount, uint8_t class, window_data_t* w, uint24_t selected);
 void Screen_UIViewer(void);
 void Screen_UIInventory(void);
 void Screen_UITransporter(void);

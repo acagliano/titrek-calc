@@ -7,8 +7,9 @@
 enum TechTypes {
     LIFESUP,
     CORE,
+    THRUSTER,
+    ENGINE,
     WARPDR,
-    IMPDR,
     NAVSENS,
     TRANS,
     SYS_MAX,

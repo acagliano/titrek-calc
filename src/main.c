@@ -40,6 +40,7 @@
 #include "rendering/errors.h"
 #include "rendering/gui.h"
 #include "rendering/imgcaching.h"
+#include "rendering/particles.h"
 
 #include "gfx/TrekGFX.h"
 #include "gfx/internal.h"
@@ -60,10 +61,10 @@
 char *settingsappv = "TrekSett";
 char *TEMP_PROGRAM = "_";
 char *MAIN_PROGRAM = "TITREK";
-uint8_t version[] = {0, 0, 96};
+uint8_t version[] = {0, 0, 98};
 char versionstr[12] = {0};
 uint8_t gfx_version[2] = {0};
-uint8_t gfx_reqd[2] = {1, 3};
+uint8_t gfx_reqd[2] = {1, 5};
 uint8_t gfx_custom[2] = {0xff, 0xff};
 ship_t Ship = {0};
 selected_t select = {0, 0};
@@ -86,6 +87,7 @@ moduleinfo_t ModuleInfo = {0};
 uint24_t ntwk_inactive_clock = 0;
 uint24_t ntwk_inactive_disconnect = 0;
 bridge_config_t bridge_config = {0};
+particles_t particles[MAX_PARTICLES] = {0};
 
 ti_var_t update_fp = 0;
 
@@ -117,7 +119,7 @@ void MainMenu(void) {
             opt = 0;
         }
         if(opt == OPT_SETTINGS){
-            uint24_t start_x = 20, start_y = 20, i, sel = 0;
+            uint24_t start_x = 20, start_y = 5, i, sel = 0;
             bool firstrender = true;
             sk_key_t key;
             do {
@@ -156,11 +158,11 @@ void ServerSelect(void){
         }
         if(key || firstrender){
             gfx_ZeroScreen();
-            gfx_RenderMenuTitle("Server List", 18, 5);
-            gfx_RenderMenu(settings.servers, 10, selected, 20, 20, 150, 160);
+            gfx_RenderMenuTitle("Server List", 3, 5);
+            gfx_RenderMenu(settings.servers, 10, selected, 5, 20, 200, 160);
             gfx_SetTextFGColor(255);
-            gfx_PrintStringXY("[Enter] Select", 200, 30);
-            gfx_PrintStringXY("[Del] Edit/Add", 200, 40);
+            gfx_PrintStringXY("[Enter] Select", 210, 30);
+            gfx_PrintStringXY("[Del] Edit/Add", 210, 40);
             gfx_BlitBuffer();
             firstrender = false;
         }
@@ -238,8 +240,15 @@ void tick_ThisTick(sk_key_t* key){
             }
             else gameflags.loopgame = false;
             break;
-        case sk_Stat:
+        case sk_Vars:
             debug = !debug;
+            break;
+        case sk_Prgm:
+            {
+            char input[LOG_LINE_SIZE] = {0};
+            prompt_for("[Chat Msg]", &input, LOG_LINE_SIZE-1, 5, 15, 0);
+            if(input[0]) ntwk_send(MESSAGE, PS_STR(input));
+            }
             break;
         case sk_Yequ:
             screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
@@ -256,7 +265,7 @@ void tick_ThisTick(sk_key_t* key){
         case sk_Graph:
             screen = (screen == SCRN_CARGO) ? SCRN_OFF : SCRN_CARGO;
             break;
-        case sk_Enter:
+        case sk_Stat:
             if((screen == SCRN_MAINS) || (screen == SCRN_TACT)){
                 uint8_t slot = (screen == SCRN_MAINS) ? select.mains : select.tactical;
                 ntwk_send(MODULE_INFO_REQUEST, PS_VAL(slot));
@@ -266,7 +275,8 @@ void tick_ThisTick(sk_key_t* key){
         case sk_Mode:
             if((screen == SCRN_MAINS) || (screen == SCRN_TACT)){
                 uint8_t slot = (screen == SCRN_MAINS) ? select.mains : select.tactical;
-                ntwk_send(MODULE_STATE_CHANGE, PS_VAL(slot), PS_VAL(CHANGE_ONLINE_STATE));
+                const uint8_t action = CHANGE_ONLINE_STATE;
+                ntwk_send(MODULE_STATE_CHANGE, PS_VAL(slot), PS_VAL(action));
             }
             break;
         case sk_Down:
@@ -324,13 +334,14 @@ void tick_ThisTick(sk_key_t* key){
     
     // RENDER BACKGROUND, MENUS, and LOG
     Screen_RenderUI();
+    gfx_RenderParticles(&particles, MAX_PARTICLES);
     if(arr_sum(log_display,4)) gui_ShowLog();
     // gfx_BlitBuffer();
     gfx_SwapDraw();
     ntwk_process();
     
     // PROCESS TICK COUNT, TIMINGS, TIMEOUTS
-    if(netflags.logged_in){
+    /*if(netflags.logged_in){
         if(ticknum % 20 == 0) {
             ntwk_send(FRAMEDATA_REQUEST,
                 PS_VAL(Ship.rot.yaw),
@@ -338,6 +349,7 @@ void tick_ThisTick(sk_key_t* key){
                 PS_VAL(Ship.rot.roll));
              }
          }
+         */
       if(ntwk_inactive_clock == settings.limits.network_timeout)  ntwk_send_nodata(PING);
       if(ntwk_inactive_clock >= ntwk_inactive_disconnect){
           gui_NetworkErrorResponse(1, 8, true);
@@ -361,8 +373,8 @@ void PlayGame(void){
         return;
     }
     gfx_InitModuleIcons();
-    
-    ntwk_send(CONNECT, PS_STR(settings.servers[bridge_config.server]));
+    gfx_SetParticle(&particles, MAX_PARTICLES, CRACKED_SCREEN);
+    ntwk_send(CONNECT, PS_VAL(settings.ssl_prefer), PS_STR(settings.servers[bridge_config.server]));
     gfx_PrintStringXY("Waiting for bridge...", 20, 190);
     gfx_PrintStringXY("[Clear] to stop", 20, 200);
     gfx_BlitBuffer();
@@ -393,4 +405,5 @@ void PlayGame(void){
     // log disconnect
     tick_ThisTick(&key);
     }
+    gfx_ClearParticles(&particles, MAX_PARTICLES);
 }

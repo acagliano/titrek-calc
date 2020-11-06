@@ -95,8 +95,8 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 memcpy(&Ship, data, sizeof(ship_t));
                 for(i = 0; i < MAX_MODULES; i++){
                     module_t *m = &Ship.system[i];
-                    if(m->techclass == mSystem) { select.mains = i; main_set = true;}
-                    if(m->techclass == mTactical) { select.tactical = i; tact_set = true;}
+                    if((m->techclass == mSystem) && !main_set) { select.mains = i; main_set = true;}
+                    if((m->techclass == mTactical) && !tact_set) { select.tactical = i; tact_set = true;}
                     if(main_set && tact_set) break;
                 }
             }

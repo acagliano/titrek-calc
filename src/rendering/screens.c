@@ -29,8 +29,9 @@ char tact_title[] = "[TACT]";
 char moduledb[][12] = {
     "LifeSup",
     "Core",
+    "Thrust",
+    "Engine",
     "WarpDr",
-    "Impulse",
     "NavSens",
     "Transpt",
     "Shields",
@@ -91,27 +92,29 @@ void Screen_RenderUI(void){
 }
 
 void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selected){
-    unsigned char i, j = 0, cur_y;
-    int cur_x;
     gfx_RLETSprite(mains_display, viewer_x, viewer_y - 3);
     gfx_PrintStringXY(mains_title, viewer_x + 26, viewer_y - 1);
-    for(i = 0; i < syscount; i++){
-        // loop module health display
+    window_data_t win = {viewer_x + 40, vWidth - 40, viewer_y + 12, vHeight};
+    LCARS_RenderModuleList(systems, syscount, mSystem, &win, selected);
+}
+
+void LCARS_RenderModuleList(module_t* systems, uint24_t syscount, uint8_t class, window_data_t* w, uint24_t selected){
+    uint24_t x = w->x, width = w->width;
+    uint8_t y = w->y, height = w->height;
+    uint8_t i;
+    for(i = 0; i<syscount; i++){
         module_t* module = &systems[i];
-        if(module->techclass == mSystem){
-            cur_y = j * 16 + viewer_y + 14;
-            cur_x = viewer_x + 40;
+        if(module->techclass == class){
             if(selected == i) {
                 gfx_SetColor(230);
-                gfx_FillRectangle(cur_x - 6, cur_y, 6, 16);
+                gfx_FillRectangle(x - 6, y, 6, 14);
             }
             gfx_SetColor(255);
-            gfx_SetTextXY(cur_x, cur_y);
-            module_RenderGeneral(module, cur_x, cur_y);
-            j++;
+            gfx_SetTextXY(x, y);
+            module_RenderGeneral(module, x, y);
+            y += 16;
         }
     }
-    return;
 }
 
 void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, uint24_t selected){
@@ -121,16 +124,11 @@ void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, u
     bool shields_active = false;
     gfx_RLETSprite(tactical_display, viewer_x, viewer_y - 3);
     gfx_PrintStringXY(tact_title, viewer_x + 26, viewer_y - 1);
+    window_data_t win = {viewer_x + 90, vWidth - 90, viewer_y + 14, vHeight};
+    LCARS_RenderModuleList(systems, syscount, mTactical, &win, selected);
     for(i = 0; i < syscount; i++){
-        int temp_y = 16 * j + viewer_y + 14;
-        int temp_x = cur_x + 90;
         module_t* module = &systems[i];
         if(module->techclass == mTactical){
-            if(selected == i) {
-                gfx_SetColor(230);
-                gfx_FillRectangle(temp_x - 6, temp_y, 6, 16);
-            }
-            module_RenderGeneral(module, temp_x, temp_y);
             if(module->techtype == SHIELD){
                 if(module_OnlineState(module)){
                     shields_active = true;
@@ -138,7 +136,6 @@ void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, u
                     shield_num++;
                 }
             }
-            j++;
         }
     }
     shield_health /= shield_num;
@@ -159,20 +156,20 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y){
     uint8_t bar = (module->techtype < SYS_MAX) ? 77 : 29;
     uint24_t x_space = vWidth - (x + 10);
     uint24_t width = (x_space > 200) ? 200 : x_space;
-    gfx_RectangleColor(229, x, y, width, 16);
+    gfx_RectangleColor(229, x, y, width, 14);
     if(module->techclass){
         uint8_t techtype = module->techtype;
         uint24_t barwidth;
         x_space -= 90;
         barwidth = (x_space > 100) ? 100 : x_space;
         if(module_OnlineState(module)){
-            gfx_FillRectangleColor(3, x + 1, y + 1, width - 2, 14);}
+            gfx_FillRectangleColor(3, x + 1, y + 1, width - 2, 12);}
         else{
-            gfx_FillRectangleColor(96, x + 1, y + 1, width - 2, 14);}
-        gfx_FillRectangleColor(0, x+1, y+1, 14, 14);
+            gfx_FillRectangleColor(96, x + 1, y + 1, width - 2, 12);}
+        gfx_FillRectangleColor(0, x+1, y+1, 12, 12);
         gfx_RLETSprite(modicons[techtype], x + 1, y + 1);
-        gfx_PrintStringXY(moduledb[techtype], x + 20, y + 5);
-        stats_DrawHealthBar(health, barwidth, x + 80, y + 4, 10, 0, 149, bar);
+        gfx_PrintStringXY(moduledb[techtype], x + 15, y + 4);
+        stats_DrawHealthBar(health, barwidth, x + 80, y + 3, 10, 0, 149, bar);
     }
     else {
         gfx_FillRectangleColor(74, x + 1, y + 1, width - 2, 14);
@@ -240,16 +237,4 @@ void Screen_Background(uint8_t active) {
     gfx_SetTextFGColor(0);
 }
 
-char *strify_version(char *str, uint8_t *version){
-  char buf[12];
-  int len,inx,vi;
-  len=inx=0;
-  for (vi=0; vi<3; vi++){
-    sprintf(&buf,"%d\.",version[vi]);
-    len=strlen(&buf);
-    memcpy(str+inx,&buf,len);
-    inx+=len;
-  }
-  str[inx-1]=0;
-  return str;
-}
+

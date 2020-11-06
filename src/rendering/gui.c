@@ -15,7 +15,7 @@
 #include "../network/controlcodes.h"
 #include <debug.h>
 
-#define MODICON_START 15
+#define MODICON_START 16
 #define TrekGFX_HEADER_SIZE 2
 #define MENU_W 100
 #define MENU_H 80
@@ -131,7 +131,7 @@ void gfx_RenderMenuOpt(bool active, const char* string, uint24_t x, uint8_t y, u
         gfx_SetTextFGColor(0);
     }
     gfx_FillRectangle(x+1, y+1, w-2, h-2);
-    gfx_PrintStringXY(string, x+10, gfx_VCenterText(y, h, 8));
+    gfx_PrintStringXY(string, x+5, gfx_VCenterText(y, h, 8));
 }
 
 void gfx_RenderMenu(char menutext[][50], uint8_t menucount, uint8_t selected, uint24_t x, uint8_t y, uint24_t w, uint8_t h){
@@ -218,6 +218,8 @@ void gfx_DrawShieldDisp(bool active, uint8_t health, gfx_rletsprite_t* img, uint
 uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y, uint8_t flags) {
 // returns first newline after prompt
     gfx_SetTextFGColor(228);
+    gfx_SetColor(0);
+    gfx_FillRectangle(x, y, 320 - (2 * x), 20);
     gfx_PrintStringXY(prompt, x, y);
     gfx_PrintStringXY(">", x, y+10);
     gfx_SetTextXY(x+10, y+10);

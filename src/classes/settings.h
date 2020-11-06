@@ -19,8 +19,9 @@ typedef struct {
 
 
 typedef struct {
-    bool savelogin;
+    bool debug;
     bool ssl_prefer;
+    bool savelogin;
     userinfo_t userinfo;
     limiter_t limits;
     char servers[10][50];
@@ -31,10 +32,10 @@ void set_defaults(void);
 bool write_settings(void);
 
 enum SettingOpt {
-    SAVE_CREDS,
+    DEBUG_MODE,
     SSL_PREFER,
+    SAVE_CREDS,
     CHUNK_REF,
-    ENTITY_REF,
     PACKET_LIMIT,
     NTWK_TIMEOUT,
     LOG_TIME

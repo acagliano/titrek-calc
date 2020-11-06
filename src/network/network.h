@@ -42,7 +42,7 @@ void ntwk_process(void);
 bool ntwk_send_(uint8_t num_parts, uint8_t ctrl, ...);
 
 #define PS_STR(str) (str), 1+strlen(str)
-#define PS_VAL(val) (val), sizeof(val)
+#define PS_VAL(val) (&val), sizeof(val)
 #define PS_ARR(arr) (arr), sizeof(arr)
 #define PS_PTR(ptr, size) (ptr), (size)
 
