@@ -1,13 +1,15 @@
 #ifndef gui_h
 #define gui_h
 
+#include "colors.h"
+
 #define wait_kb_release(key) while(kb_IsDown(key)) {ntwk_process(); kb_Scan();}
 
 enum SplashOpts {OPT_PLAY, OPT_SETTINGS, OPT_ABOUT, OPT_QUIT};
 
 extern gfx_rletsprite_t* modicons[TARG_SENS + 1];
 
-void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y, uint8_t height, uint8_t border, uint8_t bg, uint8_t bar);
+void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y, uint8_t height, bar_colors_t* colors);
 void gfx_InitModuleIcons(void);
 void gfx_GetVersion(void);
 void gfx_VersionCheck(void);

@@ -29,7 +29,7 @@ void Overlay_UIModuleInfo(void);
 
 int Stats_DrawHealthBar(unsigned int percent, unsigned int length, int x, int y, unsigned char border_color, unsigned char bar_color, gfx_rletsprite_t* icon);
 void Screen_Background(unsigned char active);
-void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y);
+void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y, uint24_t width);
 
 
 #endif

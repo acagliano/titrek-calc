@@ -11,11 +11,12 @@
 #include "../network/network.h"
 #include "gui.h"
 #include "screens.h"
+#include "colors.h"
 #include "../asm/exposure.h"
 #include "../network/controlcodes.h"
 #include <debug.h>
 
-#define MODICON_START 16
+#define MODICON_START TrekGFX_moduleicons_lifesupport_index
 #define TrekGFX_HEADER_SIZE 2
 #define MENU_W 100
 #define MENU_H 80
@@ -35,17 +36,29 @@ uint8_t gfx_VCenterText(uint8_t y, uint8_t box_height, uint8_t font_height){
     return padding/2+y;
 }
 
-void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y, uint8_t height, uint8_t border, uint8_t bg, uint8_t bar){
-    gfx_SetColor(border);
+void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y, uint8_t height, bar_colors_t* colors){
+    gfx_SetColor(colors->border);
     gfx_Rectangle(x, y-1, length, height);
     length -= 2;
-    gfx_SetColor(bg);
+    gfx_SetColor(colors->bg);
     gfx_FillRectangle(x + 1, y, length, height-2);
-    gfx_SetColor(bar);
-    if(health <= 50) gfx_SetColor(229);
-    if(health <= 25) gfx_SetColor(192);
+    gfx_SetColor(colors->bar);
+    if(health <= 50) gfx_SetColor(ALL_HEALTHBAR_WARN);
+    if(health <= 25) gfx_SetColor(ALL_HEALTHBAR_CRITICAL);
     gfx_FillRectangle(x + 1, y, health * length / 100, height-2);
     gfx_SetColor(255);
+}
+
+#define BATTERY_WIDGET_HEIGHT 10
+#define BATTERY_WIDGET_WIDTH 15
+stats_DrawPowerBar(bool power, uint24_t x, uint8_t y){
+    uint8_t color = (power) ? BATTERY_IND_COLOR_WARN : BATTERY_IND_COLOR_OK;
+    gfx_SetColor(BATTERY_IND_OUTLINE);
+    gfx_Rectangle(x, y, BATTERY_WIDGET_WIDTH, BATTERY_WIDGET_HEIGHT);
+    gfx_Rectangle(x + 1, y + 1, BATTERY_WIDGET_WIDTH - 2, BATTERY_WIDGET_HEIGHT - 2);
+    gfx_FillRectangle(x + BATTERY_WIDGET_WIDTH, y + 1, 3, BATTERY_WIDGET_HEIGHT - 2);
+    gfx_SetColor(color);
+    gfx_FillRectangle(x + 2, y + 2, BATTERY_WIDGET_WIDTH - 4, BATTERY_WIDGET_HEIGHT - 4);
 }
 
 void gfx_InitModuleIcons(void){

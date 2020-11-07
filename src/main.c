@@ -373,7 +373,6 @@ void PlayGame(void){
         return;
     }
     gfx_InitModuleIcons();
-    gfx_SetParticle(&particles, MAX_PARTICLES, CRACKED_SCREEN);
     ntwk_send(CONNECT, PS_VAL(settings.ssl_prefer), PS_STR(settings.servers[bridge_config.server]));
     gfx_PrintStringXY("Waiting for bridge...", 20, 190);
     gfx_PrintStringXY("[Clear] to stop", 20, 200);

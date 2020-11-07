@@ -2,7 +2,7 @@ converts:
     - name: internal
       palette: xlibc
       transparent-color-index: 0
-      compression: zx7
+      compress: zx7
       style: rlet
       images:
         - internal/*.png
