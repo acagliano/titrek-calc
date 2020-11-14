@@ -2,11 +2,26 @@
 #define statscreens_h
 
 #include <graphx.h>
-#include "../classes/screens.h"
 #include "../classes/ships.h"
 #define lcars_texty 223
 #define viewer_x 30
 #define viewer_y 20
+
+enum ScreenEquates {
+    SCRN_OFF = 0,
+    SCRN_SENS,
+    SCRN_TACT,
+    SCRN_MAINS,
+    SCRN_TRANSPORT,
+    SCRN_CARGO,
+    SCRN_NAVIG,
+    SCRN_INFO = 0xff00
+};
+
+typedef struct {
+    uint24_t mains;
+    uint24_t tactical;
+} selected_t;
 
 typedef struct {
     uint24_t x, width;

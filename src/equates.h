@@ -6,7 +6,7 @@
 #include <graphx.h>
 #include "classes/ships.h"
 #include "classes/modules.h"
-#include "classes/screens.h"
+#include "rendering/screens.h"
 
 #define xStart 10
 #define yStart 14

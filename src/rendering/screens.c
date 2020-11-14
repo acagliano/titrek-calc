@@ -6,7 +6,6 @@
 #include <debug.h>
 #include "../classes/tech.h"
 #include "../classes/ships.h"
-#include "../classes/screens.h"
 #include "../classes/modules.h"
 
 #include "../gfx/moduleicons.h"
@@ -86,6 +85,8 @@ void Screen_RenderUI(void){
         case SCRN_TRANSPORT:
             break;
         case SCRN_CARGO:
+            break;
+        case SCRN_NAVIG:
             break;
     }
     gfx_SetTextFGColor(0);

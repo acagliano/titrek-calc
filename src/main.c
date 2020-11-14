@@ -33,7 +33,6 @@
 
 #include "classes/ships.h"
 #include "classes/modules.h"
-#include "classes/screens.h"
 #include "classes/settings.h"
 
 #include "rendering/screens.h"
@@ -249,6 +248,9 @@ void tick_ThisTick(sk_key_t* key){
             prompt_for("[Chat Msg]", &input, LOG_LINE_SIZE-1, 5, 15, 0);
             if(input[0]) ntwk_send(MESSAGE, PS_STR(input));
             }
+            break;
+        case sk_Log:
+            screen = SCRN_NAVIG;
             break;
         case sk_Yequ:
             screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
