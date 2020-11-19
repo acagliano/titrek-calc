@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "tech.h"
+#include "systems/engines.h"
 
 // Module QuickRef Structure (Used to Populate GUI)
 
@@ -37,7 +38,8 @@ typedef struct {
     uint8_t yaw;
     uint8_t pitch;
     uint8_t roll;
-} rotations_t;
+    uint24_t speed;
+} nav_t;
 
 
 #define MAX_MODULES 15
@@ -46,8 +48,12 @@ typedef struct {
     uint24_t crew;
     hull_t hull;
     module_t system[MAX_MODULES];
-    rotations_t rot;
+    nav_t nav;
 } ship_t;
+extern ship_t Ship;
 // Core system defines
+
+// Here will be some defines used for some other things.
+extern engine_data_t engine_ref[3];
 
 #endif

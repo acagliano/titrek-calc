@@ -57,16 +57,4 @@ uint8_t text_GetStringHeight(char *str, uint24_t line_length){
     return lines;
 }
 
-char *strify_version(char *str, uint8_t *version){
-  char buf[12];
-  int len,inx,vi;
-  len=inx=0;
-  for (vi=0; vi<3; vi++){
-    sprintf(&buf,"%d\.",version[vi]);
-    len=strlen(&buf);
-    memcpy(str+inx,&buf,len);
-    inx+=len;
-  }
-  str[inx-1]=0;
-  return str;
-}
+

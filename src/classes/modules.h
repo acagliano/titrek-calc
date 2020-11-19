@@ -6,6 +6,7 @@
 #include <graphx.h>
 #include "health.h"
 #include "power.h"
+#include "systems/engines.h"
 
 // Organization for Sprites
 enum ShipZones {
@@ -22,7 +23,6 @@ enum ShipZones {
 typedef struct { unsigned char drv; } integ_data_t;
 typedef struct { int occupancy; } lifesup_data_t;
 typedef struct { int output; } core_data_t;
-typedef struct { int maxspeed; } engine_data_t;
 typedef struct { int maxrange; } navsens_data_t;
 typedef struct { int maxrange; int maxtargets; } trans_data_t;
 
@@ -57,5 +57,6 @@ typedef struct ModuleInfo_t {
     power_t power;
     moduledata_t info;
 } moduleinfo_t;
+extern moduleinfo_t ModuleInfo;
 
 #endif

@@ -23,6 +23,7 @@ enum ControlCodes {
     MODULE_INFO_REQUEST,
     MODULE_STATE_CHANGE,
     NEW_GAME_REQUEST,
+    GET_ENGINE_MAXIMUMS,
        
     // File Streaming: 90 - 91
     PRGMUPDATE = 90,

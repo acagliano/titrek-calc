@@ -14,6 +14,7 @@
 #include "colors.h"
 
 #include "../equates.h"
+#include "../versioning.h"
 #include "screens.h"
 
 #define gfx_RectangleColor(color, x1, y1, w, h) \
@@ -62,44 +63,6 @@ int num_GetLength(int number){
     return 1 + (number >= 10) + (number >= 100);
 }
 
-
-
-void Screen_RenderUI(void){
-    Screen_Background(screen);
-    gfx_SetTextFGColor(255);
-    switch(screen & 0xff){
-        case SCRN_OFF:
-            break;
-        case SCRN_SENS:
-            break;
-        case SCRN_TACT:
-            Screen_UITacticalStats(Ship.hull, Ship.system, MAX_MODULES, select.tactical);
-            if(screen > 0xff)
-                Overlay_UIModuleInfo();
-            break;
-        case SCRN_MAINS:
-            Screen_UISystemStats(Ship.system, MAX_MODULES, select.mains);
-            if(screen > 0xff)
-                Overlay_UIModuleInfo();
-            break;
-        case SCRN_TRANSPORT:
-            break;
-        case SCRN_CARGO:
-            break;
-        case SCRN_NAVIG:
-            break;
-    }
-    gfx_SetTextFGColor(0);
-    return;
-}
-
-void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selected){
-    gfx_RLETSprite(mains_display, viewer_x, viewer_y - 3);
-    gfx_PrintStringXY(mains_title, viewer_x + 26, viewer_y - 1);
-    window_data_t win = {viewer_x + 40, vWidth - viewer_x - 60, viewer_y + 12, vHeight};
-    LCARS_RenderModuleList(systems, syscount, mSystem, &win, selected);
-}
-
 void LCARS_RenderModuleList(module_t* systems, uint24_t syscount, uint8_t class, window_data_t* w, uint24_t selected){
     uint24_t x = w->x, width = w->width;
     uint8_t y = w->y, height = w->height;
@@ -117,6 +80,13 @@ void LCARS_RenderModuleList(module_t* systems, uint24_t syscount, uint8_t class,
             y += 16;
         }
     }
+}
+
+void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selected){
+    gfx_RLETSprite(mains_display, viewer_x, viewer_y - 3);
+    gfx_PrintStringXY(mains_title, viewer_x + 26, viewer_y - 1);
+    window_data_t win = {viewer_x + 40, vWidth - viewer_x - 60, viewer_y + 12, vHeight};
+    LCARS_RenderModuleList(systems, syscount, mSystem, &win, selected);
 }
 
 void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, uint24_t selected){
@@ -208,6 +178,40 @@ void Overlay_UIModuleInfo(void) {
     gfx_PrintStringXY("Status: ", text_x + 2, text_y);
     if(state) gfx_PrintString("Online");
     else gfx_PrintString("Offline");
+}
+
+void Screen_UISpeedConfig(engine_data_t* eng){
+
+}
+
+void Screen_RenderUI(void){
+    Screen_Background(screen);
+    gfx_SetTextFGColor(255);
+    switch(screen & 0xff){
+        case SCRN_OFF:
+            break;
+        case SCRN_SENS:
+            break;
+        case SCRN_TACT:
+            Screen_UITacticalStats(Ship.hull, Ship.system, MAX_MODULES, select.tactical);
+            if(screen > 0xff)
+                Overlay_UIModuleInfo();
+            break;
+        case SCRN_MAINS:
+            Screen_UISystemStats(Ship.system, MAX_MODULES, select.mains);
+            if(screen > 0xff)
+                Overlay_UIModuleInfo();
+            break;
+        case SCRN_TRANSPORT:
+            break;
+        case SCRN_CARGO:
+            break;
+        case SCRN_NAVIG:
+            Screen_UISpeedConfig(&engine_ref);
+            break;
+    }
+    gfx_SetTextFGColor(0);
+    return;
 }
 
 void Screen_Background(uint8_t active) {

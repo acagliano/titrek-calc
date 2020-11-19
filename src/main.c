@@ -28,6 +28,8 @@
 
 // Game Data Types (Structure Definitions)
 #include "equates.h"
+#include "flags.h"
+#include "versioning.h"
 #include "network/controlcodes.h"
 #include "network/network.h"
 
@@ -60,11 +62,6 @@
 char *settingsappv = "TrekSett";
 char *TEMP_PROGRAM = "_";
 char *MAIN_PROGRAM = "TITREK";
-uint8_t version[] = {0, 0, 98};
-char versionstr[12] = {0};
-uint8_t gfx_version[2] = {0};
-uint8_t gfx_reqd[2] = {1, 5};
-uint8_t gfx_custom[2] = {0xff, 0xff};
 ship_t Ship = {0};
 selected_t select = {0, 0};
 uint16_t screen = 0;
@@ -87,6 +84,7 @@ uint24_t ntwk_inactive_clock = 0;
 uint24_t ntwk_inactive_disconnect = 0;
 bridge_config_t bridge_config = {0};
 particles_t particles[MAX_PARTICLES] = {0};
+engine_ref_t engine_ref;
 
 ti_var_t update_fp = 0;
 
@@ -250,6 +248,7 @@ void tick_ThisTick(sk_key_t* key){
             }
             break;
         case sk_Log:
+            ntwk_send_nodata(GET_ENGINE_MAXIMUMS);
             screen = SCRN_NAVIG;
             break;
         case sk_Yequ:

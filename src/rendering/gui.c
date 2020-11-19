@@ -8,12 +8,14 @@
 #include "../classes/settings.h"
 #include "../classes/player.h"
 #include "../equates.h"
+#include "../flags.h"
 #include "../network/network.h"
 #include "gui.h"
 #include "screens.h"
 #include "colors.h"
 #include "../asm/exposure.h"
 #include "../network/controlcodes.h"
+#include "../versioning.h"
 #include <debug.h>
 
 #define MODICON_START TrekGFX_moduleicons_lifesupport_index
@@ -67,35 +69,6 @@ void gfx_InitModuleIcons(void){
     for(i = 0; i < ct; i++){
         modicons[i] = ((gfx_rletsprite_t*)TrekGFX_appvar[src++]);
     }
-}
-
-void gfx_GetVersion(void){
-    ti_var_t appv;
-    if(appv = ti_Open("TrekGFX", "r")){
-        ti_Read(&gfx_version, 2, 1, appv);
-        ti_Close(appv);
-    }
-}
-
-uint8_t gfx_getCustomPackCount(void){
-    ti_var_t appvar;
-    unsigned int *table;
-    void *base;
-    if(!(appvar = ti_Open("TrekGFX", "r"))) return 0;
-    table = base = (char*)ti_GetDataPtr(appvar) + TrekGFX_HEADER_SIZE;
-    return *table;
-}
-
-void gfx_VersionCheck(void){
-    if((gfx_version[0] == 0xff) && (gfx_version[1] == 0xff)) {
-        gameflags.gfx_custom = true;
-        if(gfx_getCustomPackCount() == TrekGFX_entries_num) return;
-        gameflags.gfx_error = true;
-        return;
-    }
-    if((gfx_version[0] == gfx_reqd[0]) && (gfx_version[1] == gfx_reqd[1]))
-        return;
-    gameflags.gfx_error = true;
 }
 
 void gfx_SplashGFXError(uint24_t x, uint8_t y){

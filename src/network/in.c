@@ -2,6 +2,8 @@
 #include <fileioc.h>
 #include <stdbool.h>
 #include "../equates.h"
+#include "../flags.h"
+#include "../versioning.h"
 #include "../rendering/errors.h"
 #include "../classes/settings.h"
 #include "../classes/player.h"

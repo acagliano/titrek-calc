@@ -9,6 +9,17 @@
 #include "../util.h"
 
 typedef struct {
+    bool network_up;
+    bool bridge_up;
+    bool bridge_error;
+    bool client_version_ok;
+    bool logged_in;
+    bool game_loaded;
+} net_flags_t;
+extern net_flags_t netflags;
+
+
+typedef struct {
     uint8_t control;
     uint8_t data[1];
 } packet_t;
