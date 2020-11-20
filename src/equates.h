@@ -5,12 +5,8 @@
 #include <graphx.h>
 #include "classes/ships.h"
 #include "classes/modules.h"
-#include "rendering/screens.h"
+#include "graphics/screens.h"
 
-#define xStart 10
-#define yStart 14
-#define vWidth 300
-#define vHeight 170
 #define MODICONS 14     // define first module icon
 
 
@@ -18,8 +14,6 @@
 extern gfx_rletsprite_t* err_icon;
 
 
-extern selected_t select;
-extern uint16_t screen;
 
 extern uint24_t ntwk_inactive_clock;
 

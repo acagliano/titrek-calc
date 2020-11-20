@@ -16,6 +16,7 @@
 #include "../asm/exposure.h"
 #include "../network/controlcodes.h"
 #include "../versioning.h"
+#include "text.h"
 #include <debug.h>
 
 #define MODICON_START TrekGFX_moduleicons_lifesupport_index
@@ -33,10 +34,6 @@ char options[][50] = {
     "Exit Game"
 };
 
-uint8_t gfx_VCenterText(uint8_t y, uint8_t box_height, uint8_t font_height){
-    uint8_t padding = box_height-font_height;
-    return padding/2+y;
-}
 
 void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y, uint8_t height, bar_colors_t* colors){
     gfx_SetColor(colors->border);

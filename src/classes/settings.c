@@ -6,7 +6,7 @@
 #include <fileioc.h>
 #include <graphx.h>
 #include <stdint.h>
-#include "../rendering/screens.h"
+#include "../graphics/screens.h"
 
 #define DEFAULT_NET_TIMEOUT 1200 // 60 seconds @ 20 tps
 

@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <graphx.h>
+#include <tice.h>
 #define LINE_SPACING 10
 
 // text_WrappedString(STRING, WRAPAT, X, Y)
@@ -57,4 +58,15 @@ uint8_t text_GetStringHeight(char *str, uint24_t line_length){
     return lines;
 }
 
+int text_GetCenterX(char* string){
+    return (LCD_WIDTH - gfx_GetStringWidth(string)) / 2;
+}
 
+int num_GetLength(int number){
+    return 1 + (number >= 10) + (number >= 100);
+}
+
+uint8_t gfx_VCenterText(uint8_t y, uint8_t box_height, uint8_t font_height){
+    uint8_t padding = box_height-font_height;
+    return padding/2+y;
+}

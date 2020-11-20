@@ -54,6 +54,6 @@ extern ship_t Ship;
 // Core system defines
 
 // Here will be some defines used for some other things.
-extern engine_data_t engine_ref[3];
+extern engine_ref_t engine_ref;
 
 #endif

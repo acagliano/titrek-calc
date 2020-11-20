@@ -37,11 +37,11 @@
 #include "classes/modules.h"
 #include "classes/settings.h"
 
-#include "rendering/screens.h"
-#include "rendering/errors.h"
-#include "rendering/gui.h"
-#include "rendering/imgcaching.h"
-#include "rendering/particles.h"
+#include "graphics/screens.h"
+#include "graphics/errors.h"
+#include "graphics/gui.h"
+#include "graphics/imgcaching.h"
+#include "graphics/particles.h"
 
 #include "gfx/TrekGFX.h"
 #include "gfx/internal.h"
@@ -84,7 +84,7 @@ uint24_t ntwk_inactive_clock = 0;
 uint24_t ntwk_inactive_disconnect = 0;
 bridge_config_t bridge_config = {0};
 particles_t particles[MAX_PARTICLES] = {0};
-engine_ref_t engine_ref;
+engine_ref_t engine_ref = {0};
 
 ti_var_t update_fp = 0;
 

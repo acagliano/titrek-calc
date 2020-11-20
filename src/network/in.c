@@ -4,14 +4,14 @@
 #include "../equates.h"
 #include "../flags.h"
 #include "../versioning.h"
-#include "../rendering/errors.h"
 #include "../classes/settings.h"
 #include "../classes/player.h"
 #include "../classes/ships.h"
 #include "controlcodes.h"
 #include "network.h"
-#include "../rendering/gui.h"
-#include "../rendering/engine.h"
+#include "../graphics/errors.h"
+#include "../graphics/gui.h"
+#include "../graphics/engine.h"
 #include "../asm/exposure.h"
 
 extern const char *TEMP_PROGRAM;

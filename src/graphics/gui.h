@@ -2,8 +2,12 @@
 #define gui_h
 
 #include "colors.h"
-
-#define wait_kb_release(key) while(kb_IsDown(key)) {ntwk_process(); kb_Scan();}
+#define gfx_RectangleColor(color, x1, y1, w, h) \
+    gfx_SetColor((color)); \
+    gfx_Rectangle((x1), (y1), (w), (h));
+#define gfx_FillRectangleColor(color, x1, y1, w, h) \
+    gfx_SetColor((color)); \
+    gfx_FillRectangle((x1), (y1), (w), (h));
 
 enum SplashOpts {OPT_PLAY, OPT_SETTINGS, OPT_ABOUT, OPT_QUIT};
 

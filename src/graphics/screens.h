@@ -6,6 +6,13 @@
 #define lcars_texty 223
 #define viewer_x 30
 #define viewer_y 20
+#define xStart 10
+#define yStart 14
+#define vWidth 300
+#define vHeight 170
+#define wait_kb_release(key) while(kb_IsDown(key)) {ntwk_process(); kb_Scan();}
+extern char moduledb[][12];
+extern char modulenames[][20];
 
 enum ScreenEquates {
     SCRN_OFF = 0,
@@ -29,6 +36,8 @@ typedef struct {
 } window_data_t;
 
 extern char mainsys_strings[][10];
+extern uint16_t screen;
+extern selected_t select;
 
 int num_GetLength(int number);
 void Screen_RenderUI(void);
