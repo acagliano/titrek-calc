@@ -29,12 +29,12 @@ typedef struct {
 
 // Healthbar colors for hull integrity. They are a bit different than the normal healthbars.
 #define HULLINTEGBAR_COLOR 74
-#define HULLINTEG_BORDER 33
-#define HULLINTEG_BG 107
+#define HULLINTEGBAR_BORDER 33
+#define HULLINTEGBAR_BG 107
 
-// Battery icon colors. Internal color for battery state OK and WARN, and outline.
-#define BATTERY_IND_COLOR_OK 230
-#define BATTERY_IND_COLOR_WARN 192
-#define BATTERY_IND_OUTLINE 42
+// Healthbar colors for combined shield integrity.
+#define SHIELDINTEGBAR_COLOR 30
+#define SHIELDINTEGBAR_BORDER 18
+#define SHIELDINTEGBAR_BG
 
 #endif

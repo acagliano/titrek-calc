@@ -1,3 +1,4 @@
+#include <string.h>
 #include "../../gfx/TrekGFX.h"
 #include "../../versioning.h"
 #include "../screens.h"
@@ -65,7 +66,7 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y, uint24_t widt
         gfx_RLETSprite(modicons[techtype], x + 1, y + 1);
         gfx_PrintStringXY(moduledb[techtype], x + 15, y + 4);
         stats_DrawHealthBar(health, barwidth, x + 80, y + 3, 10, &healthbar);
-        stats_DrawPowerBar(module_PowerWarn(module), x + 80 + barwidth + 5, y + 2);
+        stats_RenderPowerIndic(module_PowerWarn(module), x + 80 + barwidth + 5, y);
     }
     else {
         gfx_FillRectangleColor(74, x + 1, y + 1, width - 2, 14);

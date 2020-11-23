@@ -48,16 +48,9 @@ void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y
     gfx_SetColor(255);
 }
 
-#define BATTERY_WIDGET_HEIGHT 10
-#define BATTERY_WIDGET_WIDTH 15
-stats_DrawPowerBar(bool power, uint24_t x, uint8_t y){
-    uint8_t color = (power) ? BATTERY_IND_COLOR_WARN : BATTERY_IND_COLOR_OK;
-    gfx_SetColor(BATTERY_IND_OUTLINE);
-    gfx_Rectangle(x, y, BATTERY_WIDGET_WIDTH, BATTERY_WIDGET_HEIGHT);
-    gfx_Rectangle(x + 1, y + 1, BATTERY_WIDGET_WIDTH - 2, BATTERY_WIDGET_HEIGHT - 2);
-    gfx_FillRectangle(x + BATTERY_WIDGET_WIDTH, y + 1, 3, BATTERY_WIDGET_HEIGHT - 2);
-    gfx_SetColor(color);
-    gfx_FillRectangle(x + 2, y + 2, BATTERY_WIDGET_WIDTH - 4, BATTERY_WIDGET_HEIGHT - 4);
+stats_RenderPowerIndic(bool warn, uint24_t x, uint8_t y){
+    gfx_rletsprite_t* img = (warn) ? icon_power_warn : icon_power_ok;
+    gfx_RLETSprite(img, x, y+2);
 }
 
 void gfx_InitModuleIcons(void){

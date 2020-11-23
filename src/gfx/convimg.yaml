@@ -17,7 +17,7 @@ converts:
       transparent-color-index: 0
       style: rlet
       images:
-       - gui-items/*.png
+       - gui-icons/*.png
     - name: particles
       palette: xlibc
       transparent-color-index: 0
