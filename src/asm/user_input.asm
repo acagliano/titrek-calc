@@ -96,7 +96,8 @@ __normal_string:
 	call __maybe_new_line
 	call _gfx_PrintChar
 	pop bc
-	pop bc
+	pop hl
+	inc hl
 	jq __normal_string
 __print_overtype:
 	ld c,$FF
