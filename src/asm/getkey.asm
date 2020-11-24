@@ -1,21 +1,22 @@
 
 public _getKey
+public _getKeyAsync
 extern _kb_AnyKey
 extern _kb_Scan
 
 ;sk_key_t getKey(void);
 _getKey:
-	call __getKey
+	call _getKeyAsync
 	or a,a
 	ret z
 	push af
 __getKeyWaitUnpress:
-	call __getKey
+	call _getKeyAsync
 	or a,a
 	jr nz,__getKeyWaitUnpress
 	pop af
 	ret
-__getKey:
+_getKeyAsync:
 	call _kb_Scan
 	ld hl,$F50012
 	ld b,7

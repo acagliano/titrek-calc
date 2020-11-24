@@ -19,7 +19,7 @@ extern _kb_AnyKey
 ;uint8_t user_input(char *buffer,size_t length,uint8_t flags);
 _user_input:
     call _kb_AnyKey
-    jr nz,_user_input
+    jq nz,_user_input
 	ld hl,-11
 	call $12C ;ti._frameset
 	xor a,a
@@ -72,23 +72,32 @@ __draw:
 	pop bc
 	ld hl,(ix+6)
 	bit 0,(ix+12) ;test if we should print the string, or asterisks
-	jr z,__normal_string
+	jq z,__normal_string
 	ld c,'*'
 __print_asterisk_loop:
 	ld a,(hl)
 	or a,a
-	jr z,__print_overtype
+	jq z,__print_overtype
 	push hl
 	push bc
+	call __maybe_new_line
 	call _gfx_PrintChar
 	pop bc
 	pop hl
 	inc hl
-	jr __print_asterisk_loop
+	jq __print_asterisk_loop
 __normal_string:
+	ld a,(hl)
+	or a,a
+	jq z,__print_overtype
 	push hl
-	call _gfx_PrintString
+	ld c,a
+	push bc
+	call __maybe_new_line
+	call _gfx_PrintChar
 	pop bc
+	pop bc
+	jq __normal_string
 __print_overtype:
 	ld c,$FF
 	push bc
@@ -128,11 +137,11 @@ __print_overtype:
 __keys:
 	call _getKey
 	or a,a
-	jr z,__keys
+	jq z,__keys
 	push af
 __wait_key_off_loop:
 	call _kb_AnyKey
-	jr nz,__wait_key_off_loop
+	jq nz,__wait_key_off_loop
 	pop af
 	cp a,56
 	jq z,__delete
@@ -145,7 +154,7 @@ __wait_key_off_loop:
 	jq c,__keys
 	cp a,48
 	jq z,__prevmap
-	jr nc,__keys
+	jq nc,__keys
 	ld b,(ix-4)
 	ld c,38
 	mlt bc
@@ -169,22 +178,25 @@ __wait_key_off_loop:
 	ld (hl),a
 	inc hl
 	ld (hl),0
-	jp __draw
+	jq __draw
 __delete:
 	ld hl,(ix+6)
 	ld bc,(ix-3)
 	ld a,(ix-1)
 	or a,b
 	or a,c
-	jp z,__draw
+	jq z,__draw
 	dec bc
 	add hl,bc
 	ld (hl),0
 	ld (ix-3),bc
-	jp __draw
+	jq __draw
+__return2:
+	ld a,2
+	jq __return
 __enter:
 	ld a,1
-	jr __return
+	jq __return
 __exit:
 	xor a,a
 	ld hl,(ix+6)
@@ -202,21 +214,35 @@ __return:
 __prevmap:
 	ld a,(ix-4)
 	or a,a
-	jr nz,__decmap
+	jq nz,__decmap
 	ld a,3
 __decmap:
 	dec a
 __setmap:
 	ld (ix-4),a
-	jp __draw
+	jq __draw
 __nextmap:
 	ld a,(ix-4)
 	inc a
 	cp a,3
-	jr nz,__setmap
+	jq nz,__setmap
 	xor a,a
-	jr __setmap
+	jq __setmap
 
+__maybe_new_line:
+	call _gfx_GetTextX
+	ld bc,310
+	or a,a
+	sbc hl,bc
+	ret c
+	call gfx_GetTextY
+	ld bc,9
+	add hl,bc
+	ld bc,(ix-7)
+	push hl,bc
+	call _gfx_SetTextXY
+	pop bc,bc
+	ret
 
 __keymaps:
 	db "#WRMH  ?!VQLG  :ZUPKFC  YTOJEB  XSNIDA"
