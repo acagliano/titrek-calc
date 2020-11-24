@@ -47,6 +47,7 @@ __draw:
 	ex (sp),hl
 	call _gfx_SetColor
 	ld hl,9
+__height_of_text:=$-3
 	ex (sp),hl
 	ld hl,320
 	ld bc,(ix-7)
@@ -100,6 +101,13 @@ __normal_string:
 	inc hl
 	jq __normal_string
 __print_overtype:
+	call _gfx_GetTextY
+	ld bc,(ix-10)
+	or a,a
+	sbc hl,bc
+	ld bc,9
+	add hl,bc
+	ld (__height_of_text),bc
 	ld c,$FF
 	push bc
 	call _gfx_SetColor
