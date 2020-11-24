@@ -235,7 +235,7 @@ __maybe_new_line:
 	or a,a
 	sbc hl,bc
 	ret c
-	call gfx_GetTextY
+	call _gfx_GetTextY
 	ld bc,9
 	add hl,bc
 	ld bc,(ix-7)
