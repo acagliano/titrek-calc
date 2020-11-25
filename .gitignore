@@ -225,8 +225,6 @@ fastlane/screenshots
 obj
 bin
 src/deprecated/*
-src/gfx/*.c
-src/gfx/*.h
 *.log
 .idea
 cmake-build*
