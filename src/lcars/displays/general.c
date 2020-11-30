@@ -34,8 +34,8 @@ char modulenames[][20] = {
 };
 
 void LCARS_RenderModuleList(module_t* systems, uint24_t syscount, uint8_t class, window_data_t* w, uint24_t selected){
-    uint24_t x = w->x, width = w->width;
-    uint8_t y = w->y, height = w->height;
+    uint24_t x = w->x, width = w->w;
+    uint8_t y = w->y, height = w->h;
     uint8_t i;
     for(i = 0; i<syscount; i++){
         module_t* module = &systems[i];
@@ -64,8 +64,8 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y, uint24_t widt
         gfx_FillRectangleColor(color, x + 1, y + 1, width - 2, 12);
         gfx_FillRectangleColor(TRANSPARENT_COLOR, x+1, y+1, 12, 12);
         gfx_RLETSprite(modicons[techtype], x + 1, y + 1);
-        gfx_PrintStringXY(moduledb[techtype], x + 15, y + 4);
-        stats_DrawHealthBar(health, barwidth, x + 80, y + 3, 10, &healthbar);
+        gfx_PrintStringXY(module->name, x + 15, y + 4);
+        stats_DrawHealthBar(health, barwidth, x + 80, y + 3, 10, &healthbar, true);
         stats_RenderPowerIndic(module_PowerWarn(module), x + 80 + barwidth + 5, y);
     }
     else {

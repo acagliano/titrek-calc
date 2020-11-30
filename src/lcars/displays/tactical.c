@@ -37,11 +37,11 @@ void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, u
     cur_y += 42;
     gfx_RLETSprite(icon_shieldinteg, cur_x, cur_y - 1);
     cur_x += 12;
-    if(shield_num) stats_DrawHealthBar(shield_health, 60, cur_x, cur_y, 10, &shieldbar);
+    if(shield_num) stats_DrawHealthBar(shield_health, 60, cur_x, cur_y, 10, &shieldbar, true);
     else gfx_PrintStringXY("None", cur_x + 2, cur_y+2);
     cur_y += 16;
     cur_x = viewer_x;
     gfx_RLETSprite(icon_hullinteg, cur_x, cur_y - 1);
     cur_x += 12;
-    stats_DrawHealthBar(hull.health, 60, cur_x, cur_y, 10, &hullbar);
+    stats_DrawHealthBar(hull.health, 60, cur_x, cur_y, 10, &hullbar, false);
 }

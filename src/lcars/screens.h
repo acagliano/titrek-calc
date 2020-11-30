@@ -28,11 +28,12 @@ enum ScreenEquates {
 typedef struct {
     uint24_t mains;
     uint24_t tactical;
+    uint24_t engine, newspeed;
 } selected_t;
 
 typedef struct {
-    uint24_t x, width;
-    uint8_t y, height;
+    uint24_t x, w;
+    uint8_t y, h, border_color, border_width, bg_color;
 } window_data_t;
 
 extern char mainsys_strings[][10];
@@ -49,6 +50,7 @@ void Screen_UIInventory(void);
 void Screen_UITransporter(void);
 void Screen_UIReplicator(void);
 void Screen_UISensors(void);
+void Screen_UISpeedConfig(engine_ref_t* eng_ref);
 //void Overlay_UIModuleInfo(void);
 
 int Stats_DrawHealthBar(unsigned int percent, unsigned int length, int x, int y, unsigned char border_color, unsigned char bar_color, gfx_rletsprite_t* icon);

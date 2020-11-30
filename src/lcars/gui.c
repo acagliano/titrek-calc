@@ -35,15 +35,17 @@ char options[][50] = {
 };
 
 
-void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y, uint8_t height, bar_colors_t* colors){
+void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y, uint8_t height, bar_colors_t* colors, bool dynamic_bar_color){
     gfx_SetColor(colors->border);
     gfx_Rectangle(x, y-1, length, height);
     length -= 2;
     gfx_SetColor(colors->bg);
     gfx_FillRectangle(x + 1, y, length, height-2);
     gfx_SetColor(colors->bar);
-    if(health <= 50) gfx_SetColor(ALL_HEALTHBAR_WARN);
-    if(health <= 25) gfx_SetColor(ALL_HEALTHBAR_CRITICAL);
+    if(dynamic_bar_color){
+        if(health <= 50) gfx_SetColor(ALL_HEALTHBAR_WARN);
+        if(health <= 25) gfx_SetColor(ALL_HEALTHBAR_CRITICAL);
+    }
     gfx_FillRectangle(x + 1, y, health * length / 100, height-2);
     gfx_SetColor(255);
 }
@@ -184,11 +186,13 @@ void gfx_DrawShieldDisp(bool active, uint8_t health, gfx_rletsprite_t* img, uint
     gfx_RLETSprite(img, img_x, img_y);
 }
 
- void gfx_RenderWindow(uint24_t x, uint8_t y, uint24_t width, uint8_t height, uint8_t borderColor, uint8_t windowColor, uint8_t borderSize){
-    gfx_SetColor(borderColor);
-    gfx_FillRectangle(x, y, width, height);
-    gfx_SetColor(windowColor);
-    gfx_FillRectangle(x + borderSize, y + borderSize, width - (borderSize<<1), height - (borderSize<<1));
+ void gfx_RenderWindow(window_data_t* win){
+    uint8_t border_width = win->border_width, y = win->y, h = win->h;
+    uint24_t x = win->x, w = win->w;
+    gfx_SetColor(win->border_color);
+    gfx_FillRectangle(x, y, w, h);
+    gfx_SetColor(win->bg_color);
+    gfx_FillRectangle(x + border_width, y + border_width, w - (border_width<<1), h - (border_width<<1));
  }
 
 uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y, uint8_t flags) {

@@ -5,7 +5,7 @@
 #include <graphx.h>
 #include "classes/ships.h"
 #include "classes/modules.h"
-#include "graphics/screens.h"
+#include "lcars/screens.h"
 
 #define MODICONS 14     // define first module icon
 

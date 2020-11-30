@@ -37,11 +37,12 @@
 #include "classes/modules.h"
 #include "classes/settings.h"
 
-#include "graphics/screens.h"
-#include "graphics/errors.h"
-#include "graphics/gui.h"
-#include "graphics/imgcaching.h"
-#include "graphics/particles.h"
+#include "lcars/screens.h"
+#include "lcars/errors.h"
+#include "lcars/gui.h"
+#include "lcars/caching/imgcaching.h"
+#include "lcars/effects/particles.h"
+#include "lcars/keybinds/keyfuncs.h"
 
 #include "gfx/TrekGFX.h"
 #include "gfx/internal.h"
@@ -54,10 +55,6 @@
 #define DEBUG
 #undef NDEBUG
 #include <debug.h>
-
-
-#define setbits(bits, mask) (bits|mask)
-#define resbits(bits, mask) (bits^mask)
 
 char *settingsappv = "TrekSett";
 char *TEMP_PROGRAM = "_";
@@ -231,25 +228,19 @@ void tick_ThisTick(sk_key_t* key){
     *key = getKey();
     switch(*key){
         case sk_Clear:
-            if(netflags.logged_in){
-                if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
-                else ntwk_send_nodata(DISCONNECT);
-            }
-            else gameflags.loopgame = false;
+            keybind_Clear();
             break;
         case sk_Vars:
             debug = !debug;
             break;
         case sk_Prgm:
-            {
-            char input[LOG_LINE_SIZE] = {0};
-            prompt_for("[Chat Msg]", &input, LOG_LINE_SIZE-1, 5, 15, 0);
-            if(input[0]) ntwk_send(MESSAGE, PS_STR(input));
-            }
+            keybind_Prgm();
             break;
         case sk_Log:
-            ntwk_send_nodata(GET_ENGINE_MAXIMUMS);
-            screen = SCRN_NAVIG;
+            keybind_Log();
+            break;
+        case sk_Store:
+            keybind_Store();
             break;
         case sk_Yequ:
             screen = (screen == SCRN_SENS) ? SCRN_OFF : SCRN_SENS;
@@ -267,69 +258,22 @@ void tick_ThisTick(sk_key_t* key){
             screen = (screen == SCRN_CARGO) ? SCRN_OFF : SCRN_CARGO;
             break;
         case sk_Stat:
-            if((screen == SCRN_MAINS) || (screen == SCRN_TACT)){
-                uint8_t slot = (screen == SCRN_MAINS) ? select.mains : select.tactical;
-                ntwk_send(MODULE_INFO_REQUEST, PS_VAL(slot));
-                screen = setbits(screen, SCRN_INFO);
-            }
+            keybind_Stat();
             break;
         case sk_Mode:
-            if((screen == SCRN_MAINS) || (screen == SCRN_TACT)){
-                uint8_t slot = (screen == SCRN_MAINS) ? select.mains : select.tactical;
-                const uint8_t action = CHANGE_ONLINE_STATE;
-                ntwk_send(MODULE_STATE_CHANGE, PS_VAL(slot), PS_VAL(action));
-            }
+            keybind_Mode();
+            break;
+        case sk_Right:
+            keybind_RightArrow();
+            break;
+          case sk_Left:
+            keybind_LeftArrow();
             break;
         case sk_Down:
-        {
-            char i;
-            switch(screen){
-                case SCRN_TACT:
-                    for(i = select.tactical + 1; i < (MAX_MODULES - 1); i++){
-                        int type = Ship.system[i].techclass;
-                        if( type == mTactical ){
-                            select.tactical = i;
-                            break;
-                        }
-                    }
-                    break;
-                case SCRN_MAINS:
-                    for(i = select.mains + 1; i < (MAX_MODULES - 1); i++){
-                        int type = Ship.system[i].techclass;
-                        if( type == mSystem ){
-                            select.mains = i;
-                            break;
-                        }
-                    }
-                    break;
-                }
-        }
+            keybind_DownArrow();
             break;
         case sk_Up:
-        {
-            char i;
-                  switch(screen){
-                      case SCRN_TACT:
-                          for(i = select.tactical - 1; i >= 0; i--){
-                              int type = Ship.system[i].techclass;
-                              if( type == mTactical ){
-                                  select.tactical = i;
-                                  break;
-                              }
-                          }
-                          break;
-                      case SCRN_MAINS:
-                          for(i = select.mains - 1; i >= 0; i--){
-                              int type = Ship.system[i].techclass;
-                              if( type == mSystem ){
-                                  select.mains = i;
-                                  break;
-                              }
-                          }
-                          break;
-                  }
-
-        }
+            keybind_UpArrow();
             break;
     }
     

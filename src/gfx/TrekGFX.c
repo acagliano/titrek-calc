@@ -3,7 +3,7 @@
 
 #define TrekGFX_HEADER_SIZE 2
 
-unsigned char *TrekGFX_appvar[30];
+unsigned char *TrekGFX_appvar[31];
 
 unsigned char TrekGFX_init(void)
 {
@@ -21,12 +21,12 @@ unsigned char TrekGFX_init(void)
     }
 
     table = base = (char*)ti_GetDataPtr(appvar) + TrekGFX_HEADER_SIZE;
-    if (*table != 30)
+    if (*table != 31)
     {
         return 0;
     }
 
-    for (i = 0; i < 30; i++)
+    for (i = 0; i < 31; i++)
     {
         TrekGFX_appvar[i] = (void*)(*++table + (unsigned int)base);
     }

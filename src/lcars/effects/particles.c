@@ -1,7 +1,7 @@
 #include <tice.h>
 #include "particles.h"
-#include "../equates.h"
-#include "../gfx/TrekGFX.h"
+#include "../../equates.h"
+#include "../../gfx/TrekGFX.h"
 
 void gfx_RenderParticles(particles_t* part, uint8_t ct){
     uint8_t i, y;

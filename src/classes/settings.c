@@ -1,12 +1,12 @@
 
-#include "settings.h"
-#include "player.h"
 #include <string.h>
 #include <stdbool.h>
 #include <fileioc.h>
 #include <graphx.h>
 #include <stdint.h>
-#include "../graphics/screens.h"
+#include "settings.h"
+#include "player.h"
+#include "../lcars/screens.h"
 
 #define DEFAULT_NET_TIMEOUT 1200 // 60 seconds @ 20 tps
 

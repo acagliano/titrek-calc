@@ -18,6 +18,7 @@ enum StatusFlags {
 
 
 typedef struct {
+    char name[10];
     uint8_t techclass, techtype;
     uint8_t health;   // percentages
     uint8_t status_flags;
@@ -55,5 +56,8 @@ extern ship_t Ship;
 
 // Here will be some defines used for some other things.
 extern engine_ref_t engine_ref;
+#define ENGINE_THRUST 0
+#define ENGINE_IMPULSE 1
+#define ENGINE_WARP 2
 
 #endif

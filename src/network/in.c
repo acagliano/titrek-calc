@@ -9,9 +9,9 @@
 #include "../classes/ships.h"
 #include "controlcodes.h"
 #include "network.h"
-#include "../graphics/errors.h"
-#include "../graphics/gui.h"
-#include "../graphics/engine.h"
+#include "../lcars/errors.h"
+#include "../lcars/gui.h"
+#include "../lcars/engine.h"
 #include "../asm/exposure.h"
 
 extern const char *TEMP_PROGRAM;
@@ -127,8 +127,21 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 memcpy(&ModuleInfo, &packet->info, sizeof(ModuleInfo));
             }
             break;
+        case ENGINE_SETSPEED:
+        {
+            struct {
+                uint8_t slot;
+                uint24_t speed;
+            } *packet = (void*)data;
+            engine_ref.engine[packet->slot].current_speed = packet->speed;
+        }
+            break;
         case PING:
             ntwk_inactive_clock = 0;
+            break;
+        case GET_ENGINE_MAXIMUMS:
+            memcpy(&engine_ref.engine[0], data, sizeof(engine_ref_t)-1);
+            engine_ref.loaded = true;
             break;
         default:
             gui_SetLog(LOG_ERROR, "unknown packet received");

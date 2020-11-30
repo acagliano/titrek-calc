@@ -12,8 +12,9 @@ void Overlay_UIModuleInfo(void) {
     uint8_t y = 30, height = 110;
     uint24_t text_x = x + 4;
     uint8_t text_y = y + 4;
+    window_data_t win = {x, width, y, height, 139, 3, 205};
     gfx_SetTextFGColor(0);
-    gfx_RenderWindow(x, y, width, height, 139, 205, 3);
+    gfx_RenderWindow(&win);
     gfx_FillRectangleColor(139, x + 2, y + 2, width - 4, 16);
     if(!ModuleInfo.modclass) {
         gfx_PrintStringXY("No Module Info Loaded", text_x + 20, text_y + 2);
@@ -28,13 +29,13 @@ void Overlay_UIModuleInfo(void) {
     gfx_PrintStringXY(modulenames[techtype], text_x + 20, text_y + 2);
     text_y += 17;
     gfx_RLETSprite(icon_health, text_x, text_y - 2);
-    stats_DrawHealthBar(health, 130, text_x + 15, text_y, 10, &healthbar);
+    stats_DrawHealthBar(health, 130, text_x + 15, text_y, 10, &healthbar, true);
     gfx_SetTextXY(text_x + 15 + 135, text_y);
     gfx_PrintUInt(health, 1 + (health > 9) + (health > 99));
     gfx_PrintString("%");
     text_y += 12;
     gfx_RLETSprite(icon_sourcereserve, text_x, text_y - 2);
-    stats_DrawHealthBar(power, 130, text_x + 15, text_y, 10, &healthbar);
+    stats_DrawHealthBar(power, 130, text_x + 15, text_y, 10, &healthbar, true);
     gfx_SetTextXY(text_x + 15 + 135, text_y);
     gfx_PrintUInt(power, 1 + (power > 9) + (power > 99));
     gfx_PrintString("%");
