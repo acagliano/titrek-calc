@@ -250,9 +250,14 @@ __PrintChar:
 	ld hl,320
 	or a,a
 	sbc hl,bc
-	push de,hl
+	ld bc,9
+	push bc,hl
 	ld bc,(ix-7)
 	push de,bc
+	ld c,0
+	push bc
+	call _gfx_SetColor
+	pop bc
 	call _gfx_SetTextXY
 	call _gfx_FillRectangle
 	pop bc,bc,bc,bc
