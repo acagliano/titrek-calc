@@ -12,6 +12,7 @@
 #include "../network/network.h"
 #include "gui.h"
 #include "screens.h"
+#include "errors.h"
 #include "colors.h"
 #include "../asm/exposure.h"
 #include "../network/controlcodes.h"
@@ -129,7 +130,7 @@ void gfx_RenderMenuTitle(const char* title, uint24_t x, uint8_t y){
     gfx_PrintString(title);
 }
 
-uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash) {
+uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash, uint8_t playgame_err) {
     bool firstrun = true;
     uint24_t text_x = 60;
     uint8_t text_y = 130;
@@ -156,6 +157,8 @@ uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash) {
         if(key || firstrun){
             gfx_RenderVersion(text_x - 2, text_y-15);
             gfx_RenderMenu(options, 4, selected, text_x, text_y, MENU_W, MENU_H);
+            if(playgame_err)
+                gfx_HighlightedText(err_text[playgame_err], text_x, text_y+MENU_H+10, 255, 192);
             firstrun = false;
         }
         if(gameflags.gfx_error)

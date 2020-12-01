@@ -70,3 +70,12 @@ uint8_t gfx_VCenterText(uint8_t y, uint8_t box_height, uint8_t font_height){
     uint8_t padding = box_height-font_height;
     return padding/2+y;
 }
+
+void gfx_HighlightedText(const char* string, uint24_t x, uint8_t y, uint8_t text_color, uint8_t highlight_color){
+    uint24_t width = gfx_GetStringWidth(string);
+    uint8_t oldcolor = gfx_SetTextFGColor(text_color);
+    gfx_SetColor(highlight_color);
+    gfx_FillRectangle(x, y, width + 16, 12);
+    gfx_PrintStringXY(string, x + 8, y + 2);
+    gfx_SetTextFGColor(oldcolor);
+}

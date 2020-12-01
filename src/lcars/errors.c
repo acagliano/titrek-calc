@@ -21,6 +21,7 @@
 char log_msg[4][LOG_LINE_SIZE] = {0};
 gfx_rletsprite_t* icon[4] = {NULL};
 uint24_t log_display[4] = {0};
+char err_text[][15] = {"", "ERR: Gfx", "ERR: Network", "Err: Bridge", "Err: Timeout"};
 
 char ctl_codes[][20] = {
     "CONNECT",
