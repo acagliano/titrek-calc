@@ -3,7 +3,6 @@
 
 public _user_input
 extern _gfx_SetColor
-extern _gfx_PrintString
 extern _gfx_PrintChar
 extern _gfx_GetTextX
 extern _gfx_GetTextY
@@ -81,8 +80,7 @@ __print_asterisk_loop:
 	jq z,__print_overtype
 	push hl
 	push bc
-	call __maybe_new_line
-	call _gfx_PrintChar
+	call __PrintChar
 	pop bc
 	pop hl
 	inc hl
@@ -94,8 +92,7 @@ __normal_string:
 	push hl
 	ld c,a
 	push bc
-	call __maybe_new_line
-	call _gfx_PrintChar
+	call __PrintChar
 	pop bc
 	pop hl
 	inc hl
@@ -132,7 +129,7 @@ __print_overtype:
 	pop bc
 	pop bc
 	pop bc
-	call _gfx_PrintChar
+	call __PrintChar
 	ld hl,(ix-7)
 	ex (sp),hl
 	ld bc,(ix-10)
@@ -238,20 +235,33 @@ __nextmap:
 	xor a,a
 	jq __setmap
 
-__maybe_new_line:
+
+__PrintChar:
 	call _gfx_GetTextX
 	ld bc,310
 	or a,a
 	sbc hl,bc
-	ret c
+	jq c,__PrintChar_Draw
 	call _gfx_GetTextY
 	ld bc,9
 	add hl,bc
+	ex hl,de
 	ld bc,(ix-7)
-	push hl,bc
+	ld hl,320
+	or a,a
+	sbc hl,bc
+	push de,hl
+	ld bc,(ix-7)
+	push de,bc
 	call _gfx_SetTextXY
-	pop bc,bc
-	ret
+	call _gfx_FillRectangle
+	pop bc,bc,bc,bc
+__PrintChar_Draw:
+	pop hl
+	ld (__PrintChar_return_smc),hl
+	call _gfx_PrintChar
+	jp _user_input
+__PrintChar_return_smc:=$-3
 
 __keymaps:
 	db "#WRMH  ?!VQLG  :ZUPKFC  YTOJEB  XSNIDA"
@@ -259,3 +269,4 @@ __keymaps:
 	db "+-*/^  ;369)$@ .258(&~ 0147,][  ",$1A,"<=>}{"
 __overtypes:
 	db "Aa1"
+

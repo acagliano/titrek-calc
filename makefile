@@ -9,7 +9,7 @@ MAIN_ARGS    ?= NO
 COMPRESSED   ?= NO
 ARCHIVED     ?= NO
 
-L ?= graphx fileioc keypadc srldrvce
+L ?= graphx fileioc keypadc srldrvce usbdrvce
 
 # ----------------------------
 # Compile Options
@@ -24,5 +24,5 @@ EXTRA_CFLAGS ?= -Wall -Wextra
 
 OUTPUT_MAP   ?= NO
 
-include $(CEDEV)/include/.makefile
+include $(CEDEV)/meta/makefile.mk
 
