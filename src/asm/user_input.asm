@@ -98,13 +98,6 @@ __normal_string:
 	inc hl
 	jq __normal_string
 __print_overtype:
-	call _gfx_GetTextY
-	ld bc,(ix-10)
-	or a,a
-	sbc hl,bc
-	ld bc,9
-	add hl,bc
-	ld (__height_of_text),bc
 	ld c,$FF
 	push bc
 	call _gfx_SetColor
@@ -118,9 +111,9 @@ __print_overtype:
 	add hl,bc
 	ld l,(hl)
 	push hl
+	call _gfx_GetTextY
 	ld bc,8
 	push bc
-	ld hl,(ix-10)
 	add hl,bc
 	push hl
 	call _gfx_GetTextX
@@ -238,24 +231,41 @@ __nextmap:
 
 __PrintChar:
 	call _gfx_GetTextX
-	ld bc,310
+	ld bc,300
 	or a,a
 	sbc hl,bc
 	jq c,__PrintChar_Draw
+	push hl
 	call _gfx_GetTextY
 	ld bc,9
 	add hl,bc
+	ld (__PrintChar_NextLineY),hl
 	ex hl,de
 	ld bc,(ix-7)
 	ld hl,320
 	or a,a
 	sbc hl,bc
-	push de,hl
+	ld bc,9
+	push bc,hl
 	ld bc,(ix-7)
 	push de,bc
-	call _gfx_SetTextXY
+	ld c,0
+	push bc
+	call _gfx_SetColor
+	pop bc
 	call _gfx_FillRectangle
 	pop bc,bc,bc,bc
+	pop hl
+	ld bc,10
+	or a,a
+	sbc hl,bc
+	jq c,__PrintChar_Draw
+	ld hl,0
+__PrintChar_NextLineY:=$-3
+	ld bc,(ix-7)
+	push hl,bc
+	call _gfx_SetTextXY
+	pop bc,bc
 __PrintChar_Draw:
 	pop hl
 	ld (__PrintChar_return_smc),hl
