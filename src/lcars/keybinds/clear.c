@@ -6,5 +6,5 @@ void keybind_Clear(void){
         if(screen > 0xff) screen = resbits(screen, SCRN_INFO);
         else ntwk_send_nodata(DISCONNECT);
     }
-    else gameflags.loopgame = false;
+    else gameflags.exit = true;
 }

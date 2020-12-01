@@ -82,18 +82,19 @@ uint24_t ntwk_inactive_disconnect = 0;
 bridge_config_t bridge_config = {0};
 particles_t particles[MAX_PARTICLES] = {0};
 engine_ref_t engine_ref = {0};
+uint8_t playgame_return = 0;
 
 ti_var_t update_fp = 0;
 
 /* Main Menu */
 
-void PlayGame(void);
+uint8_t PlayGame(void);
 void ServerSelect(void);
 
 void MainMenu(void) {
     uint8_t opt = 0;
     while(1){
-        opt = gfx_RenderSplash(splash);
+        opt = gfx_RenderSplash(splash, playgame_return);
         if(opt == OPT_PLAY) ServerSelect();
         if(opt == OPT_QUIT) {gameflags.exit = 1; break;}
         if(opt == OPT_ABOUT) {
@@ -163,7 +164,7 @@ void ServerSelect(void){
         if(key == sk_Enter){
             if(settings.servers[selected][0]){
                 bridge_config.server = selected;
-                PlayGame();
+                playgame_return = PlayGame();
                 break;
             }
         }
@@ -306,48 +307,47 @@ void tick_ThisTick(sk_key_t* key){
 }
 
 
-void PlayGame(void){
+uint8_t PlayGame(void){
     sk_key_t key = 0;
-    if(gameflags.gfx_error) return;
-    if(!netflags.network_up) return;
+    uint24_t wait = 5000;
+    if(gameflags.gfx_error) return GFX;
+    if(!netflags.network_up) return NTWK;
     ntwk_inactive_disconnect = settings.limits.network_timeout * 11 / 10;
     gameflags.loopgame = true;
     netflags.bridge_error = false;
+    gameflags.exit = false;
+    netflags.bridge_up = false;
     if(!TrekGFX_init()) {
         dbg_sprintf(dbgout, "Failed to init graphics\n");
-        return;
+        return GFX;
     }
     gfx_InitModuleIcons();
     ntwk_send(CONNECT, PS_VAL(settings.ssl_prefer), PS_STR(settings.servers[bridge_config.server]));
     gfx_PrintStringXY("Waiting for bridge...", 20, 190);
     gfx_PrintStringXY("[Clear] to stop", 20, 200);
     gfx_BlitBuffer();
-    while(gameflags.loopgame){
-        size_t bytes_read;
+    do {
         key = getKey();
-        if(netflags.bridge_error) break;
-        if(netflags.bridge_up && netflags.client_version_ok){
-            if(!gui_Login()){
-                dbg_sprintf(dbgout, "Failed to login\n");
-                break;
-            }
-        }
-        while(netflags.bridge_up
-            && netflags.network_up
-            && gameflags.loopgame
-            && netflags.client_version_ok){
-            
-            while(netflags.logged_in
-                && netflags.network_up
-                && netflags.bridge_up
-                && gameflags.loopgame){
-                tick_ThisTick(&key);
-            }
-            // log log out
-            tick_ThisTick(&key);
-        }
-    // log disconnect
-    tick_ThisTick(&key);
+        ntwk_process();
+        if(key==sk_Clear) return USER_RETURN;
+        if(netflags.bridge_up==true) break;
+        if(netflags.bridge_error==true) return BRIDGE;
+        if(!wait--) return TIMEOUT;
+    }   while(1);
+    if(!gui_Login()) return USER_RETURN;
+    wait = 5000;
+    do {
+        key = getKey();
+        ntwk_process();
+        if(key==sk_Clear) return USER_RETURN;
+        if(netflags.logged_in) break;
+        if(!wait--) return TIMEOUT;
+    } while(1);
+    if(key==sk_Clear) return USER_RETURN;
+    while(!gameflags.exit){
+        size_t bytes_read;
+        tick_ThisTick(&key);
     }
     gfx_ClearParticles(&particles, MAX_PARTICLES);
+    return NO_ERROR;
 }

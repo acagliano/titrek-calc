@@ -18,5 +18,15 @@ enum LogType {
 extern char log_msg[4][LOG_LINE_SIZE];
 extern gfx_rletsprite_t* icon[4];
 extern uint24_t log_display[4];
+extern char err_text[][15];
+
+enum PlayGameError {
+    NO_ERROR,
+    USER_RETURN = NO_ERROR,
+    GFX,
+    NTWK,
+    BRIDGE,
+    TIMEOUT
+};
 
 #endif

@@ -24,6 +24,11 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     uint8_t ctl = in_buff->control;
     uint8_t response = in_buff->data[0];    // for handlers needing only response codes
     uint8_t* data = &in_buff->data[0];      // for handlers needing arbitrary data
+    if(settings.debug){
+        char msg[LOG_LINE_SIZE] = {0};
+        sprintf(&msg, "[RECV]: Ctl: %u Len: %u", in_buff[0], buff_size);
+        gui_SetLog(LOG_DEBUG, msg);
+    }
     
     switch(ctl){
         case CONNECT:
@@ -35,9 +40,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 );
             break;
         case DISCONNECT:
-            netflags.bridge_up = false;
-            netflags.logged_in = false;
-            gameflags.loopgame = false;
+            gameflags.exit = true;
             break;
         case BRIDGE_ERROR:
             netflags.bridge_error = true;
@@ -107,15 +110,10 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             {
                 struct {
                     uint8_t slot;
-                    uint8_t action;
-                    uint8_t value;
+                    module_t newdata;
                 } *packet = (void*)data;
                 module_t* thismodule = &Ship.system[packet->slot];
-                uint8_t* target = (packet->action == CHANGE_HEALTH) ? &thismodule->health
-                    : (packet->action == CHANGE_STATUS_FLAGS) ? &thismodule->status_flags
-                    : NULL;
-                if(!target) break;
-                *target = packet->value;
+                memcpy(thismodule, &packet->newdata, sizeof(module_t));
             }
             break;
         case MODULE_INFO_REQUEST:
