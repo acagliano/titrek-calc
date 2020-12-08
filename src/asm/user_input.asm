@@ -11,7 +11,7 @@ extern _gfx_SetTextFGColor
 extern _gfx_HorizLine
 extern _gfx_FillRectangle
 extern _gfx_SetDraw
-extern _gfx_BlitLines
+extern _gfx_Blit
 extern _getKey
 extern _kb_AnyKey
 
@@ -123,15 +123,9 @@ __print_overtype:
 	pop bc
 	pop bc
 	call __PrintChar
-	ld hl,(ix-7)
+	ld l,1
 	ex (sp),hl
-	ld bc,(ix-10)
-	push bc
-	ld c,1
-	push bc
-	call _gfx_BlitLines
-	pop bc
-	pop bc
+	call _gfx_Blit
 	pop bc
 __keys:
 	call _getKey
