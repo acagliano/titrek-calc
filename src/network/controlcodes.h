@@ -29,6 +29,7 @@ enum ControlCodes {
     // File Streaming: 90 - 91
     PRGMUPDATE = 90,
     GFXUPDATE,
+    CACHE_SPRITE,
        
     // DEBUG: 0xf*
     BRIDGE_ERROR = 0xf0,

@@ -26,7 +26,8 @@ enum PlayGameError {
     GFX,
     NTWK,
     BRIDGE,
-    TIMEOUT
+    TIMEOUT,
+    VERSION
 };
 
 #endif

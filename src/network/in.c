@@ -12,6 +12,7 @@
 #include "../lcars/errors.h"
 #include "../lcars/gui.h"
 #include "../lcars/engine.h"
+#include "../lcars/caching/imgcaching.h"
 #include "../asm/exposure.h"
 
 extern const char *TEMP_PROGRAM;
@@ -47,7 +48,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             break;
         case VERSION_CHECK:
             if(response == VERSION_OK) netflags.client_version_ok = true;
-            else gui_SetLog(LOG_SERVER, "client outdated");
+            else gameflags.version_err = true;
             break;
         case REGISTER:
         case LOGIN:
@@ -140,6 +141,17 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case GET_ENGINE_MAXIMUMS:
             memcpy(&engine_ref.engine[0], data, sizeof(engine_ref_t)-1);
             engine_ref.loaded = true;
+            break;
+        case CACHE_SPRITE:
+        {
+            struct {
+                uint8_t type;
+                uint8_t slot;
+                uint24_t size;
+                gfx_sprite_t sprite;
+            } *packet = (void*)data;
+            cache_insert(&packet->sprite, packet->type, packet->slot, packet->size);
+        }
             break;
         default:
             gui_SetLog(LOG_ERROR, "unknown packet received");
