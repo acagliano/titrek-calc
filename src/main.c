@@ -83,6 +83,7 @@ bridge_config_t bridge_config = {0};
 particles_t particles[MAX_PARTICLES] = {0};
 engine_ref_t engine_ref = {0};
 uint8_t playgame_return = 0;
+bool full_redraw = true;
 
 ti_var_t update_fp = 0;
 
@@ -279,6 +280,7 @@ void tick_ThisTick(sk_key_t* key){
     }
     
     // RENDER BACKGROUND, MENUS, and LOG
+    gfx_BlitScreen();
     Screen_RenderUI();
     gfx_RenderParticles(&particles, MAX_PARTICLES);
     if(arr_sum(log_display,4)) gui_ShowLog();
@@ -310,6 +312,7 @@ void tick_ThisTick(sk_key_t* key){
 uint8_t PlayGame(void){
     sk_key_t key = 0;
     uint24_t wait = 5000;
+    full_redraw = true;
     if(gameflags.gfx_error) return GFX;
     if(!netflags.network_up) return NTWK;
     ntwk_inactive_disconnect = settings.limits.network_timeout * 11 / 10;
@@ -348,6 +351,7 @@ uint8_t PlayGame(void){
         if(netflags.logged_in) break;
         if(!wait--) return TIMEOUT;
     } while(1);
+    gfx_ZeroScreen();
     if(key==sk_Clear) return USER_RETURN;
     while(!gameflags.exit){
         size_t bytes_read;

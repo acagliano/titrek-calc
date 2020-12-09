@@ -44,7 +44,7 @@ typedef struct {
 extern net_mode_t mode_srl;
 extern net_mode_t mode_pipe;
 
-extern char net_buf[1024];
+extern char net_buf[8192];
 extern size_t net_buf_size;
 
 bool ntwk_init(void);

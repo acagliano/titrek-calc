@@ -4,7 +4,7 @@
 #include "network.h"
 #include "../equates.h"
 
-char net_buf[1024];
+char net_buf[8192];
 size_t net_buf_size = 0;
 
 bool pipe_init() {

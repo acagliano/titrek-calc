@@ -2,6 +2,7 @@
 #define statscreens_h
 
 #include <graphx.h>
+#include <stdbool.h>
 #include "../classes/ships.h"
 #define lcars_texty 223
 #define viewer_x 30
@@ -11,8 +12,11 @@
 #define vWidth 300
 #define vHeight 170
 #define wait_kb_release(key) while(kb_IsDown(key)) {ntwk_process(); kb_Scan();}
+#define Screen_ZeroViewport() gfx_SetColor(0); gfx_FillRectangle(23, 17, 273, 140);
+#define Screen_ZeroAll() gfx_SetColor(0); gfx_FillRectangle(0, 0, 320, 240);
 extern char moduledb[][12];
 extern char modulenames[][20];
+extern bool full_redraw;
 
 enum ScreenEquates {
     SCRN_OFF = 0,
@@ -51,10 +55,11 @@ void Screen_UITransporter(void);
 void Screen_UIReplicator(void);
 void Screen_UISensors(void);
 void Screen_UISpeedConfig(engine_ref_t* eng_ref);
+void Overlay_UIModuleInfo(void);
 //void Overlay_UIModuleInfo(void);
 
 int Stats_DrawHealthBar(unsigned int percent, unsigned int length, int x, int y, unsigned char border_color, unsigned char bar_color, gfx_rletsprite_t* icon);
-void Screen_Background(unsigned char active);
+void Screen_RenderLCARSTabs(unsigned char active);
 void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y, uint24_t width);
 
 

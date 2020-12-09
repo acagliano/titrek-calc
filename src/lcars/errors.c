@@ -102,7 +102,7 @@ void gui_ShowLog(void){
     uint24_t x = 2;
     uint8_t y = 216-2;
     for(i=0; i<4; i++){
-        if(!log_display[i]) memset(&log_msg[i], 0, LOG_LINE_SIZE);
+        if(!log_display[i]) {memset(&log_msg[i], 0, LOG_LINE_SIZE); full_redraw = true;}
         if(*log_msg[i])
             h+=text_GetStringHeight(log_msg[i], 312-x+12);
     }

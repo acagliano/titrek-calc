@@ -75,7 +75,13 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y, uint24_t widt
 }
 
 void Screen_RenderUI(void){
-    Screen_Background(screen);
+    if(full_redraw){
+        Screen_ZeroAll();
+        gfx_RLETSprite(shipinterior_left, 0, 0);
+        gfx_RLETSprite(shipinterior_right, 160, 0);
+    }
+    else Screen_ZeroViewport();
+    Screen_RenderLCARSTabs(screen);
     gfx_SetTextFGColor(255);
     switch(screen & 0xff){
         case SCRN_OFF:
@@ -101,15 +107,15 @@ void Screen_RenderUI(void){
             break;
     }
     gfx_SetTextFGColor(0);
+    full_redraw = false;
     return;
 }
 
-void Screen_Background(uint8_t active) {
+void Screen_RenderLCARSTabs(uint8_t active) {
     int i;
     gfx_SetTextFGColor(255);
-    gfx_ZeroScreen();
-    gfx_RLETSprite(shipinterior_left, 0, 0);
-    gfx_RLETSprite(shipinterior_right, 160, 0);
+    gfx_SetColor(74);
+    gfx_FillRectangle(0, 217, 320, 18);
     for(i = 0; i < 320; i++){
         gfx_SetColor(0);
         gfx_Rectangle(i * 64, 216, 64, 20);

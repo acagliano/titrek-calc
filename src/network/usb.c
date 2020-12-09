@@ -5,7 +5,7 @@
 #include "network.h"
 
 srl_device_t srl;
-uint8_t srl_buf[2048];
+uint8_t srl_buf[8192];
 
 static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
                                     usb_callback_data_t *callback_data);
