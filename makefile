@@ -24,5 +24,5 @@ EXTRA_CFLAGS ?= -Wall -Wextra
 
 OUTPUT_MAP   ?= NO
 
-include $(CEDEV)/include/.makefile
+include $(CEDEV)/meta/makefile.mk
 

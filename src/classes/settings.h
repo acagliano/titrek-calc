@@ -17,14 +17,12 @@ typedef struct {
 } limiter_t;
 
 
-
+#define LOGIN_TOKEN_SIZE 128
 typedef struct {
     bool debug;
-    bool ssl_prefer;
-    bool savelogin;
-    userinfo_t userinfo;
     limiter_t limits;
     char servers[10][50];
+    uint8_t login_key[LOGIN_TOKEN_SIZE];
 } settings_t;
 extern settings_t settings;
 
@@ -33,13 +31,12 @@ bool write_settings(void);
 
 enum SettingOpt {
     DEBUG_MODE,
-    SSL_PREFER,
-    SAVE_CREDS,
     CHUNK_REF,
     PACKET_LIMIT,
     NTWK_TIMEOUT,
     LOG_TIME
 };
 
+bool check_import_login_key(void);
 
 #endif

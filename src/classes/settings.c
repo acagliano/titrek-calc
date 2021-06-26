@@ -12,8 +12,6 @@
 
 char settingtext[][20] = {
     "Debug Mode",
-    "Prefer SSL",
-    "Save Login Info",
     "Frame Refresh Rate",
     "Packet Limit",
     "Ntwk Timeout Limit",
@@ -22,8 +20,6 @@ char settingtext[][20] = {
 
 char settinginfo[][70] = {
     "Whether program should log debug msgs.",
-    "Always use SSL if available",
-    "Whether program should save login info.",
     "How often to request frame data from server.",
     "Max number of packets to process per tick.",
     "Ticks w/o net activity triggering timeout.",
@@ -36,6 +32,7 @@ enum _accessmode {
     SETT_INT
 };
 
+char *keyappv = "trekkey";
 
 void set_defaults(void){
     // defaults are hardcoded within the game and cannot be changed unless through a rebuild
@@ -97,12 +94,6 @@ void gfx_RenderSettingOpt(uint8_t index, uint8_t selected, uint24_t x, uint8_t y
         case DEBUG_MODE:
             gfx_SettingOptRender(&settings.debug, SETT_BOOL);
             break;
-        case SAVE_CREDS:
-            gfx_SettingOptRender(&settings.savelogin, SETT_BOOL);
-            break;
-        case SSL_PREFER:
-            gfx_SettingOptRender(&settings.ssl_prefer, SETT_BOOL);
-            break;
         case CHUNK_REF:
             gfx_SettingOptRender(&settings.limits.chunk_refresh, SETT_CHAR);
             break;
@@ -124,12 +115,6 @@ void gfx_AlterSettingOpt(uint8_t selected, int8_t direction){
         case DEBUG_MODE:
             settings.debug = !settings.debug;
             break;
-        case SAVE_CREDS:
-            settings.savelogin = !settings.savelogin;
-            break;
-        case SSL_PREFER:
-            settings.ssl_prefer = !settings.ssl_prefer;
-            break;
         case CHUNK_REF:
             settings.limits.chunk_refresh += direction;
             break;
@@ -144,4 +129,17 @@ void gfx_AlterSettingOpt(uint8_t selected, int8_t direction){
             break;
     }
 
+}
+
+bool check_import_login_key(void){
+    ti_var_t keyfile = ti_Open(keyappv, "r");
+    size_t size;
+    bool result;
+    if(!keyfile) return false;
+    size = ti_GetSize(keyfile);
+    if(size != LOGIN_TOKEN_SIZE) return false;
+    result = ti_Read(&settings.login_key, LOGIN_TOKEN_SIZE, 1, keyfile);
+    ti_Close(keyfile);
+    ti_Delete(keyappv);
+    return result;
 }

@@ -32,6 +32,9 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     }
     
     switch(ctl){
+        case WELCOME:
+            gui_Login(data);
+            break;
         case CONNECT:
             netflags.bridge_up = true;
             gui_SetLog(LOG_INFO, "bridge connect successful");
@@ -50,18 +53,13 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             if(response == VERSION_OK) netflags.client_version_ok = true;
             else gameflags.version_err = true;
             break;
-        case REGISTER:
         case LOGIN:
             if(response == SUCCESS) {
                 netflags.logged_in = true;
                 ntwk_send_nodata(LOAD_SHIP);
                 break;
             }
-            if((response == MISSING) && (ctl == LOGIN)) gui_Register();
-            else {
-                memset(&settings.userinfo, 0, sizeof(userinfo_t));
-                gui_NetworkErrorResponse(ctl, response, true);
-            }
+            else gui_NetworkErrorResponse(ctl, response, true);
             break;
         case FRAMEDATA_REQUEST:
             {

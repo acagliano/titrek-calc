@@ -3,6 +3,7 @@
 #include <keypadc.h>
 #include <fileioc.h>
 #include <tice.h>
+#include <hashlib.h>
 #include "../gfx/TrekGFX.h"
 #include "../classes/ships.h"
 #include "../classes/settings.h"
@@ -211,48 +212,28 @@ uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y
     return y+22;
 }
 
-bool gui_Login(void) {
-    uint24_t text_x = 0;
-    uint8_t text_y = 0;
-    if(getKey() == sk_Del) memset(&settings.userinfo, 0, sizeof(userinfo_t));
-    gfx_ZeroScreen();
-    gfx_BlitBuffer();
-    if(!settings.userinfo.username[0])
-        text_y = prompt_for("Username:", settings.userinfo.username, 24, text_x, text_y, 0);
-    if(!settings.userinfo.passwd[0])
-        text_y = prompt_for("Password:", settings.userinfo.passwd, 32, text_x, text_y, 1);
-    if(!settings.userinfo.username[0] || !settings.userinfo.passwd[0]){
-        // if one or both fields left blank, clear the buffers
-        memset(&settings.userinfo, 0, sizeof(userinfo_t));
-        return false;
-    }
-
+#define PPT_LEN (LOGIN_TOKEN_SIZE+AES_BLOCKSIZE)
+bool gui_Login(uint8_t* key) {
+    aes_ctx ctx;
+    uint8_t iv[AES_BLOCKSIZE];
+    uint8_t ppt[PPT_LEN];
+    uint8_t ct[PPT_LEN];
+    
+    hashlib_AESLoadKey(key, &ctx, 256);         // load secret key
+    hashlib_RandomBytes(iv, AES_BLOCKSIZE);     // get IV
+    
+    // Pad plaintext
+    hashlib_PadInputPlaintext(&settings.login_key, LOGIN_TOKEN_SIZE, ppt, ALG_AES, SCHM_DEFAULT);
+    
+    // Encrypt the login token with AES-256
+    hashlib_AESEncrypt(ppt, PPT_LEN, ct, &ctx, iv);
+    
     return ntwk_send(LOGIN,
-        PS_STR(settings.userinfo.username),
-        PS_STR(settings.userinfo.passwd)
+        PS_PTR(iv, AES_BLOCKSIZE),
+        PS_PTR(ct, PPT_LEN)
     );
-}
-
-bool gui_Register(void) {
-// input = pointer to preserved username/password data from login function
-    char email[64];
-    if(!netflags.network_up) return false;
-
-    gfx_ZeroScreen();
-    gfx_SetTextFGColor(255);
-    gfx_PrintStringXY("User: ", 0, 0);
-    gfx_PrintString(settings.userinfo.username);
-    gfx_PrintStringXY("No matching account found!", 0, 10);
-    gfx_PrintStringXY("Let's create one...", 0, 20);
-    gfx_BlitBuffer();
-    prompt_for("Email:", &email, 63, 0, 30, 0);    // get email address
-    if(!email[0]) return false;
-
-    return ntwk_send(REGISTER,
-        PS_STR(settings.userinfo.username),
-        PS_STR(settings.userinfo.passwd),
-        PS_STR(email)
-    );
+    free(ppt);
+    free(ct);
 }
 
 bool gui_NewGame(void) {

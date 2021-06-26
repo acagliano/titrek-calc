@@ -29,7 +29,7 @@ void gfx_VersionCheck(void);
 uint8_t gfx_RenderSplash(gfx_rletsprite_t* splash, uint8_t playgame_err);
 void gfx_DrawShieldDisp(bool active, uint8_t health, gfx_rletsprite_t* img, uint24_t x, uint8_t y);
 void gfx_RenderWindow(window_data_t* win);
-bool gui_Login(void);
+bool gui_Login(uint8_t *key);
 bool gui_Register(void);
 
 void gfx_RenderMenu(char menutext[][50], uint8_t menucount, uint8_t selected, uint24_t x, uint8_t y, uint24_t w, uint8_t h);

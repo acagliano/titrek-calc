@@ -57,6 +57,7 @@
 #include <debug.h>
 
 char *settingsappv = "TrekSett";
+char *keyappv = "trekkey";
 char *TEMP_PROGRAM = "_";
 char *MAIN_PROGRAM = "TITREK";
 ship_t Ship = {0};
@@ -186,6 +187,7 @@ int main(void) {
         
     } else { set_defaults(); }
 
+    check_import_login_key();
     zx7_Decompress(err_icon, icon_error_compressed);
     zx7_Decompress(splash, splash_compressed);
     zx7_Decompress(icon_netup, icon_networkup_compressed);
@@ -207,7 +209,6 @@ int main(void) {
     do {
         MainMenu();
     } while(!gameflags.exit);
-    if(!settings.savelogin) memset(&settings.userinfo, 0, sizeof(userinfo_t));
 error:
     //cache_purge();
     write_settings();
@@ -313,6 +314,7 @@ uint8_t PlayGame(void){
     sk_key_t key = 0;
     uint24_t wait = 5000;
     full_redraw = true;
+    bool enable_ssl = false;
     if(gameflags.gfx_error) return GFX;
     if(!netflags.network_up) return NTWK;
     ntwk_inactive_disconnect = settings.limits.network_timeout * 11 / 10;
@@ -325,7 +327,7 @@ uint8_t PlayGame(void){
         return GFX;
     }
     gfx_InitModuleIcons();
-    ntwk_send(CONNECT, PS_VAL(settings.ssl_prefer), PS_STR(settings.servers[bridge_config.server]));
+    ntwk_send(CONNECT, PS_VAL(enable_ssl), PS_STR(settings.servers[bridge_config.server]));
     gfx_PrintStringXY("Waiting for bridge...", 20, 190);
     gfx_PrintStringXY("[Clear] to stop", 20, 200);
     gfx_BlitBuffer();
@@ -343,7 +345,6 @@ uint8_t PlayGame(void){
         if(key==sk_Clear) return USER_RETURN;
         if(gameflags.version_err) return VERSION;
     }
-    if(!gui_Login()) return USER_RETURN;
     wait = 5000;
     do {
         key = getKey();

@@ -17,7 +17,7 @@ void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, u
     bar_colors_t shieldbar = {SHIELDINTEGBAR_COLOR, SHIELDINTEGBAR_BORDER, SHIELDINTEGBAR_BG};
     gfx_RLETSprite(tactical_display, viewer_x, viewer_y - 3);
     gfx_PrintStringXY(tact_title, viewer_x + 26, viewer_y - 1);
-    window_data_t win = {viewer_x + 90, vWidth - viewer_x - 100, viewer_y + 14, vHeight};
+    window_data_t win = {viewer_x + 90, vWidth - viewer_x - 100, viewer_y + 4, vHeight-4};
     LCARS_RenderModuleList(systems, syscount, mTactical, &win, selected);
     for(i = 0; i < syscount; i++){
         module_t* module = &systems[i];

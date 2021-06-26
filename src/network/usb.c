@@ -42,16 +42,10 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 }
 
 bool usb_read_to_size(size_t size) {
-    if(net_buf_size > size) {
-        // todo: this should probably disconnect you
-        dbg_sprintf(dbgerr, "Network buffer in invalid state\n");
-        return true;
-    }
-    if(net_buf_size + srl_Available(&srl) >= size) {
-        srl_Read(&srl, &net_buf[net_buf_size], size - net_buf_size);
-        return true;
-    }
-    return false;
+    static bytes_read = 0;
+    bytes_read += srl_Read(&srl, &net_buf[bytes_read], size - bytes_read);
+    if(bytes_read >= size) {bytes_read = 0; return true;}
+    else return false;
 }
 
 void usb_write(void *buf, size_t size) {

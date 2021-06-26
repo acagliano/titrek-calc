@@ -9,6 +9,7 @@ enum ControlCodes {
     REGISTER,
     LOGIN,
     VERSION_CHECK,
+    WELCOME,
     // This is for the client not up to date response , See response codes. VERSION_* must be the second byte of packet
        
     // GAMEPLAY
