@@ -218,7 +218,9 @@ bool gui_Login(uint8_t* key) {
     uint8_t iv[AES_BLOCKSIZE];
     uint8_t ppt[PPT_LEN];
     uint8_t ct[PPT_LEN];
+    static bool rng_initialized = false;
     
+    if(!rng_initialized) hashlib_CSPRNGInit();
     hashlib_AESLoadKey(key, &ctx, 256);         // load secret key
     hashlib_RandomBytes(iv, AES_BLOCKSIZE);     // get IV
     
@@ -232,8 +234,12 @@ bool gui_Login(uint8_t* key) {
         PS_PTR(iv, AES_BLOCKSIZE),
         PS_PTR(ct, PPT_LEN)
     );
-    free(ppt);
-    free(ct);
+    
+    // Zero out key schedule, key used, and IV
+    hashlib_EraseContext(&ctx, sizeof(aes_ctx));
+    hashlib_EraseContext(key, 32);
+    hashlib_EraseContext(iv, AES_BLOCKSIZE);
+
 }
 
 bool gui_NewGame(void) {
