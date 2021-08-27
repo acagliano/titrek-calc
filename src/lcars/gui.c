@@ -52,7 +52,7 @@ void stats_DrawHealthBar(uint24_t health, uint24_t length, uint24_t x, uint8_t y
     gfx_SetColor(255);
 }
 
-stats_RenderPowerIndic(bool warn, uint24_t x, uint8_t y){
+void stats_RenderPowerIndic(bool warn, uint24_t x, uint8_t y){
     gfx_rletsprite_t* img = (warn) ? icon_power_warn : icon_power_ok;
     gfx_RLETSprite(img, x, y+2);
 }
@@ -218,14 +218,12 @@ bool gui_Login(uint8_t* key) {
     uint8_t iv[AES_BLOCKSIZE];
     uint8_t ppt[PPT_LEN];
     uint8_t ct[PPT_LEN];
-    static bool rng_initialized = false;
     
-    if(!rng_initialized) hashlib_CSPRNGInit();
     hashlib_AESLoadKey(key, &ctx, 256);         // load secret key
     hashlib_RandomBytes(iv, AES_BLOCKSIZE);     // get IV
     
     // Pad plaintext
-    hashlib_PadInputPlaintext(&settings.login_key, LOGIN_TOKEN_SIZE, ppt, ALG_AES, SCHM_DEFAULT);
+    hashlib_AESPadMessage(&settings.login_key, LOGIN_TOKEN_SIZE, ppt, SCHM_DEFAULT);
     
     // Encrypt the login token with AES-256
     hashlib_AESEncrypt(ppt, PPT_LEN, ct, &ctx, iv);
@@ -236,10 +234,6 @@ bool gui_Login(uint8_t* key) {
     );
     
     // Zero out key schedule, key used, and IV
-    hashlib_EraseContext(&ctx, sizeof(aes_ctx));
-    hashlib_EraseContext(key, 32);
-    hashlib_EraseContext(iv, AES_BLOCKSIZE);
-
 }
 
 bool gui_NewGame(void) {

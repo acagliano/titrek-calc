@@ -36,7 +36,7 @@ enum SettingOpt {
     NTWK_TIMEOUT,
     LOG_TIME
 };
-
+#define NUM_SETTINGS (LOG_TIME+1)
 bool check_import_login_key(void);
 
 #endif

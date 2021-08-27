@@ -17,6 +17,7 @@ L ?= graphx fileioc keypadc srldrvce usbdrvce
 
 OPT_MODE     ?= -Oz
 EXTRA_CFLAGS ?= -Wall -Wextra
+HAS_PRINTF := NO
 
 # ----------------------------
 # Debug Options

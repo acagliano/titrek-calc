@@ -121,13 +121,13 @@ void MainMenu(void) {
             sk_key_t key;
             do {
                 key = getKey();
-                if(key == sk_Down) sel = sel + (sel < (num_settings-1));
+                if(key == sk_Down) sel = sel + (sel < (NUM_SETTINGS-1));
                 if(key == sk_Up) sel = sel - (sel > 0);
                 if(key == sk_Left) gfx_AlterSettingOpt(sel, -1);
                 if(key == sk_Right) gfx_AlterSettingOpt(sel, 1);
                 if(key || firstrender){
                     gfx_ZeroScreen();
-                    for(i = 0; i < num_settings; i++)
+                    for(i = 0; i < NUM_SETTINGS; i++)
                         gfx_RenderSettingOpt(i, sel, start_x, i * 16 + start_y);
                     gfx_BlitBuffer();
                     firstrender = false;
@@ -314,7 +314,6 @@ uint8_t PlayGame(void){
     sk_key_t key = 0;
     uint24_t wait = 5000;
     full_redraw = true;
-    bool enable_ssl = false;
     if(gameflags.gfx_error) return GFX;
     if(!netflags.network_up) return NTWK;
     ntwk_inactive_disconnect = settings.limits.network_timeout * 11 / 10;
@@ -327,7 +326,7 @@ uint8_t PlayGame(void){
         return GFX;
     }
     gfx_InitModuleIcons();
-    ntwk_send(CONNECT, PS_VAL(enable_ssl), PS_STR(settings.servers[bridge_config.server]));
+    ntwk_send(CONNECT, PS_STR(settings.servers[bridge_config.server]));
     gfx_PrintStringXY("Waiting for bridge...", 20, 190);
     gfx_PrintStringXY("[Clear] to stop", 20, 200);
     gfx_BlitBuffer();

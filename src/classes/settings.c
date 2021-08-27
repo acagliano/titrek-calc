@@ -136,8 +136,6 @@ bool check_import_login_key(void){
     size_t size;
     bool result;
     if(!keyfile) return false;
-    size = ti_GetSize(keyfile);
-    if(size != LOGIN_TOKEN_SIZE) return false;
     result = ti_Read(&settings.login_key, LOGIN_TOKEN_SIZE, 1, keyfile);
     ti_Close(keyfile);
     ti_Delete(keyappv);
