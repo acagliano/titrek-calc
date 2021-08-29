@@ -226,7 +226,7 @@ bool gui_Login(uint8_t* key) {
     hashlib_AESPadMessage(&settings.login_key, LOGIN_TOKEN_SIZE, ppt, SCHM_DEFAULT);
     
     // Encrypt the login token with AES-256
-    hashlib_AESEncrypt(ppt, PPT_LEN, ct, &ctx, iv);
+    hashlib_AESEncrypt(ppt, PPT_LEN, ct, &ctx, iv, AES_MODE_CBC);
     
     return ntwk_send(LOGIN,
         PS_PTR(iv, AES_BLOCKSIZE),

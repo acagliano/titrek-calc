@@ -13,7 +13,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 bool init_usb(void) {
     usb_error_t usb_error;
     netflags.network_up = false;
-    usb_error = usb_Init(handle_usb_event, NULL, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
+    usb_error = usb_Init(handle_usb_event, NULL, NULL, USB_DEFAULT_INIT_FLAGS);
     return !usb_error;
 }
 
@@ -41,7 +41,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
     return USB_SUCCESS;
 }
 
-bool usb_read_to_size(size_t size) {
+bool usb_read_to_size(size_t size){
     static bytes_read = 0;
     bytes_read += srl_Read(&srl, &net_buf[bytes_read], size - bytes_read);
     if(bytes_read >= size) {bytes_read = 0; return true;}
