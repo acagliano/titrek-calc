@@ -29,9 +29,10 @@ enum ControlCodes {
        
     // GFX Streaming: 90 - 99
     GFX_REQ_UPDATE = 90,
-    GFX_FRAME_IN,                   // 91
-    GFX_FRAME_NEXT,                 // 92
-    GFX_FRAME_DONE,                 // 93
+    GFX_FRAME_START,                // 91
+    GFX_FRAME_IN,                   // 92
+    GFX_FRAME_NEXT,                 // 93
+    GFX_FRAME_DONE,                 // 94
     
     PRGMUPDATE = 90,
     GFXUPDATE,

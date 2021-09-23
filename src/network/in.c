@@ -21,6 +21,8 @@ extern const char *MAIN_PROGRAM;
 extern ti_var_t update_fp = 0;
 ti_var_t gfx_fp;
 extern uint8_t *gfx_appv_name = "TrekGFX";
+size_t gfx_dl_size;
+size_t gfx_bytes_written = 0;
 sha256_ctx gfx_hash;
 uint32_t mbuffer[64];
 
@@ -145,29 +147,35 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             memcpy(&engine_ref.engine[0], data, sizeof(engine_ref_t)-1);
             engine_ref.loaded = true;
             break;
-        case GFX_FRAME_IN:                   // 91
+        case GFX_FRAME_START:               // 91
+            gfx_fp = ti_Open(gfx_appv_name, "w");
+            hashlib_Sha256Init(&gfx_hash, mbuffer);
+            memcpy(&gfx_dl_size, data, sizeof(size_t));
+            ntwk_send_nodata(GFX_FRAME_NEXT);
+            break;
+        case GFX_FRAME_IN:                   // 92
         {
-            if(!gfx_fp) {
-                if(!(gfx_fp = ti_Open(gfx_appv_name, "w"))) return;
-                hashlib_Sha256Init(&gfx_hash, mbuffer);
-            }
-            ti_Write(data, buff_size-1, 1, gfx_fp);
+            char msg[LOG_LINE_SIZE] = {0};
+            if(ti_Write(data, buff_size-1, 1, gfx_fp))
+                gfx_bytes_written += buff_size-1;
             hashlib_Sha256Update(&gfx_hash, data, buff_size-1);
-            ntwk_send_nodata(GFX_FRAME_NEXT);       // 92
+            sprintf(msg, "Gfx download :%u\%", (100*gfx_bytes_written/gfx_dl_size));
+            gui_SetLog(LOG_INFO, msg);
+            ntwk_send_nodata(GFX_FRAME_NEXT);       // 93
             break;
         }
-        case GFX_FRAME_DONE,        // 93
+        case GFX_FRAME_DONE,        // 94
             if(gfx_fp){
                 uint8_t digest[SHA256_DIGEST_LEN];
                 hashlib_Sha256Final(&gfx_hash, digest);
                 if(hashlib_CompareDigest(digest, data, SHA256_DIGEST_LEN)){
                     ti_SetArchiveStatus(true, gfx_fp);
                     ti_Close(gfx_fp);
-                    gui_SetLog(LOG_SERVER, "gfx downloaded");
+                    gui_SetLog(LOG_INFO, "download done");
                     gameflags.gfx_error = false;
                 }
                 else {
-                    gui_SetLog(LOG_ERROR, "gfx download error");
+                    gui_SetLog(LOG_ERROR, "download failed");
                     gameflags.gfx_error = true;
                     ti_Close(gfx_fp);
                     ti_Delete(gfx_appv_name);
