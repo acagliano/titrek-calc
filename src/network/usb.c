@@ -5,6 +5,7 @@
 #include "network.h"
 
 srl_device_t srl;
+usb_device_t device;
 uint8_t srl_buf[8192];
 
 static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
@@ -24,8 +25,7 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
     if((event == USB_DEVICE_CONNECTED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE)) || event == USB_HOST_CONFIGURE_EVENT) {
         usb_device_t device = event_data;
         char dummy;
-        srl_error_t srl_error = srl_Init(&srl, device, srl_buf, sizeof(srl_buf), SRL_INTERFACE_ANY);
-        if(!srl_error) srl_SetRate(&srl, 115200);
+        srl_error_t srl_error = srl_Open(&srl, device, srl_buf, sizeof(srl_buf), SRL_INTERFACE_ANY, 115200);
         if(!srl_error) srl_Read(&srl, &dummy, 1);
         if(!srl_error) {
             netflags.network_up = true;

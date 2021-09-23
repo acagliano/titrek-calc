@@ -1,29 +1,20 @@
 # ----------------------------
-# Program Options
+# Makefile Options
 # ----------------------------
 
-NAME         ?= TITREK
-ICON         ?= icon.png
-DESCRIPTION  ?= "TI-Trek Multiplayer"
-MAIN_ARGS    ?= NO
-COMPRESSED   ?= NO
-ARCHIVED     ?= NO
+NAME = TITREK
+ICON = icon.png
+DESCRIPTION = "TI-Trek Multiplayer"
+COMPRESSED = NO
+ARCHIVED = NO
 
-L ?= graphx fileioc keypadc srldrvce usbdrvce
-
-# ----------------------------
-# Compile Options
-# ----------------------------
-
-OPT_MODE     ?= -Oz
-EXTRA_CFLAGS ?= -Wall -Wextra
-HAS_PRINTF := NO
+CFLAGS = -Wall -Wextra -Oz
+CXXFLAGS = -Wall -Wextra -Oz
 
 # ----------------------------
-# Debug Options
-# ----------------------------
 
-OUTPUT_MAP   ?= NO
+ifndef CEDEV
+$(error CEDEV environment path variable is not set)
+endif
 
 include $(CEDEV)/meta/makefile.mk
-

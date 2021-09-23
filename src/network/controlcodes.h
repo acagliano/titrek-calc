@@ -4,30 +4,35 @@
 enum ControlCodes {
     // CONNECTION/ADMIN
     // 0 - 9
-    CONNECT,
-    DISCONNECT,
-    REGISTER,
-    LOGIN,
-    VERSION_CHECK,
-    WELCOME,
+    CONNECT,            // 0
+    DISCONNECT,         // 1
+    REGISTER,           // 2
+    LOGIN,              // 3
+    VERSION_CHECK,      // 4
+    WELCOME,            // 5
     // This is for the client not up to date response , See response codes. VERSION_* must be the second byte of packet
        
     // GAMEPLAY
     // Map Interfacing: 10 - 19
     FRAMEDATA_REQUEST = 10,
-    SENSOR_DATA_REQUEST,     // May add REQPOSITION if needed
-    PLAYER_MOVE,
-    POSITION_REQUEST,
+    SENSOR_DATA_REQUEST,        // 11
+    PLAYER_MOVE,                // 12
+    POSITION_REQUEST,           // 13
        
     // Ship Interfacing: 20 - 29
     LOAD_SHIP = 20,
-    MODULE_INFO_REQUEST,
-    MODULE_STATE_CHANGE,
-    NEW_GAME_REQUEST,
-    GET_ENGINE_MAXIMUMS,
-    ENGINE_SETSPEED,
+    MODULE_INFO_REQUEST,            // 21
+    MODULE_STATE_CHANGE,            // 22
+    NEW_GAME_REQUEST,               // 23
+    GET_ENGINE_MAXIMUMS,            // 24
+    ENGINE_SETSPEED,                // 25
        
-    // File Streaming: 90 - 91
+    // GFX Streaming: 90 - 99
+    GFX_REQ_UPDATE = 90,
+    GFX_FRAME_IN,                   // 91
+    GFX_FRAME_NEXT,                 // 92
+    GFX_FRAME_DONE,                 // 93
+    
     PRGMUPDATE = 90,
     GFXUPDATE,
     CACHE_SPRITE,

@@ -45,7 +45,7 @@ extern uint16_t screen;
 extern selected_t select;
 
 int num_GetLength(int number);
-void Screen_RenderUI(void);
+void Screen_RenderUI(bool gfx_loaded);
 //void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selected);
 //void Screen_UITacticalStats(hull_t hull, module_t* systems, uint24_t syscount, uint24_t selected);
 //void LCARS_RenderModuleList(module_t* systems, uint24_t syscount, uint8_t class, window_data_t* w, uint24_t selected);

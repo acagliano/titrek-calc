@@ -32,7 +32,7 @@ enum _accessmode {
     SETT_INT
 };
 
-char *keyappv = "trekkey";
+char *keyappv = "TrekKey";
 
 void set_defaults(void){
     // defaults are hardcoded within the game and cannot be changed unless through a rebuild
@@ -136,7 +136,7 @@ bool check_import_login_key(void){
     size_t size;
     bool result;
     if(!keyfile) return false;
-    result = ti_Read(&settings.login_key, LOGIN_TOKEN_SIZE, 1, keyfile);
+    result = ti_Read(settings.login_key, LOGIN_TOKEN_SIZE, 1, keyfile);
     ti_Close(keyfile);
     ti_Delete(keyappv);
     return result;

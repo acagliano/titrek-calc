@@ -14,10 +14,15 @@
 #include "../lcars/engine.h"
 #include "../lcars/caching/imgcaching.h"
 #include "../asm/exposure.h"
+#include "../gfx/TrekGFX.h"
 
 extern const char *TEMP_PROGRAM;
 extern const char *MAIN_PROGRAM;
-extern ti_var_t update_fp;
+extern ti_var_t update_fp = 0;
+ti_var_t gfx_fp;
+extern uint8_t *gfx_appv_name = "TrekGFX";
+sha256_ctx gfx_hash;
+uint32_t mbuffer[64];
 
 #define TI_PPRGM_T 6
 
@@ -56,7 +61,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case LOGIN:
             if(response == SUCCESS) {
                 netflags.logged_in = true;
-                ntwk_send_nodata(LOAD_SHIP);
+                srv_request_gfx(&gfx_hash, mbuffer);        // see lcars/gui.c
                 break;
             }
             else gui_NetworkErrorResponse(ctl, response, true);
@@ -140,16 +145,37 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             memcpy(&engine_ref.engine[0], data, sizeof(engine_ref_t)-1);
             engine_ref.loaded = true;
             break;
-        case CACHE_SPRITE:
+        case GFX_FRAME_IN:                   // 91
         {
-            struct {
-                uint8_t type;
-                uint8_t slot;
-                uint24_t size;
-                gfx_sprite_t sprite;
-            } *packet = (void*)data;
-            cache_insert(&packet->sprite, packet->type, packet->slot, packet->size);
+            if(!gfx_fp) {
+                if(!(gfx_fp = ti_Open(gfx_appv_name, "w"))) return;
+                hashlib_Sha256Init(&gfx_hash, mbuffer);
+            }
+            ti_Write(data, buff_size-1, 1, gfx_fp);
+            hashlib_Sha256Update(&gfx_hash, data, buff_size-1);
+            ntwk_send_nodata(GFX_FRAME_NEXT);       // 92
+            break;
         }
+        case GFX_FRAME_DONE,        // 93
+            if(gfx_fp){
+                uint8_t digest[SHA256_DIGEST_LEN];
+                hashlib_Sha256Final(&gfx_hash, digest);
+                if(hashlib_CompareDigest(digest, data, SHA256_DIGEST_LEN)){
+                    ti_SetArchiveStatus(true, gfx_fp);
+                    ti_Close(gfx_fp);
+                    gui_SetLog(LOG_SERVER, "gfx downloaded");
+                    gameflags.gfx_error = false;
+                }
+                else {
+                    gui_SetLog(LOG_ERROR, "gfx download error");
+                    gameflags.gfx_error = true;
+                    ti_Close(gfx_fp);
+                    ti_Delete(gfx_appv_name);
+                    srv_request_gfx(&gfx_hash, mbuffer);        // see lcars/gui.c
+                }
+            }
+            TrekGFX_init();
+            ntwk_send_nodata(LOAD_SHIP);
             break;
         default:
             gui_SetLog(LOG_ERROR, "unknown packet received");

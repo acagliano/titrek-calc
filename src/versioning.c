@@ -26,17 +26,19 @@ uint8_t gfx_getCustomPackCount(void){
     void *base;
     if(!(appvar = ti_Open("TrekGFX", "r"))) return 0;
     table = base = (char*)ti_GetDataPtr(appvar) + TrekGFX_HEADER_SIZE;
+    ti_Close(appvar);
     return *table;
 }
 
 void gfx_VersionCheck(void){
+	gfx_GetVersion();
     if((gfx_version[0] == 0xff) && (gfx_version[1] == 0xff)) {
         gameflags.gfx_custom = true;
         if(gfx_getCustomPackCount() == TrekGFX_entries_num) return;
         gameflags.gfx_error = true;
         return;
     }
-    if((gfx_version[0] == gfx_reqd[0]) && (gfx_version[1] == gfx_reqd[1]))
+    if((gfx_version[0] >= gfx_reqd[0]) && (gfx_version[1] >= gfx_reqd[1]))
         return;
     gameflags.gfx_error = true;
 }

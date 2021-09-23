@@ -31,7 +31,7 @@ unsigned char TrekGFX_init(void)
         TrekGFX_appvar[i] = (void*)(*++table + (unsigned int)base);
     }
 
-    ti_CloseAll();
+    ti_Close(appvar);
 
     return 1;
 }

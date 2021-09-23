@@ -9,10 +9,10 @@
 
 #define MODICONS 14     // define first module icon
 
+extern uint8_t *gfx_appv_name;
 
 
 extern gfx_rletsprite_t* err_icon;
-
 
 
 extern uint24_t ntwk_inactive_clock;

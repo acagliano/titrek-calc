@@ -85,6 +85,8 @@ particles_t particles[MAX_PARTICLES] = {0};
 engine_ref_t engine_ref = {0};
 uint8_t playgame_return = 0;
 bool full_redraw = true;
+bool gfx_loaded = false;
+uint8_t errors = 0;
 
 ti_var_t update_fp = 0;
 
@@ -198,7 +200,6 @@ int main(void) {
     zx7_Decompress(log_server, log_server_compressed);
     if(!ntwk_init()) goto error;
     
-    gfx_GetVersion();
     gfx_VersionCheck();
     
     gfx_SetDefaultPalette(gfx_8bpp);
@@ -321,10 +322,6 @@ uint8_t PlayGame(void){
     netflags.bridge_error = false;
     gameflags.exit = false;
     netflags.bridge_up = false;
-    if(!TrekGFX_init()) {
-        dbg_sprintf(dbgout, "Failed to init graphics\n");
-        return GFX;
-    }
     gfx_InitModuleIcons();
     ntwk_send(CONNECT, PS_STR(settings.servers[bridge_config.server]));
     gfx_PrintStringXY("Waiting for bridge...", 20, 190);

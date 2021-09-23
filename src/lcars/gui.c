@@ -219,11 +219,11 @@ bool gui_Login(uint8_t* key) {
     uint8_t ppt[PPT_LEN];
     uint8_t ct[PPT_LEN];
     
-    hashlib_AESLoadKey(key, &ctx, 256);         // load secret key
+    hashlib_AESLoadKey(key, &ctx, 32);         // load secret key
     hashlib_RandomBytes(iv, AES_BLOCKSIZE);     // get IV
     
     // Pad plaintext
-    hashlib_AESPadMessage(&settings.login_key, LOGIN_TOKEN_SIZE, ppt, SCHM_DEFAULT);
+    hashlib_AESPadMessage(settings.login_key, LOGIN_TOKEN_SIZE, ppt, SCHM_DEFAULT);
     
     // Encrypt the login token with AES-256
     hashlib_AESEncrypt(ppt, PPT_LEN, ct, &ctx, iv, AES_MODE_CBC);
@@ -238,4 +238,17 @@ bool gui_Login(uint8_t* key) {
 
 bool gui_NewGame(void) {
     return ntwk_send_nodata(NEW_GAME_REQUEST);
+}
+
+void srv_request_gfx(sha256_ctx *ctx, uint8_t *mbuffer){
+    ti_var_t f;
+    uint8_t digest[SHA256_DIGEST_LEN];
+    hashlib_Sha256Init(ctx, mbuffer);
+    if((f = ti_Open(gfx_appv_name, "r"))){
+        hashlib_Sha256Update(ctx, ti_GetDataPtr(f), ti_GetSize(f));
+        ti_Close(f);
+    }
+    hashlib_Sha256Final(ctx, digest);
+    ntwk_send(GFX_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_LEN));
+    hashlib_Sha256Init(ctx, mbuffer);
 }
