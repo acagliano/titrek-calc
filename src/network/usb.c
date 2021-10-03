@@ -1,4 +1,5 @@
 #include <tice.h>
+#include <keypadc.h>
 #include <usbdrvce.h>
 #include <srldrvce.h>
 #include <debug.h>
@@ -15,13 +16,13 @@ static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
 bool init_usb(void) {
     usb_error_t usb_error;
     srl_error_t srl_error;
-    size_t usb_timeout = 500000;
+    sk_key_t key = 0;
     netflags.network_up = false;
     usb_error = usb_Init(handle_usb_event, NULL, srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS);
     do {
         usb_HandleEvents();
-        usb_timeout--;
-    } while((!device) && usb_timeout);
+        key = os_GetCSC();
+    } while((!device) && (key!= sk_Clear));
     if(!device) {
         printf("no device");
         os_GetKey();
