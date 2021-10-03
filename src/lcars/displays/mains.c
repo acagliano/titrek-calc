@@ -1,10 +1,12 @@
 #include <stdint.h>
 #include <graphx.h>
+#include <string.h>
 #include "../../gfx/TrekGFX.h"
 #include "../screens.h"
 #include "../../classes/ships.h"
 
 char mains_title[] = "[MAIN]";
+#define CEMU_CONSOLE ((char*)0xFB0000)
 
 void Screen_UISystemStats(module_t* systems, uint24_t syscount, uint24_t selected){
     gfx_RLETSprite(mains_display, viewer_x, viewer_y - 3);

@@ -40,7 +40,6 @@
 #include "lcars/screens.h"
 #include "lcars/errors.h"
 #include "lcars/gui.h"
-#include "lcars/caching/imgcaching.h"
 #include "lcars/effects/particles.h"
 #include "lcars/keybinds/keyfuncs.h"
 

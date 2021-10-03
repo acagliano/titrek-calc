@@ -6,6 +6,8 @@
 #include "../colors.h"
 #include "../../flags.h"
 
+#define CEMU_CONSOLE ((char*)0xFB0000)
+
 char moduledb[][12] = {
     "LifeSup",
     "Core",

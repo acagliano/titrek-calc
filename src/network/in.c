@@ -14,7 +14,6 @@
 #include "../lcars/errors.h"
 #include "../lcars/gui.h"
 #include "../lcars/engine.h"
-#include "../lcars/caching/imgcaching.h"
 #include "../asm/exposure.h"
 #include "../gfx/TrekGFX.h"
 
@@ -190,6 +189,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             gameflags.gfx_loaded = TrekGFX_init();
             if(gameflags.gfx_loaded){
                 gui_SetLog(LOG_INFO, "gfx init success");
+                gfx_InitModuleIcons();
                 ntwk_send_nodata(LOAD_SHIP);
             }
             break;
