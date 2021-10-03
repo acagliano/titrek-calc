@@ -199,7 +199,6 @@ int main(void) {
     zx7_Decompress(log_server, log_server_compressed);
     if(!ntwk_init()) goto error;
     
-    gfx_VersionCheck();
     
     gfx_SetDefaultPalette(gfx_8bpp);
     gfx_SetDrawBuffer();

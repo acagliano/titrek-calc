@@ -190,6 +190,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             if(gameflags.gfx_loaded){
                 gui_SetLog(LOG_INFO, "gfx init success");
                 gfx_InitModuleIcons();
+                gfx_VersionCheck();
                 ntwk_send_nodata(LOAD_SHIP);
             }
             break;
