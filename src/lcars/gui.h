@@ -1,6 +1,7 @@
 #ifndef gui_h
 #define gui_h
 
+#include <hashlib.h>
 #include "colors.h"
 #define gfx_RectangleColor(color, x1, y1, w, h) \
     gfx_SetColor((color)); \
@@ -38,5 +39,7 @@ void gfx_RenderMenuTitle(const char* title, uint24_t x, uint8_t y);
 #define gfx_RenderVersion(x, y) gfx_RenderMenuTitle((versionstr), (x), (y))
 
 uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y, uint8_t flags);
+
+void srv_request_gfx(sha256_ctx *ctx, uint8_t *mbuffer);
 
 #endif

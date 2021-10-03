@@ -4,6 +4,7 @@
 #include "../screens.h"
 #include "../gui.h"
 #include "../colors.h"
+#include "../../flags.h"
 
 char moduledb[][12] = {
     "LifeSup",
@@ -74,8 +75,8 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y, uint24_t widt
     }
 }
 
-void Screen_RenderUI(bool gfx_loaded){
-    if(!gfx_loaded) return 0;
+void Screen_RenderUI(void){
+    if(!gameflags.gfx_loaded) return;
     if(full_redraw){
         Screen_ZeroAll();
         gfx_RLETSprite(shipinterior_left, 0, 0);

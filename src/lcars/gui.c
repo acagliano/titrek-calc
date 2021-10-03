@@ -242,13 +242,13 @@ bool gui_NewGame(void) {
 
 void srv_request_gfx(sha256_ctx *ctx, uint8_t *mbuffer){
     ti_var_t f;
-    uint8_t digest[SHA256_DIGEST_LEN];
+    uint8_t digest[SHA256_DIGEST_SIZE];
     hashlib_Sha256Init(ctx, mbuffer);
     if((f = ti_Open(gfx_appv_name, "r"))){
         hashlib_Sha256Update(ctx, ti_GetDataPtr(f), ti_GetSize(f));
         ti_Close(f);
     }
     hashlib_Sha256Final(ctx, digest);
-    ntwk_send(GFX_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_LEN));
+    ntwk_send(GFX_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_SIZE));
     hashlib_Sha256Init(ctx, mbuffer);
 }

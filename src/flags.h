@@ -4,6 +4,7 @@
 typedef struct {
     bool exit;
     bool loopgame;
+    bool gfx_loaded;
     bool gfx_error;
     bool gfx_custom;
     bool version_err;

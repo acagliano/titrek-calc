@@ -1,6 +1,8 @@
 #include <keypadc.h>
 #include <fileioc.h>
 #include <stdbool.h>
+#include <hashlib.h>
+#include <compression.h>
 #include "../equates.h"
 #include "../flags.h"
 #include "../versioning.h"
@@ -19,7 +21,7 @@
 extern const char *TEMP_PROGRAM;
 extern const char *MAIN_PROGRAM;
 extern ti_var_t update_fp = 0;
-ti_var_t gfx_fp;
+ti_var_t gfx_fp = 0;
 extern uint8_t *gfx_appv_name = "TrekGFX";
 size_t gfx_dl_size;
 size_t gfx_bytes_written = 0;
@@ -148,31 +150,32 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             engine_ref.loaded = true;
             break;
         case GFX_FRAME_START:               // 91
-            gfx_fp = ti_Open(gfx_appv_name, "w");
             hashlib_Sha256Init(&gfx_hash, mbuffer);
             memcpy(&gfx_dl_size, data, sizeof(size_t));
             ntwk_send_nodata(GFX_FRAME_NEXT);
+            gfx_bytes_written = 0;
             break;
         case GFX_FRAME_IN:                   // 92
         {
             char msg[LOG_LINE_SIZE] = {0};
+            if(!gfx_fp) {if(!(gfx_fp = ti_Open(gfx_appv_name, "w"))) break;}
             if(ti_Write(data, buff_size-1, 1, gfx_fp))
                 gfx_bytes_written += buff_size-1;
             hashlib_Sha256Update(&gfx_hash, data, buff_size-1);
-            sprintf(msg, "Gfx download :%u\%", (100*gfx_bytes_written/gfx_dl_size));
+            sprintf(msg, "Gfx download :%u%%", (100*gfx_bytes_written/gfx_dl_size));
             gui_SetLog(LOG_INFO, msg);
             ntwk_send_nodata(GFX_FRAME_NEXT);       // 93
             break;
         }
-        case GFX_FRAME_DONE,        // 94
+        case GFX_FRAME_DONE:        // 94
             if(gfx_fp){
-                uint8_t digest[SHA256_DIGEST_LEN];
+                uint8_t digest[SHA256_DIGEST_SIZE];
                 hashlib_Sha256Final(&gfx_hash, digest);
-                if(hashlib_CompareDigest(digest, data, SHA256_DIGEST_LEN)){
+                if(hashlib_CompareDigest(digest, data, SHA256_DIGEST_SIZE)){
                     ti_SetArchiveStatus(true, gfx_fp);
-                    ti_Close(gfx_fp);
                     gui_SetLog(LOG_INFO, "download done");
                     gameflags.gfx_error = false;
+                    ti_Close(gfx_fp);
                 }
                 else {
                     gui_SetLog(LOG_ERROR, "download failed");
@@ -180,10 +183,15 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                     ti_Close(gfx_fp);
                     ti_Delete(gfx_appv_name);
                     srv_request_gfx(&gfx_hash, mbuffer);        // see lcars/gui.c
+                    break;
                 }
             }
-            TrekGFX_init();
-            ntwk_send_nodata(LOAD_SHIP);
+        case GFX_SKIP:
+            gameflags.gfx_loaded = TrekGFX_init();
+            if(gameflags.gfx_loaded){
+                gui_SetLog(LOG_INFO, "gfx init success");
+                ntwk_send_nodata(LOAD_SHIP);
+            }
             break;
         default:
             gui_SetLog(LOG_ERROR, "unknown packet received");
