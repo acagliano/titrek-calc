@@ -219,6 +219,7 @@ bool gui_Login(uint8_t* key) {
     uint8_t ppt[PPT_LEN];
     uint8_t ct[PPT_LEN];
     
+    gfx_TextClearBG("encrypting auth token...", 20, 190);
     hashlib_AESLoadKey(key, &ctx, 32);         // load secret key
     hashlib_RandomBytes(iv, AES_BLOCKSIZE);     // get IV
     
@@ -227,7 +228,7 @@ bool gui_Login(uint8_t* key) {
     
     // Encrypt the login token with AES-256
     hashlib_AESEncrypt(ppt, PPT_LEN, ct, &ctx, iv, AES_MODE_CBC);
-    
+    gfx_TextClearBG("logging you in...", 20, 190);
     return ntwk_send(LOGIN,
         PS_PTR(iv, AES_BLOCKSIZE),
         PS_PTR(ct, PPT_LEN)
@@ -243,12 +244,28 @@ bool gui_NewGame(void) {
 void srv_request_gfx(sha256_ctx *ctx, uint8_t *mbuffer){
     ti_var_t f;
     uint8_t digest[SHA256_DIGEST_SIZE];
+    gfx_TextClearBG("Hashing gfx for version...", 20, 190);
     hashlib_Sha256Init(ctx, mbuffer);
     if((f = ti_Open(gfx_appv_name, "r"))){
         hashlib_Sha256Update(ctx, ti_GetDataPtr(f), ti_GetSize(f));
         ti_Close(f);
     }
     hashlib_Sha256Final(ctx, digest);
+    gfx_TextClearBG("Comparing version w/ server...", 20, 190);
     ntwk_send(GFX_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_SIZE));
+}
+
+void srv_request_client(sha256_ctx *ctx, uint8_t *mbuffer){
+    ti_var_t f;
+    uint8_t digest[SHA256_DIGEST_SIZE];
+    gfx_TextClearBG("", 20, 200);
+    gfx_TextClearBG("Hashing client for version...", 20, 190);
     hashlib_Sha256Init(ctx, mbuffer);
+    if((f = ti_OpenVar("TITREK", "r", TI_PPRGM_TYPE))){
+        hashlib_Sha256Update(ctx, ti_GetDataPtr(f), ti_GetSize(f));
+        ti_Close(f);
+    }
+    hashlib_Sha256Final(ctx, digest);
+    gfx_TextClearBG("Comparing version w/ server...", 20, 190);
+    ntwk_send(MAIN_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_SIZE));
 }

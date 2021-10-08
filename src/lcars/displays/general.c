@@ -5,6 +5,7 @@
 #include "../gui.h"
 #include "../colors.h"
 #include "../../flags.h"
+#include "../../network/network.h"
 
 #define CEMU_CONSOLE ((char*)0xFB0000)
 
@@ -79,6 +80,7 @@ void module_RenderGeneral(module_t* module, uint24_t x, uint8_t y, uint24_t widt
 
 void Screen_RenderUI(void){
     if(!gameflags.gfx_loaded) return;
+    if(!netflags.logged_in) return;
     if(full_redraw){
         Screen_ZeroAll();
         gfx_RLETSprite(shipinterior_left, 0, 0);

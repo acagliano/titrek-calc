@@ -1,3 +1,4 @@
+#include <tice.h>
 #include <keypadc.h>
 #include <fileioc.h>
 #include <stdbool.h>
@@ -16,15 +17,15 @@
 #include "../lcars/engine.h"
 #include "../asm/exposure.h"
 #include "../gfx/TrekGFX.h"
+#include "../lcars/text.h"
 
 extern const char *TEMP_PROGRAM;
 extern const char *MAIN_PROGRAM;
-extern ti_var_t update_fp = 0;
-ti_var_t gfx_fp = 0;
+ti_var_t gfx_fp = 0, client_fp = 0;
 extern uint8_t *gfx_appv_name = "TrekGFX";
-size_t gfx_dl_size;
-size_t gfx_bytes_written = 0;
-sha256_ctx gfx_hash;
+size_t gfx_dl_size, client_dl_size;
+size_t gfx_bytes_written = 0, client_bytes_written = 0;
+sha256_ctx gfx_hash, client_hash;
 uint32_t mbuffer[64];
 
 #define TI_PPRGM_T 6
@@ -40,26 +41,19 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     }
     
     switch(ctl){
-        case WELCOME:
+        case REQ_SECURE_SESSION:
             gui_Login(data);
             break;
         case CONNECT:
             netflags.bridge_up = true;
-            gui_SetLog(LOG_INFO, "bridge connect successful");
-            ntwk_send(VERSION_CHECK,
-                PS_ARR(version),
-                PS_ARR(gfx_version)
-                );
+            srv_request_client(&client_hash, mbuffer);
             break;
         case DISCONNECT:
+            netflags.logged_in = false;
             gameflags.exit = true;
             break;
         case BRIDGE_ERROR:
             netflags.bridge_error = true;
-            break;
-        case VERSION_CHECK:
-            if(response == VERSION_OK) netflags.client_version_ok = true;
-            else gameflags.version_err = true;
             break;
         case LOGIN:
             if(response == SUCCESS) {
@@ -87,18 +81,6 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             break;
         case MESSAGE:
             gui_SetLog(LOG_SERVER, data);
-            break;
-        case PRGMUPDATE:
-            if (!update_fp){
-                update_fp = ti_OpenVar(TEMP_PROGRAM,"w",TI_PPRGM_T);
-            }
-            if (buff_size<2){
-                ti_Close(update_fp);
-                ti_DeleteVar(MAIN_PROGRAM,TI_PPRGM_T);
-                ti_RenameVar(TEMP_PROGRAM,MAIN_PROGRAM,TI_PPRGM_T);
-                update_program();
-            }
-            ti_Write(data, buff_size-1, 1, update_fp);
             break;
         case LOAD_SHIP:
             {
@@ -161,8 +143,8 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             if(ti_Write(data, buff_size-1, 1, gfx_fp))
                 gfx_bytes_written += buff_size-1;
             hashlib_Sha256Update(&gfx_hash, data, buff_size-1);
-            sprintf(msg, "Gfx download :%u%%", (100*gfx_bytes_written/gfx_dl_size));
-            gui_SetLog(LOG_INFO, msg);
+            sprintf(msg, "Gfx download: %u%%", (100*gfx_bytes_written/gfx_dl_size));
+            gfx_TextClearBG(msg, 20, 190);
             ntwk_send_nodata(GFX_FRAME_NEXT);       // 93
             break;
         }
@@ -172,12 +154,11 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 hashlib_Sha256Final(&gfx_hash, digest);
                 if(hashlib_CompareDigest(digest, data, SHA256_DIGEST_SIZE)){
                     ti_SetArchiveStatus(true, gfx_fp);
-                    gui_SetLog(LOG_INFO, "download done");
                     gameflags.gfx_error = false;
                     ti_Close(gfx_fp);
                 }
                 else {
-                    gui_SetLog(LOG_ERROR, "download failed");
+                    gfx_ErrorClearBG("gfx download error", 20, 190);
                     gameflags.gfx_error = true;
                     ti_Close(gfx_fp);
                     ti_Delete(gfx_appv_name);
@@ -188,11 +169,48 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case GFX_SKIP:
             gameflags.gfx_loaded = TrekGFX_init();
             if(gameflags.gfx_loaded){
-                gui_SetLog(LOG_INFO, "gfx init success");
                 gfx_InitModuleIcons();
                 gfx_VersionCheck();
                 ntwk_send_nodata(LOAD_SHIP);
             }
+            break;
+        case MAIN_FRAME_START:               // 91
+            hashlib_Sha256Init(&client_hash, mbuffer);
+            memcpy(&client_dl_size, data, sizeof(size_t));
+            ntwk_send_nodata(MAIN_FRAME_NEXT);
+            client_bytes_written = 0;
+            break;
+        case MAIN_FRAME_IN:                   // 92
+        {
+            char msg[LOG_LINE_SIZE] = {0};
+            if(!client_fp) {if(!(client_fp = ti_OpenVar("TITREK", "w", TI_PPRGM_TYPE))) break;}
+            if(ti_Write(data, buff_size-1, 1, client_fp))
+                client_bytes_written += buff_size-1;
+            hashlib_Sha256Update(&client_hash, data, buff_size-1);
+            sprintf(msg, "Client download: %u%%", (100*client_bytes_written/client_dl_size));
+            gfx_TextClearBG(msg, 20, 190);
+            ntwk_send_nodata(MAIN_FRAME_NEXT);       // 93
+            break;
+        }
+        case MAIN_FRAME_DONE:        // 94
+            if(client_fp){
+                uint8_t digest[SHA256_DIGEST_SIZE];
+                hashlib_Sha256Final(&client_hash, digest);
+                if(hashlib_CompareDigest(digest, data, SHA256_DIGEST_SIZE)){
+                    ntwk_send_nodata(DISCONNECT);
+                    ti_Close(client_fp);
+                    os_RunPrgm("TITREK", NULL, 0, NULL);
+                }
+                else {
+                    gfx_ErrorClearBG("client download error", 20, 190);
+                    ti_Close(client_fp);
+                    srv_request_client(&client_hash, mbuffer);        // see lcars/gui.c
+                    break;
+                }
+            }
+        case MAIN_SKIP:
+            gfx_TextClearBG("initiating secure session...", 20, 190);
+            ntwk_send_nodata(REQ_SECURE_SESSION);
             break;
         default:
             gui_SetLog(LOG_ERROR, "unknown packet received");

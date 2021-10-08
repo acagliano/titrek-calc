@@ -79,3 +79,22 @@ void gfx_HighlightedText(const char* string, uint24_t x, uint8_t y, uint8_t text
     gfx_PrintStringXY(string, x + 8, y + 2);
     gfx_SetTextFGColor(oldcolor);
 }
+
+void gfx_TextClearBG(const char* string, uint24_t x, uint8_t y){
+    uint8_t old_gfx_color = gfx_SetColor(0);
+    gfx_FillRectangle(x, y, 320, 8);
+    gfx_PrintStringXY(string, x, y);
+    gfx_SetColor(old_gfx_color);
+    gfx_BlitRectangle(gfx_buffer, x, y, 320, 8);
+}
+
+void gfx_ErrorClearBG(const char* error, uint24_t x, uint8_t y){
+    uint8_t old_gfx_color = gfx_SetColor(0);
+    uint24_t width = gfx_GetStringWidth(error);
+    gfx_FillRectangle(x, y, 320, 8);
+    gfx_SetColor(224);
+    gfx_FillRectangle(x-5, y-1, width+10, 10);
+    gfx_PrintStringXY(error, x, y);
+    gfx_SetColor(old_gfx_color);
+    gfx_BlitRectangle(gfx_buffer, x-5, y-1, 320, 10);
+}

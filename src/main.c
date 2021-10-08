@@ -333,13 +333,7 @@ uint8_t PlayGame(void){
         if(netflags.bridge_error==true) return BRIDGE;
         if(!wait--) return TIMEOUT;
     }   while(1);
-    while(!netflags.client_version_ok){
-        key = getKey();
-        ntwk_process();
-        if(key==sk_Clear) return USER_RETURN;
-        if(gameflags.version_err) return VERSION;
-    }
-    wait = 5000;
+    gfx_TextClearBG("Waiting for server...", 20, 190);
     do {
         key = getKey();
         ntwk_process();
