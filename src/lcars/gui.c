@@ -21,6 +21,7 @@
 #include "text.h"
 #include <debug.h>
 
+#define SHA256_DIGEST_SIZE SHA256_DIGEST_LEN
 #define MODICON_START TrekGFX_moduleicons_lifesupport_index
 #define TrekGFX_HEADER_SIZE 2
 #define MENU_W 100

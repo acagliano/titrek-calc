@@ -19,6 +19,11 @@
 #include "../gfx/TrekGFX.h"
 #include "../lcars/text.h"
 
+#define TI_PPRGM_T 6
+#define RSA_PUBKEY_LEN 128
+#define AES_KEYLEN      32
+#define SHA256_DIGEST_SIZE SHA256_DIGEST_LEN
+
 extern const char *TEMP_PROGRAM;
 extern const char *MAIN_PROGRAM;
 ti_var_t gfx_fp = 0, client_fp = 0;
@@ -27,8 +32,9 @@ size_t gfx_dl_size, client_dl_size;
 size_t gfx_bytes_written = 0, client_bytes_written = 0;
 sha256_ctx gfx_hash, client_hash;
 uint32_t mbuffer[64];
+uint8_t aes_key[AES_KEYLEN] = {0};
 
-#define TI_PPRGM_T 6
+
 
 void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     uint8_t ctl = in_buff->control;
@@ -42,7 +48,25 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     
     switch(ctl){
         case REQ_SECURE_SESSION:
-            gui_Login(data);
+            {
+                uint8_t oaep_buf[RSA_PUBKEY_LEN] = {0};
+                uint8_t plaintext[RSA_PUBKEY_LEN];
+                uint8_t rsa_outbuf[RSA_PUBKEY_LEN] = {0};
+                uint8_t ciphertext[RSA_PUBKEY_LEN];
+                uint8_t pubkey[RSA_PUBKEY_LEN];
+                gfx_TextClearBG("generating AES key...", 20, 190);
+                hashlib_RandomBytes(aes_key, AES_KEYLEN);
+                hashlib_RSAEncodeOAEP(aes_key, AES_KEYLEN, oaep_buf, RSA_PUBKEY_LEN, NULL);
+                hashlib_ReverseEndianness(oaep_buf, plaintext, RSA_PUBKEY_LEN);
+                hashlib_ReverseEndianness(data, pubkey, RSA_PUBKEY_LEN);
+                gfx_TextClearBG("RSA-1024 encrypting...", 20, 190);
+                hashlib_RSAEncrypt(rsa_outbuf, plaintext, RSA_PUBKEY_LEN, pubkey, RSA_PUBKEY_LEN);
+                hashlib_ReverseEndianness(rsa_outbuf, ciphertext, RSA_PUBKEY_LEN);
+                ntwk_send(RSA_SEND_SESSION_KEY, PS_PTR(ciphertext, RSA_PUBKEY_LEN));
+                break;
+            }
+        case RSA_SEND_SESSION_KEY:
+            gui_Login(aes_key);
             break;
         case CONNECT:
             netflags.bridge_up = true;
