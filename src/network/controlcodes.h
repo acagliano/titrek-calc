@@ -27,6 +27,10 @@ enum ControlCodes {
     NEW_GAME_REQUEST,               // 23
     GET_ENGINE_MAXIMUMS,            // 24
     ENGINE_SETSPEED,                // 25
+    
+    // Map Streaming : 30 - 39
+    RENDER_FBUF_OBJ = 30,
+    RENDER_FBUF_DATA,
        
     // File Streaming
     GFX_REQ_UPDATE = 0xe0,

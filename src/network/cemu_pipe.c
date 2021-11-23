@@ -20,7 +20,7 @@ bool pipe_read_to_size(size_t size) {
     }
 
     if(net_buf_size > size) {
-        dbg_sprintf(dbgerr, "Pipe buffer in illegal state\n");
+        dbg_printf("Pipe buffer in illegal state\n");
     }
 
     if(net_buf_size == size) {

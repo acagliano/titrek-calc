@@ -35,6 +35,17 @@ uint32_t mbuffer[64];
 uint8_t aes_key[AES_KEYLEN] = {0};
 
 
+#define CEMU_CONSOLE ((char*)0xFB0000)
+void hexdump(uint8_t *addr, size_t len, uint8_t *label){
+    if(label) sprintf(CEMU_CONSOLE, "\n%s\n", label);
+    else sprintf(CEMU_CONSOLE, "\n");
+    for(size_t rem_len = len, ct=1; rem_len>0; rem_len--, addr++, ct++){
+        sprintf(CEMU_CONSOLE, "%02X ", *addr);
+        if(!(ct%AES_BLOCKSIZE)) sprintf(CEMU_CONSOLE, "\n");
+    }
+    sprintf(CEMU_CONSOLE, "\n");
+}
+
 
 void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     uint8_t ctl = in_buff->control;
@@ -49,20 +60,24 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     switch(ctl){
         case REQ_SECURE_SESSION:
             {
-                uint8_t oaep_buf[RSA_PUBKEY_LEN] = {0};
-                uint8_t plaintext[RSA_PUBKEY_LEN];
-                uint8_t rsa_outbuf[RSA_PUBKEY_LEN] = {0};
-                uint8_t ciphertext[RSA_PUBKEY_LEN];
-                uint8_t pubkey[RSA_PUBKEY_LEN];
+                struct {
+                    size_t kl;
+                    uint8_t k[1];
+                } *p = (void*)data;
+                size_t keylen = p->kl;
+                uint8_t* key = &p->k;
+                uint8_t msg[256] = {0};
+                uint8_t encr_text[32] = {0};
                 gfx_TextClearBG("generating AES key...", 20, 190);
                 hashlib_RandomBytes(aes_key, AES_KEYLEN);
-                hashlib_RSAEncodeOAEP(aes_key, AES_KEYLEN, oaep_buf, RSA_PUBKEY_LEN, NULL);
-                hashlib_ReverseEndianness(oaep_buf, plaintext, RSA_PUBKEY_LEN);
-                hashlib_ReverseEndianness(data, pubkey, RSA_PUBKEY_LEN);
-                gfx_TextClearBG("RSA-1024 encrypting...", 20, 190);
-                hashlib_RSAEncrypt(rsa_outbuf, plaintext, RSA_PUBKEY_LEN, pubkey, RSA_PUBKEY_LEN);
-                hashlib_ReverseEndianness(rsa_outbuf, ciphertext, RSA_PUBKEY_LEN);
-                ntwk_send(RSA_SEND_SESSION_KEY, PS_PTR(ciphertext, RSA_PUBKEY_LEN));
+                sprintf(encr_text, "RSA-%u encrypting...", keylen<<3);
+                gfx_TextClearBG(encr_text, 20, 190);
+                hashlib_RSAEncodeOAEP(aes_key, AES_KEYLEN, msg, keylen, NULL);
+                hexdump(msg, keylen, "---OAEP Encoded---");
+                hexdump(key, keylen, "---RSA Key Encoded---");
+                hashlib_RSAEncrypt(msg, keylen, key, keylen);
+                hexdump(msg, keylen, "---Output---");
+                ntwk_send(RSA_SEND_SESSION_KEY, PS_PTR(msg, keylen));
                 break;
             }
         case RSA_SEND_SESSION_KEY:
