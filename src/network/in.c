@@ -72,11 +72,9 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 hashlib_RandomBytes(aes_key, AES_KEYLEN);
                 sprintf(encr_text, "RSA-%u encrypting...", keylen<<3);
                 gfx_TextClearBG(encr_text, 20, 190);
-                hashlib_RSAEncodeOAEP(aes_key, AES_KEYLEN, msg, keylen, NULL);
-                hexdump(msg, keylen, "---OAEP Encoded---");
-                hexdump(key, keylen, "---RSA Key Encoded---");
-                hashlib_RSAEncrypt(msg, keylen, key, keylen);
-                hexdump(msg, keylen, "---Output---");
+                hexdump(key, keylen, "---RSA Key---");
+                hashlib_RSAEncrypt(aes_key, AES_KEYLEN, msg, key, keylen);
+                hexdump(msg, keylen, "---Encrypted---");
                 ntwk_send(RSA_SEND_SESSION_KEY, PS_PTR(msg, keylen));
                 break;
             }

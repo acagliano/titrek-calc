@@ -225,10 +225,10 @@ bool gui_Login(uint8_t* key) {
     hashlib_RandomBytes(iv, AES_BLOCKSIZE);     // get IV
     
     // Pad plaintext
-    hashlib_AESPadMessage(settings.login_key, LOGIN_TOKEN_SIZE, ppt, SCHM_DEFAULT);
+    //hashlib_AESPadMessage(settings.login_key, LOGIN_TOKEN_SIZE, ppt, SCHM_DEFAULT);
     
     // Encrypt the login token with AES-256
-    hashlib_AESEncrypt(ppt, PPT_LEN, ct, &ctx, iv, AES_MODE_CBC);
+    hashlib_AESEncrypt(settings.login_key, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT);
     gfx_TextClearBG("logging you in...", 20, 190);
     return ntwk_send(LOGIN,
         PS_PTR(iv, AES_BLOCKSIZE),
