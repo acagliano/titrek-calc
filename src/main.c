@@ -298,6 +298,7 @@ void tick_ThisTick(sk_key_t* key){
              }
          }
          */
+        if(gameflags.exit) return;
       if(ntwk_inactive_clock == settings.limits.network_timeout)  ntwk_send_nodata(PING);
       if(ntwk_inactive_clock >= ntwk_inactive_disconnect){
           gui_NetworkErrorResponse(1, 8, true);
@@ -313,6 +314,7 @@ uint8_t PlayGame(void){
     sk_key_t key = 0;
     uint24_t wait = 5000;
     full_redraw = true;
+    if(!settings.key_loaded) return KEY;
     if(gameflags.gfx_error) return GFX;
     if(!netflags.network_up) return NTWK;
     ntwk_inactive_disconnect = settings.limits.network_timeout * 11 / 10;
@@ -338,6 +340,7 @@ uint8_t PlayGame(void){
         key = getKey();
         ntwk_process();
         if(netflags.logged_in) break;
+        if(gameflags.login_err) return NO_ERROR;
         if(!wait--) return TIMEOUT;
     } while(1);
     gfx_ZeroScreen();

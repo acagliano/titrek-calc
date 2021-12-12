@@ -217,7 +217,6 @@ uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y
 bool gui_Login(uint8_t* key) {
     aes_ctx ctx;
     uint8_t iv[AES_BLOCKSIZE];
-    uint8_t ppt[PPT_LEN];
     uint8_t ct[PPT_LEN];
     
     gfx_TextClearBG("encrypting auth token...", 20, 190);
@@ -226,16 +225,23 @@ bool gui_Login(uint8_t* key) {
     
     // Pad plaintext
     //hashlib_AESPadMessage(settings.login_key, LOGIN_TOKEN_SIZE, ppt, SCHM_DEFAULT);
+    // this is no longer necessary as of HASHLIB 8
     
     // Encrypt the login token with AES-256
-    hashlib_AESEncrypt(settings.login_key, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT);
+    if(hashlib_AESEncrypt(settings.login_key, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
     gfx_TextClearBG("logging you in...", 20, 190);
-    return ntwk_send(LOGIN,
+    ntwk_send(LOGIN,
         PS_PTR(iv, AES_BLOCKSIZE),
         PS_PTR(ct, PPT_LEN)
     );
     
     // Zero out key schedule, key used, and IV
+    hashlib_EraseContext(iv, AES_BLOCKSIZE);
+    hashlib_EraseContext(&ctx, sizeof(aes_ctx));
+    hashlib_EraseContext(key, 32);
+    hashlib_EraseContext(ct, PPT_LEN);
+    
+    return true;
 }
 
 bool gui_NewGame(void) {

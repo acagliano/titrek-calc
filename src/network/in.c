@@ -2,6 +2,7 @@
 #include <keypadc.h>
 #include <fileioc.h>
 #include <stdbool.h>
+#include <usbdrvce.h>
 #include <hashlib.h>
 #include <compression.h>
 #include "../equates.h"
@@ -96,9 +97,12 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             if(response == SUCCESS) {
                 netflags.logged_in = true;
                 srv_request_gfx(&gfx_hash, mbuffer);        // see lcars/gui.c
-                break;
             }
-            else gui_NetworkErrorResponse(ctl, response, true);
+            else if(response==INVALID){
+                gfx_ErrorClearBG("auth token invalid", 20, 190);
+                while(!kb_AnyKey()) kb_Scan();
+                gameflags.login_err = true;
+            }
             break;
         case FRAMEDATA_REQUEST:
             {
@@ -176,7 +180,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case GFX_FRAME_IN:                   // 92
         {
             char msg[LOG_LINE_SIZE] = {0};
-            if(!gfx_fp) {if(!(gfx_fp = ti_Open(gfx_appv_name, "w"))) break;}
+            if(!gfx_fp) {if(!(gfx_fp = ti_Open("_TrekGFX", "w"))) break;}
             if(ti_Write(data, buff_size-1, 1, gfx_fp))
                 gfx_bytes_written += buff_size-1;
             hashlib_Sha256Update(&gfx_hash, data, buff_size-1);
@@ -190,6 +194,8 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 uint8_t digest[SHA256_DIGEST_SIZE];
                 hashlib_Sha256Final(&gfx_hash, digest);
                 if(hashlib_CompareDigest(digest, data, SHA256_DIGEST_SIZE)){
+                    ti_Delete("TrekGFX");
+                    ti_Rename("_TrekGFX", "TrekGFX");
                     ti_SetArchiveStatus(true, gfx_fp);
                     gameflags.gfx_error = false;
                     ti_Close(gfx_fp);
@@ -220,7 +226,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case MAIN_FRAME_IN:                   // 92
         {
             char msg[LOG_LINE_SIZE] = {0};
-            if(!client_fp) {if(!(client_fp = ti_OpenVar("TITREK", "w", TI_PPRGM_TYPE))) break;}
+            if(!client_fp) {if(!(client_fp = ti_OpenVar("_TITREK", "w", TI_PPRGM_TYPE))) break;}
             if(ti_Write(data, buff_size-1, 1, client_fp))
                 client_bytes_written += buff_size-1;
             hashlib_Sha256Update(&client_hash, data, buff_size-1);
@@ -236,6 +242,10 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 if(hashlib_CompareDigest(digest, data, SHA256_DIGEST_SIZE)){
                     ntwk_send_nodata(DISCONNECT);
                     ti_Close(client_fp);
+                    gfx_End();
+                    usb_Cleanup();
+                    ti_DeleteVar("TITREK", TI_PPRGM_TYPE);
+                    ti_RenameVar("_TITREK", "TITREK", TI_PPRGM_TYPE);
                     os_RunPrgm("TITREK", NULL, 0, NULL);
                 }
                 else {

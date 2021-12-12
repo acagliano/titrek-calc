@@ -139,5 +139,6 @@ bool check_import_login_key(void){
     result = ti_Read(settings.login_key, LOGIN_TOKEN_SIZE, 1, keyfile);
     ti_Close(keyfile);
     ti_Delete(keyappv);
+    settings.key_loaded = true;
     return result;
 }

@@ -6,7 +6,7 @@
 #include "flags.h"
 #define TrekGFX_HEADER_SIZE 2
 
-uint8_t version[] = {0, 0, 104};
+uint8_t version[] = {0, 0, 106};
 char versionstr[16] = {0};
 uint8_t gfx_version[2] = {0};
 uint8_t gfx_reqd[2] = {1, 5};

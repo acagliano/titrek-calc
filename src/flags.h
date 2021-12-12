@@ -7,6 +7,7 @@ typedef struct {
     bool gfx_loaded;
     bool gfx_error;
     bool gfx_custom;
+    bool login_err;
     bool version_err;
 } flags_t;
 extern flags_t gameflags;
