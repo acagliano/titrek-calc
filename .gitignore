@@ -229,4 +229,4 @@ src/deprecated/*
 .idea
 cmake-build*
 *.8xv
-
+release
