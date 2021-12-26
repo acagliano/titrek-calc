@@ -1,0 +1,6 @@
+0.0.106
+=========
+- Uses new version of HASHLIB where padding is internal.
+- Proper error codes for invalid and missing login token.
+- Client and GFX now download to temp files until hash match verified.
+- Attempt to fix the failure to autoupload files.
