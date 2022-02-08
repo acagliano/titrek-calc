@@ -56,7 +56,6 @@ enum ControlCodes {
     PING = 0xfc,
     MESSAGE,
     DEBUG,
-    SERVINFO
 };
 
 //returned from some routines

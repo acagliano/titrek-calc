@@ -40,7 +40,7 @@ void gfx_RenderMenuTitle(const char* title, uint24_t x, uint8_t y);
 
 uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y, uint8_t flags);
 
-void srv_request_gfx(sha256_ctx *ctx, uint8_t *mbuffer);
-void srv_request_client(sha256_ctx *ctx, uint8_t *mbuffer);
+void srv_request_gfx(sha256_ctx *ctx);
+void srv_request_client(sha256_ctx *ctx);
 
 #endif

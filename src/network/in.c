@@ -32,7 +32,6 @@ extern uint8_t *gfx_appv_name = "TrekGFX";
 size_t gfx_dl_size, client_dl_size;
 size_t gfx_bytes_written = 0, client_bytes_written = 0;
 sha256_ctx gfx_hash, client_hash;
-uint32_t mbuffer[64];
 uint8_t aes_key[AES_KEYLEN] = {0};
 
 
@@ -84,7 +83,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             break;
         case CONNECT:
             netflags.bridge_up = true;
-            srv_request_client(&client_hash, mbuffer);
+            srv_request_client(&client_hash);
             break;
         case DISCONNECT:
             netflags.logged_in = false;
@@ -96,7 +95,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case LOGIN:
             if(response == SUCCESS) {
                 netflags.logged_in = true;
-                srv_request_gfx(&gfx_hash, mbuffer);        // see lcars/gui.c
+                srv_request_gfx(&gfx_hash);        // see lcars/gui.c
             }
             else if(response==INVALID){
                 gfx_ErrorClearBG("auth token invalid", 20, 190);
@@ -121,7 +120,11 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             }
             break;
         case MESSAGE:
-            gui_SetLog(LOG_SERVER, data);
+        case DEBUG:
+            if(ctl==MESSAGE)
+                gui_SetLog(LOG_SERVER, data);
+            else
+                gui_SetLog(LOG_ERROR, data);
             break;
         case LOAD_SHIP:
             {
@@ -172,8 +175,9 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             engine_ref.loaded = true;
             break;
         case GFX_FRAME_START:               // 91
-            hashlib_Sha256Init(&gfx_hash, mbuffer);
+            hashlib_Sha256Init(&gfx_hash);
             memcpy(&gfx_dl_size, data, sizeof(size_t));
+            ti_CloseAll();
             ntwk_send_nodata(GFX_FRAME_NEXT);
             gfx_bytes_written = 0;
             break;
@@ -194,18 +198,18 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 uint8_t digest[SHA256_DIGEST_SIZE];
                 hashlib_Sha256Final(&gfx_hash, digest);
                 if(hashlib_CompareDigest(digest, data, SHA256_DIGEST_SIZE)){
+                    ti_SetArchiveStatus(true, gfx_fp);
+                    ti_Close(gfx_fp);
                     ti_Delete("TrekGFX");
                     ti_Rename("_TrekGFX", "TrekGFX");
-                    ti_SetArchiveStatus(true, gfx_fp);
                     gameflags.gfx_error = false;
-                    ti_Close(gfx_fp);
                 }
                 else {
                     gfx_ErrorClearBG("gfx download error", 20, 190);
                     gameflags.gfx_error = true;
                     ti_Close(gfx_fp);
                     ti_Delete(gfx_appv_name);
-                    srv_request_gfx(&gfx_hash, mbuffer);        // see lcars/gui.c
+                    srv_request_gfx(&gfx_hash);        // see lcars/gui.c
                     break;
                 }
             }
@@ -218,8 +222,9 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             }
             break;
         case MAIN_FRAME_START:               // 91
-            hashlib_Sha256Init(&client_hash, mbuffer);
+            hashlib_Sha256Init(&client_hash);
             memcpy(&client_dl_size, data, sizeof(size_t));
+            ti_CloseAll();
             ntwk_send_nodata(MAIN_FRAME_NEXT);
             client_bytes_written = 0;
             break;
@@ -251,7 +256,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 else {
                     gfx_ErrorClearBG("client download error", 20, 190);
                     ti_Close(client_fp);
-                    srv_request_client(&client_hash, mbuffer);        // see lcars/gui.c
+                    srv_request_client(&client_hash);        // see lcars/gui.c
                     break;
                 }
             }

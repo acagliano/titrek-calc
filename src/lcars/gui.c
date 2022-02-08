@@ -236,11 +236,6 @@ bool gui_Login(uint8_t* key) {
     );
     
     // Zero out key schedule, key used, and IV
-    hashlib_EraseContext(iv, AES_BLOCKSIZE);
-    hashlib_EraseContext(&ctx, sizeof(aes_ctx));
-    hashlib_EraseContext(key, 32);
-    hashlib_EraseContext(ct, PPT_LEN);
-    
     return true;
 }
 
@@ -248,11 +243,11 @@ bool gui_NewGame(void) {
     return ntwk_send_nodata(NEW_GAME_REQUEST);
 }
 
-void srv_request_gfx(sha256_ctx *ctx, uint8_t *mbuffer){
+void srv_request_gfx(sha256_ctx *ctx){
     ti_var_t f;
     uint8_t digest[SHA256_DIGEST_SIZE];
     gfx_TextClearBG("Hashing gfx for version...", 20, 190);
-    hashlib_Sha256Init(ctx, mbuffer);
+    hashlib_Sha256Init(ctx);
     if((f = ti_Open(gfx_appv_name, "r"))){
         hashlib_Sha256Update(ctx, ti_GetDataPtr(f), ti_GetSize(f));
         ti_Close(f);
@@ -262,12 +257,12 @@ void srv_request_gfx(sha256_ctx *ctx, uint8_t *mbuffer){
     ntwk_send(GFX_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_SIZE));
 }
 
-void srv_request_client(sha256_ctx *ctx, uint8_t *mbuffer){
+void srv_request_client(sha256_ctx *ctx){
     ti_var_t f;
     uint8_t digest[SHA256_DIGEST_SIZE];
     gfx_TextClearBG("", 20, 200);
     gfx_TextClearBG("Hashing client for version...", 20, 190);
-    hashlib_Sha256Init(ctx, mbuffer);
+    hashlib_Sha256Init(ctx);
     if((f = ti_OpenVar("TITREK", "r", TI_PPRGM_TYPE))){
         hashlib_Sha256Update(ctx, ti_GetDataPtr(f), ti_GetSize(f));
         ti_Close(f);
