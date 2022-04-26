@@ -1,3 +1,5 @@
+section .text
+
 
 public _getKey
 public _getKeyAsync

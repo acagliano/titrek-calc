@@ -1,3 +1,6 @@
+
+section .text
+
 public _cemu_check
 public _cemu_get
 public _cemu_send

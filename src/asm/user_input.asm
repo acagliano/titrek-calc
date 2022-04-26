@@ -1,6 +1,8 @@
 ;user input subroutine for use with ez80 C toolchain programs
 ;author: Adam "beckadamtheinventor" Beckingham
 
+section .text
+
 public _user_input
 extern _gfx_SetColor
 extern _gfx_PrintChar

@@ -180,6 +180,8 @@ int main(void) {
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
+    csrand_init();
+    
     if((savefile = ti_Open(settingsappv, "r")) && (ti_GetSize(savefile) == sizeof(settings))){
         ti_Read(&settings, sizeof(settings), 1, savefile);
         ti_Close(savefile);
