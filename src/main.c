@@ -314,7 +314,7 @@ void tick_ThisTick(sk_key_t* key){
 
 uint8_t PlayGame(void){
     sk_key_t key = 0;
-    uint24_t wait = 5000;
+    uint24_t wait = 10000;
     full_redraw = true;
     if(!settings.key_loaded) return KEY;
     if(gameflags.gfx_error) return GFX;
@@ -338,6 +338,7 @@ uint8_t PlayGame(void){
         if(!wait--) return TIMEOUT;
     }   while(1);
     gfx_TextClearBG("Waiting for server...", 20, 190);
+    wait = 10000;
     do {
         key = getKey();
         ntwk_process();
