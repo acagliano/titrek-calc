@@ -194,7 +194,9 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 hash_final(&gfx_hash, digest);
                 if(digest_compare(digest, data, SHA256_DIGEST_SIZE)){
                     ti_Delete("TrekGFX");
+                    ti_Close(gfx_fp);
                     ti_Rename("_TrekGFX", "TrekGFX");
+                    gfx_fp = ti_Open("_TrekGFX", "w");
                     ti_SetArchiveStatus(true, gfx_fp);
                     gameflags.gfx_error = false;
                     ti_Close(gfx_fp);
