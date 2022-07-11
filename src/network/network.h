@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "../util.h"
+#include "../flags.h"
 
 typedef struct {
     bool network_up;
@@ -36,10 +37,6 @@ typedef struct {
     bool (*read_to_size)(size_t size);
     void (*write)(void *data, size_t size);
 } net_mode_t;
-
-typedef struct {
-    uint8_t server;
-} bridge_config_t;
 
 extern net_mode_t mode_srl;
 extern net_mode_t mode_pipe;

@@ -32,7 +32,6 @@ enum _accessmode {
     SETT_INT
 };
 
-char *keyappv = "TrekKey";
 
 void set_defaults(void){
     // defaults are hardcoded within the game and cannot be changed unless through a rebuild
@@ -42,7 +41,7 @@ void set_defaults(void){
     settings.limits.packet_limit = 5;
     settings.limits.network_timeout = DEFAULT_NET_TIMEOUT;
     settings.limits.log_limit = 100;
-    strcpy(settings.servers[0], "play.titrek.us");
+    strcpy(settings.server[0].hostname, "play.titrek.us");
 }
 
 bool write_settings(void){
@@ -131,14 +130,3 @@ void gfx_AlterSettingOpt(uint8_t selected, int8_t direction){
 
 }
 
-bool check_import_login_key(void){
-    ti_var_t keyfile = ti_Open(keyappv, "r");
-    size_t size;
-    bool result;
-    if(!keyfile) return false;
-    result = ti_Read(settings.login_key, LOGIN_TOKEN_SIZE, 1, keyfile);
-    ti_Close(keyfile);
-    ti_Delete(keyappv);
-    settings.key_loaded = true;
-    return result;
-}

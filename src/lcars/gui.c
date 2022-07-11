@@ -218,8 +218,11 @@ bool gui_Login(uint8_t* key) {
     aes_ctx ctx;
     uint8_t iv[AES_BLOCKSIZE];
     uint8_t ct[PPT_LEN];
+    char *keyfile = settings.server[bridge_config.server].keyfile;
+    ti_var_t kf = ti_Open(keyfile, "r");
+    if(!kf) return false;
     
-    gfx_TextClearBG("encrypting auth token...", 20, 190);
+    gfx_TextClearBG("encrypting auth token...", 20, 190, true);
     aes_init(key, &ctx, 32);         // load secret key
     csrand_fill(iv, AES_BLOCKSIZE);     // get IV
     
@@ -228,13 +231,15 @@ bool gui_Login(uint8_t* key) {
     // this is no longer necessary as of HASHLIB 8
     
     // Encrypt the login token with AES-256
-    if(aes_encrypt(settings.login_key, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
-    gfx_TextClearBG("logging you in...", 20, 190);
+    if(aes_encrypt(ti_GetDataPtr(kf)+7, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
+    gfx_TextClearBG("logging you in...", 20, 190, true);
     ntwk_send(LOGIN,
         PS_PTR(iv, AES_BLOCKSIZE),
         PS_PTR(ct, PPT_LEN)
     );
     
+    ti_SetArchiveStatus(true, kf);
+    ti_Close(kf);
     // Zero out key schedule, key used, and IV
     
     return true;
@@ -247,28 +252,47 @@ bool gui_NewGame(void) {
 void srv_request_gfx(hash_ctx *ctx){
     ti_var_t f;
     uint8_t digest[SHA256_DIGEST_SIZE];
-    gfx_TextClearBG("Hashing gfx for version...", 20, 190);
+    gfx_TextClearBG("Hashing gfx for version...", 20, 190, true);
     hash_init(ctx, SHA256);
     if((f = ti_Open(gfx_appv_name, "r"))){
         hash_update(ctx, ti_GetDataPtr(f), ti_GetSize(f));
         ti_Close(f);
     }
     hash_final(ctx, digest);
-    gfx_TextClearBG("Comparing version w/ server...", 20, 190);
+    gfx_TextClearBG("Comparing version w/ server...", 20, 190, true);
     ntwk_send(GFX_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_SIZE));
 }
 
 void srv_request_client(hash_ctx *ctx){
     ti_var_t f;
     uint8_t digest[SHA256_DIGEST_SIZE];
-    gfx_TextClearBG("", 20, 200);
-    gfx_TextClearBG("Hashing client for version...", 20, 190);
+    gfx_TextClearBG("", 20, 200, true);
+    gfx_TextClearBG("Hashing client for version...", 20, 190, true);
     hash_init(ctx, SHA256);
     if((f = ti_OpenVar("TITREK", "r", TI_PPRGM_TYPE))){
         hash_update(ctx, ti_GetDataPtr(f), ti_GetSize(f));
         ti_Close(f);
     }
     hash_final(ctx, digest);
-    gfx_TextClearBG("Comparing version w/ server...", 20, 190);
+    gfx_TextClearBG("Comparing version w/ server...", 20, 190, true);
     ntwk_send(MAIN_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_SIZE));
+}
+
+void gfx_RenderServerMenu(serverdata_t *servers, uint8_t menucount, uint8_t selected, uint24_t x, uint8_t y, uint24_t w, uint8_t h){
+    gfx_SetColor(195);
+    gfx_Rectangle(x-2, y-2, w+4, h+4);
+    gfx_Rectangle(x-1, y-1, w+2, h+2);
+    for(uint8_t i = 0; i<menucount; i++)
+        gfx_RenderMenuOpt((selected == i), servers[i].hostname, x, h / menucount * i + y, w, h/menucount);
+}
+
+void gfx_RenderServerMeta(serverdata_t *server){
+    if(!server->hostname[0]) return;
+    char *filename = server->keyfile;
+    gfx_PrintStringXY("Keyfile: ", 5, 190);
+    if(filename[0] == 0) {
+        gfx_PrintString("none");
+    } else {
+        gfx_PrintString(filename);
+    }
 }
