@@ -66,6 +66,7 @@ gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_error_size);
 gfx_UninitedRLETSprite(icon_netup, icon_networkup_size);
 gfx_UninitedRLETSprite(icon_netdown, icon_networkdown_size);
+gfx_UninitedRLETSprite(icon_security, icon_security_size);
 gfx_UninitedRLETSprite(log_error, log_error_size);
 gfx_UninitedRLETSprite(log_info, log_info_size);
 gfx_UninitedRLETSprite(log_debug, log_debug_size);
@@ -178,7 +179,7 @@ void ServerSelect(void){
         }
         
         if(key || firstrender){
-            window_data_t win = {3, 260, 20, 100, 195, 2, 181};
+            window_data_t win = {3, 260, 20, 90, 195, 2, 181};
             ti_var_t tfp = ti_Open(9*offset+filenames, "r");
             gfx_ZeroScreen();
             
@@ -186,18 +187,28 @@ void ServerSelect(void){
             gfx_RenderMenuTitle("Server Info", 3, 5);
             gfx_RenderWindow(&win);
             gfx_SetTextFGColor(255);
-            gfx_PrintStringXY("[Enter] Connect to selected host", 5, 130);
-            if(offset>0) gfx_ColoredText("[Left] Select previous server", 5, 140, 255);
-            else gfx_ColoredText("[Left] Select previous server", 5, 140, 74);
-            if(offset<(filect-1)) gfx_ColoredText("[Right] Select next server", 5, 150, 255);
-            else gfx_ColoredText("[Right] Select next server", 5, 150, 74);
+            gfx_PrintStringXY("[Enter] Connect to selected host", 5, 120);
+            if(offset>0) gfx_ColoredText("[Left] Select previous server", 5, 130, 255);
+            else gfx_ColoredText("[Left] Select previous server", 5, 130, 74);
+            if(offset<(filect-1)) gfx_ColoredText("[Right] Select next server", 5, 140, 255);
+            else gfx_ColoredText("[Right] Select next server", 5, 140, 74);
             gfx_SetTextFGColor(0);
             if(tfp) {
                 // if appv opened
-                gfx_PrintStringXY("Hostname: ", 10, 30);
-                gfx_PrintStringXY(ti_GetDataPtr(tfp)+7, 15, 40);
-                gfx_PrintStringXY("Keyfile: ", 10, 55);
-                gfx_PrintStringXY(9*offset+filenames, 15, 65);
+                size_t filesize = ti_GetSize(tfp);
+                size_t keylen = filesize - strlen(ti_GetDataPtr(tfp)+7);
+                keylen -= 8; keylen *= 8;
+                gfx_PrintStringXY("Keyfile: ", 10, 35);
+                gfx_PrintString(9*offset+filenames);
+                gfx_RLETSprite(log_server, 10, 50);
+                gfx_RLETSprite(icon_security, 10, 65);
+                gfx_PrintStringXY(ti_GetDataPtr(tfp)+7, 25, 50);
+                gfx_SetTextXY(25, 65);
+                gfx_PrintUInt(keylen, num_GetLength(keylen));
+                gfx_PrintString("-bit session key");
+                gfx_PrintStringXY("RSA-<=2048 cipher, key exch", 25, 75);
+                gfx_PrintStringXY("AES-256 cipher, login", 25, 85);
+                
                 ti_Close(tfp);
             }
             else {
@@ -234,6 +245,7 @@ int main(void) {
     zx7_Decompress(splash, splash_compressed);
     zx7_Decompress(icon_netup, icon_networkup_compressed);
     zx7_Decompress(icon_netdown, icon_networkdown_compressed);
+    zx7_Decompress(icon_security, icon_security_compressed);
     zx7_Decompress(log_error, log_error_compressed);
     zx7_Decompress(log_info, log_info_compressed);
     zx7_Decompress(log_debug, log_debug_compressed);

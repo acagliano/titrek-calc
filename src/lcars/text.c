@@ -63,7 +63,7 @@ int text_GetCenterX(char* string){
 }
 
 int num_GetLength(int number){
-    return 1 + (number >= 10) + (number >= 100);
+    return 1 + (number >= 10) + (number >= 100) + (number >= 1000) + (number >= 10000);
 }
 
 uint8_t gfx_VCenterText(uint8_t y, uint8_t box_height, uint8_t font_height){
