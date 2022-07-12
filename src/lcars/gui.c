@@ -218,7 +218,7 @@ bool gui_Login(uint8_t* key) {
     aes_ctx ctx;
     uint8_t iv[AES_BLOCKSIZE];
     uint8_t ct[PPT_LEN];
-    char *keyfile = settings.server[bridge_config.server].keyfile;
+    char *keyfile = serverinfo.appvname;
     ti_var_t kf = ti_Open(keyfile, "r");
     if(!kf) return false;
     
@@ -231,7 +231,9 @@ bool gui_Login(uint8_t* key) {
     // this is no longer necessary as of HASHLIB 8
     
     // Encrypt the login token with AES-256
-    if(aes_encrypt(ti_GetDataPtr(kf)+7, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
+    char* hostname = ti_GetDataPtr(kf)+7;
+    char* keydata = hostname+strlen(hostname)+1;
+    if(aes_encrypt(keydata, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
     gfx_TextClearBG("logging you in...", 20, 190, true);
     ntwk_send(LOGIN,
         PS_PTR(iv, AES_BLOCKSIZE),
@@ -278,21 +280,3 @@ void srv_request_client(hash_ctx *ctx){
     ntwk_send(MAIN_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_SIZE));
 }
 
-void gfx_RenderServerMenu(serverdata_t *servers, uint8_t menucount, uint8_t selected, uint24_t x, uint8_t y, uint24_t w, uint8_t h){
-    gfx_SetColor(195);
-    gfx_Rectangle(x-2, y-2, w+4, h+4);
-    gfx_Rectangle(x-1, y-1, w+2, h+2);
-    for(uint8_t i = 0; i<menucount; i++)
-        gfx_RenderMenuOpt((selected == i), servers[i].hostname, x, h / menucount * i + y, w, h/menucount);
-}
-
-void gfx_RenderServerMeta(serverdata_t *server){
-    if(!server->hostname[0]) return;
-    char *filename = server->keyfile;
-    gfx_PrintStringXY("Keyfile: ", 5, 190);
-    if(filename[0] == 0) {
-        gfx_PrintString("none");
-    } else {
-        gfx_PrintString(filename);
-    }
-}

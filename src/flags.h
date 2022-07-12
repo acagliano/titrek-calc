@@ -13,9 +13,4 @@ typedef struct {
 extern flags_t gameflags;
 
 
-typedef struct {
-    uint8_t server;
-} bridge_config_t;
-extern bridge_config_t bridge_config;
-
 #endif

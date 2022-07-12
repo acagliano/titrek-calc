@@ -38,6 +38,12 @@ typedef struct {
     void (*write)(void *data, size_t size);
 } net_mode_t;
 
+typedef struct {
+    char appvname[9];
+    char hostname[256];
+} serverinfo_t;
+extern serverinfo_t serverinfo;
+
 extern net_mode_t mode_srl;
 extern net_mode_t mode_pipe;
 

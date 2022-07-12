@@ -25,7 +25,6 @@ typedef struct {
 typedef struct {
     bool debug;
     limiter_t limits;
-    serverdata_t server[10];
     bool key_loaded;
 } settings_t;
 extern settings_t settings;

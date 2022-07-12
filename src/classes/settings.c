@@ -41,7 +41,6 @@ void set_defaults(void){
     settings.limits.packet_limit = 5;
     settings.limits.network_timeout = DEFAULT_NET_TIMEOUT;
     settings.limits.log_limit = 100;
-    strcpy(settings.server[0].hostname, "play.titrek.us");
 }
 
 bool write_settings(void){

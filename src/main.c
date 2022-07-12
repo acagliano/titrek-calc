@@ -84,7 +84,7 @@ uint8_t playgame_return = 0;
 bool full_redraw = true;
 bool gfx_loaded = false;
 uint8_t errors = 0;
-bridge_config_t bridge_config = {0};
+serverinfo_t serverinfo = {0};
 
 ti_var_t update_fp = 0;
 
@@ -141,76 +141,73 @@ void MainMenu(void) {
 }
 
 void ServerSelect(void){
+#define CEMU_CONSOLE ((char*)0xFB0000)
     uint8_t i, selected = 0;
     bool firstrender = true;
-    sk_key_t key;
+    sk_key_t key = 0;
+    char *var_name;
+    void *vat_ptr = NULL;
+    char *filenames = NULL;
+    size_t filect = 0, offset=0;
     if(gameflags.gfx_error) return;
+    
+    // parse VAT for files containing TrekKey string at beginning.
+    while ((var_name = ti_Detect(&vat_ptr, "TrekKey"))){
+        filenames = realloc(filenames, sizeof(filenames)+9);
+        strncpy(9*filect+filenames, var_name, 9);
+        filect++;
+    }
+    filect;
+    if(filenames==NULL) return;
     do {
+        char* hostinfo;
         key = getKey();
-        if(key == sk_Down) selected += (selected < 9);
-        if(key == sk_Up) selected -= (selected > 0);
+        
         if(key == sk_Clear) break;
-        if((key == sk_Del) && (selected != 0)){
-            prompt_for("Add Server:", settings.server[selected].hostname, 49, 20, 210, 0);
+        if((key == sk_Left) && (offset>0)) offset--;
+        if((key == sk_Right) && (offset<(filect-1))) offset++;
+        
+         if(key == sk_Enter){
+            ti_var_t fp = ti_Open(9*offset+filenames, "r");
+            if(!fp) return;
+            strcpy(serverinfo.appvname, 9*offset+filenames);
+            strcpy(serverinfo.hostname, ti_GetDataPtr(fp)+7);
+            ti_Close(fp);
+            playgame_return = PlayGame();
+            break;
         }
-        if(key== sk_Store){
-            window_data_t win = {160-40, 80, 120-20, 35, 195, 2, 0};
-            bool firstrun = true;
-            char *var_name;
-            void *vat_ptr = NULL;
-            char *filenames = NULL;
-            size_t filect = 0;
-            while ((var_name = ti_Detect(&vat_ptr, "TrekKey"))){
-                filenames = realloc(filenames, sizeof(filenames)+9);
-                strncpy(9*filect+filenames, var_name, 9);
-                filect++;
-            }
-            filect--;
-            if(filenames!=NULL){
-                size_t offset = 0;
-                size_t limit = sizeof(filenames)-9;
-                while(1){
-                    key = getKey();
-                    if(key==sk_Clear) break;
-                    if((key==sk_Left) && offset) offset--;
-                    if((key==sk_Right) && (offset < filect)) offset++;
-                    if(key==sk_Enter) {
-                        strncpy(settings.server[selected].keyfile, offset*9+filenames, 9);
-                        break;
-                    }
-                    if(key || firstrun) {
-                        gfx_RenderWindow(&win);
-                        if(offset) gfx_PrintStringXY("<", 125, 120);
-                        if(offset<filect) gfx_PrintStringXY(">", 190, 120);
-                        gfx_TextClearBG(offset*9+filenames, 125, 105, false);
-                        gfx_BlitBuffer();
-                    }
-                }
-            }
-            key = 0;
-            firstrender=true;
-            free(filenames);
-        }
+        
         if(key || firstrender){
+            window_data_t win = {3, 260, 20, 100, 195, 2, 181};
+            ti_var_t tfp = ti_Open(9*offset+filenames, "r");
             gfx_ZeroScreen();
-            gfx_RenderMenuTitle("Server List", 3, 5);
-            gfx_RenderServerMenu(settings.server, 10, selected, 5, 20, 200, 160);
+            
+            // main GUI elements
+            gfx_RenderMenuTitle("Server Info", 3, 5);
+            gfx_RenderWindow(&win);
             gfx_SetTextFGColor(255);
-            gfx_RenderServerMeta(&settings.server[selected]);
-            gfx_PrintStringXY("[Enter] Select", 210, 30);
-            gfx_PrintStringXY("[Del] Edit/Add", 210, 40);
-            gfx_PrintStringXY("[Sto] Link Key", 210, 50);
+            gfx_PrintStringXY("[Enter] Connect to selected host", 5, 130);
+            if(offset>0) gfx_ColoredText("[Left] Select previous server", 5, 140, 255);
+            else gfx_ColoredText("[Left] Select previous server", 5, 140, 74);
+            if(offset<(filect-1)) gfx_ColoredText("[Right] Select next server", 5, 150, 255);
+            else gfx_ColoredText("[Right] Select next server", 5, 150, 74);
+            gfx_SetTextFGColor(0);
+            if(tfp) {
+                // if appv opened
+                gfx_PrintStringXY("Hostname: ", 10, 30);
+                gfx_PrintStringXY(ti_GetDataPtr(tfp)+7, 15, 40);
+                gfx_PrintStringXY("Keyfile: ", 10, 55);
+                gfx_PrintStringXY(9*offset+filenames, 15, 65);
+                ti_Close(tfp);
+            }
+            else {
+                gfx_PrintStringXY("Error opening file", 10, 25);
+            }
             gfx_BlitBuffer();
             firstrender = false;
         }
-        if(key == sk_Enter){
-            if(settings.server[selected].hostname[0]){
-                bridge_config.server = selected;
-                playgame_return = PlayGame();
-                break;
-            }
-        }
-    ntwk_process();
+        
+        ntwk_process();
     } while (1);
 }
 
@@ -368,7 +365,8 @@ uint8_t PlayGame(void){
     gameflags.exit = false;
     netflags.bridge_up = false;
     gfx_InitModuleIcons();
-    ntwk_send(CONNECT, PS_STR(settings.server[bridge_config.server].hostname));
+    gfx_SetTextFGColor(255);
+    ntwk_send(CONNECT, PS_STR(serverinfo.hostname));
     gfx_TextClearBG("Waiting for bridge...", 20, 190, true);
     gfx_TextClearBG("[Clear] to stop", 20, 200, true);
     gfx_BlitBuffer();

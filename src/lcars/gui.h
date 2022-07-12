@@ -44,7 +44,5 @@ uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y
 void srv_request_gfx(hash_ctx *ctx);
 void srv_request_client(hash_ctx *ctx);
 
-void gfx_RenderServerMenu(serverdata_t *servers, uint8_t menucount, uint8_t selected, uint24_t x, uint8_t y, uint24_t w, uint8_t h);
-void gfx_RenderServerMeta(serverdata_t *server);
 
 #endif
