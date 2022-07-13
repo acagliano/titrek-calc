@@ -238,8 +238,8 @@ bool gui_Login(uint8_t* key) {
         PS_PTR(ct, PPT_LEN)
     );
     
-    ti_SetArchiveStatus(true, kf);
-    ti_Close(kf);
+    ti_SetArchiveStatus(true, tfp);
+    ti_Close(tfp);
     // Zero out key schedule, key used, and IV
     
     return true;
