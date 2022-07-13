@@ -66,11 +66,7 @@ gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_error_size);
 gfx_UninitedRLETSprite(icon_netup, icon_networkup_size);
 gfx_UninitedRLETSprite(icon_netdown, icon_networkdown_size);
-<<<<<<< HEAD
-gfx_UninitedRLETSprite(icon_security, icon_networkdown_size);
-=======
 gfx_UninitedRLETSprite(icon_security, icon_security_size);
->>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
 gfx_UninitedRLETSprite(log_error, log_error_size);
 gfx_UninitedRLETSprite(log_info, log_info_size);
 gfx_UninitedRLETSprite(log_debug, log_debug_size);
@@ -177,7 +173,7 @@ void ServerSelect(void){
             ti_var_t tfp = ti_Open(9*offset+filenames, "r");
             if(!tfp) return;
             strcpy(serverinfo.appvname, 9*offset+filenames);
-            strcpy(serverinfo.hostname, ti_GetDataPtr(fp)+7);
+            strcpy(serverinfo.hostname, ti_GetDataPtr(tfp)+7);
             ti_Close(tfp);
             playgame_return = PlayGame();
             break;
