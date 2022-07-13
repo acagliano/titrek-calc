@@ -25,10 +25,6 @@ typedef struct {
 typedef struct {
     bool debug;
     limiter_t limits;
-<<<<<<< HEAD
-=======
-    bool key_loaded;
->>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
 } settings_t;
 extern settings_t settings;
 
@@ -43,6 +39,5 @@ enum SettingOpt {
     LOG_TIME
 };
 #define NUM_SETTINGS (LOG_TIME+1)
-bool check_import_login_key(void);
 
 #endif

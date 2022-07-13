@@ -128,7 +128,4 @@ void gfx_AlterSettingOpt(uint8_t selected, int8_t direction){
     }
 
 }
-<<<<<<< HEAD
-=======
 
->>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
