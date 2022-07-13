@@ -218,10 +218,16 @@ bool gui_Login(uint8_t* key) {
     aes_ctx ctx;
     uint8_t iv[AES_BLOCKSIZE];
     uint8_t ct[PPT_LEN];
+<<<<<<< HEAD
     ti_var_t tfp = ti_Open(serverinfo.appvname, "r");
     if(!tfp) return false;
+=======
+    char *keyfile = serverinfo.appvname;
+    ti_var_t kf = ti_Open(keyfile, "r");
+    if(!kf) return false;
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
     
-    gfx_TextClearBG("encrypting auth token...", 20, 190);
+    gfx_TextClearBG("encrypting auth token...", 20, 190, true);
     aes_init(key, &ctx, 32);         // load secret key
     csrand_fill(iv, AES_BLOCKSIZE);     // get IV
     
@@ -231,13 +237,22 @@ bool gui_Login(uint8_t* key) {
     char* keydata = hostname + strlen(hostname) + 1;
     
     // Encrypt the login token with AES-256
+<<<<<<< HEAD
     if(aes_encrypt(keydata, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
     gfx_TextClearBG("logging you in...", 20, 190);
+=======
+    char* hostname = ti_GetDataPtr(kf)+7;
+    char* keydata = hostname+strlen(hostname)+1;
+    if(aes_encrypt(keydata, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
+    gfx_TextClearBG("logging you in...", 20, 190, true);
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
     ntwk_send(LOGIN,
         PS_PTR(iv, AES_BLOCKSIZE),
         PS_PTR(ct, PPT_LEN)
     );
     
+    ti_SetArchiveStatus(true, kf);
+    ti_Close(kf);
     // Zero out key schedule, key used, and IV
     
     return true;
@@ -250,28 +265,29 @@ bool gui_NewGame(void) {
 void srv_request_gfx(hash_ctx *ctx){
     ti_var_t f;
     uint8_t digest[SHA256_DIGEST_SIZE];
-    gfx_TextClearBG("Hashing gfx for version...", 20, 190);
+    gfx_TextClearBG("Hashing gfx for version...", 20, 190, true);
     hash_init(ctx, SHA256);
     if((f = ti_Open(gfx_appv_name, "r"))){
         hash_update(ctx, ti_GetDataPtr(f), ti_GetSize(f));
         ti_Close(f);
     }
     hash_final(ctx, digest);
-    gfx_TextClearBG("Comparing version w/ server...", 20, 190);
+    gfx_TextClearBG("Comparing version w/ server...", 20, 190, true);
     ntwk_send(GFX_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_SIZE));
 }
 
 void srv_request_client(hash_ctx *ctx){
     ti_var_t f;
     uint8_t digest[SHA256_DIGEST_SIZE];
-    gfx_TextClearBG("", 20, 200);
-    gfx_TextClearBG("Hashing client for version...", 20, 190);
+    gfx_TextClearBG("", 20, 200, true);
+    gfx_TextClearBG("Hashing client for version...", 20, 190, true);
     hash_init(ctx, SHA256);
     if((f = ti_OpenVar("TITREK", "r", TI_PPRGM_TYPE))){
         hash_update(ctx, ti_GetDataPtr(f), ti_GetSize(f));
         ti_Close(f);
     }
     hash_final(ctx, digest);
-    gfx_TextClearBG("Comparing version w/ server...", 20, 190);
+    gfx_TextClearBG("Comparing version w/ server...", 20, 190, true);
     ntwk_send(MAIN_REQ_UPDATE, PS_PTR(digest, SHA256_DIGEST_SIZE));
 }
+

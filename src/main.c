@@ -66,7 +66,11 @@ gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_error_size);
 gfx_UninitedRLETSprite(icon_netup, icon_networkup_size);
 gfx_UninitedRLETSprite(icon_netdown, icon_networkdown_size);
+<<<<<<< HEAD
 gfx_UninitedRLETSprite(icon_security, icon_networkdown_size);
+=======
+gfx_UninitedRLETSprite(icon_security, icon_security_size);
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
 gfx_UninitedRLETSprite(log_error, log_error_size);
 gfx_UninitedRLETSprite(log_info, log_info_size);
 gfx_UninitedRLETSprite(log_debug, log_debug_size);
@@ -142,8 +146,13 @@ void MainMenu(void) {
 }
 
 void ServerSelect(void){
+#define CEMU_CONSOLE ((char*)0xFB0000)
     uint8_t i, selected = 0;
+<<<<<<< HEAD
     bool render = true;
+=======
+    bool firstrender = true;
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
     sk_key_t key = 0;
     char *var_name;
     void *vat_ptr = NULL;
@@ -157,16 +166,29 @@ void ServerSelect(void){
         strncpy(9*filect+filenames, var_name, 9);
         filect++;
     }
+<<<<<<< HEAD
     if(filenames==NULL) return;
     
+=======
+    filect;
+    if(filenames==NULL) return;
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
     do {
+        char* hostinfo;
         key = getKey();
         
         if(key == sk_Clear) break;
+<<<<<<< HEAD
         if((key == sk_Left) && (offset>0)) {offset--; render=true;}
         if((key == sk_Right) && (offset<(filect-1))) {offset++; render=true;}
         
         if(key == sk_Enter){
+=======
+        if((key == sk_Left) && (offset>0)) offset--;
+        if((key == sk_Right) && (offset<(filect-1))) offset++;
+        
+         if(key == sk_Enter){
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
             ti_var_t fp = ti_Open(9*offset+filenames, "r");
             if(!fp) return;
             strcpy(serverinfo.appvname, 9*offset+filenames);
@@ -176,7 +198,11 @@ void ServerSelect(void){
             break;
         }
         
+<<<<<<< HEAD
         if(render){
+=======
+        if(key || firstrender){
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
             window_data_t win = {3, 260, 20, 90, 195, 2, 181};
             ti_var_t tfp = ti_Open(9*offset+filenames, "r");
             gfx_ZeroScreen();
@@ -213,10 +239,17 @@ void ServerSelect(void){
                 gfx_PrintStringXY("Error opening file", 10, 25);
             }
             gfx_BlitBuffer();
+<<<<<<< HEAD
             render = false;
         }
         ntwk_process();
        
+=======
+            firstrender = false;
+        }
+        
+        ntwk_process();
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
     } while (1);
 }
 
@@ -225,8 +258,11 @@ int main(void) {
     gfx_Begin();
     srandom(rtc_Time());
     ti_CloseAll();
+    
+    gfx_PrintStringXY("initializing secure rng...", 5, 5);
     csrand_init();
     
+<<<<<<< HEAD
     if((savefile = ti_Open(settingsappv, "r"))){
         if(ti_GetSize(savefile) != (sizeof settings)) set_defaults();
         else {
@@ -235,6 +271,18 @@ int main(void) {
         }
     } else { set_defaults(); }
 
+=======
+    gfx_PrintStringXY("initializing settings...", 5, 15);
+    if((savefile = ti_Open(settingsappv, "r")) && (ti_GetSize(savefile) == sizeof(settings))){
+        ti_Read(&settings, sizeof(settings), 1, savefile);
+        ti_Close(savefile);
+    }
+    if(savefile = ti_Open(settingsappv, "r")){
+        
+    } else { set_defaults(); }
+
+    gfx_PrintStringXY("decompressing internal assets...", 5, 25);
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
     zx7_Decompress(err_icon, icon_error_compressed);
     zx7_Decompress(splash, splash_compressed);
     zx7_Decompress(icon_netup, icon_networkup_compressed);
@@ -244,6 +292,8 @@ int main(void) {
     zx7_Decompress(log_info, log_info_compressed);
     zx7_Decompress(log_debug, log_debug_compressed);
     zx7_Decompress(log_server, log_server_compressed);
+    
+    gfx_PrintStringXY("initializing usb device...", 5, 35);
     if(!ntwk_init()) goto error;
     
     
@@ -369,9 +419,16 @@ uint8_t PlayGame(void){
     gameflags.exit = false;
     netflags.bridge_up = false;
     gfx_InitModuleIcons();
+<<<<<<< HEAD
     ntwk_send(CONNECT, PS_STR(serverinfo.hostname));
     gfx_PrintStringXY("Waiting for bridge...", 20, 190);
     gfx_PrintStringXY("[Clear] to stop", 20, 200);
+=======
+    gfx_SetTextFGColor(255);
+    ntwk_send(CONNECT, PS_STR(serverinfo.hostname));
+    gfx_TextClearBG("Waiting for bridge...", 20, 190, true);
+    gfx_TextClearBG("[Clear] to stop", 20, 200, true);
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
     gfx_BlitBuffer();
     do {
         key = getKey();
@@ -381,7 +438,7 @@ uint8_t PlayGame(void){
         if(netflags.bridge_error==true) return BRIDGE;
         if(!wait--) return TIMEOUT;
     }   while(1);
-    gfx_TextClearBG("Waiting for server...", 20, 190);
+    gfx_TextClearBG("Waiting for server...", 20, 190, true);
     wait = 10000;
     do {
         key = getKey();

@@ -16,11 +16,19 @@ typedef struct {
     uint24_t log_limit;
 } limiter_t;
 
+typedef struct {
+    char hostname[50];
+    char keyfile[9];
+} serverdata_t;
 
 #define LOGIN_TOKEN_SIZE 128
 typedef struct {
     bool debug;
     limiter_t limits;
+<<<<<<< HEAD
+=======
+    bool key_loaded;
+>>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
 } settings_t;
 extern settings_t settings;
 

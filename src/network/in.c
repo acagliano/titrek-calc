@@ -68,10 +68,10 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 uint8_t* key = &p->k;
                 uint8_t msg[256] = {0};
                 uint8_t encr_text[32] = {0};
-                gfx_TextClearBG("generating AES key...", 20, 190);
+                gfx_TextClearBG("generating AES key...", 20, 190, true);
                 csrand_fill(aes_key, AES_KEYLEN);
                 sprintf(encr_text, "RSA-%u encrypting...", keylen<<3);
-                gfx_TextClearBG(encr_text, 20, 190);
+                gfx_TextClearBG(encr_text, 20, 190, true);
                 hexdump(key, keylen, "---RSA Key---");
                 rsa_encrypt(aes_key, AES_KEYLEN, msg, key, keylen, SHA256);
                 hexdump(msg, keylen, "---Encrypted---");
@@ -184,7 +184,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 gfx_bytes_written += buff_size-1;
             hash_update(&gfx_hash, data, buff_size-1);
             sprintf(msg, "Gfx download: %u%%", (100*gfx_bytes_written/gfx_dl_size));
-            gfx_TextClearBG(msg, 20, 190);
+            gfx_TextClearBG(msg, 20, 190, true);
             ntwk_send_nodata(GFX_FRAME_NEXT);       // 93
             break;
         }
@@ -194,12 +194,10 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 hash_final(&gfx_hash, digest);
                 if(digest_compare(digest, data, SHA256_DIGEST_SIZE)){
                     ti_Delete("TrekGFX");
+                    ti_SetArchiveStatus(true, gfx_fp);
                     ti_Close(gfx_fp);
                     ti_Rename("_TrekGFX", "TrekGFX");
-                    gfx_fp = ti_Open("_TrekGFX", "w");
-                    ti_SetArchiveStatus(true, gfx_fp);
                     gameflags.gfx_error = false;
-                    ti_Close(gfx_fp);
                 }
                 else {
                     gfx_ErrorClearBG("gfx download error", 20, 190);
@@ -232,7 +230,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 client_bytes_written += buff_size-1;
             hash_update(&client_hash, data, buff_size-1);
             sprintf(msg, "Client download: %u%%", (100*client_bytes_written/client_dl_size));
-            gfx_TextClearBG(msg, 20, 190);
+            gfx_TextClearBG(msg, 20, 190, true);
             ntwk_send_nodata(MAIN_FRAME_NEXT);       // 93
             break;
         }
@@ -257,7 +255,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 }
             }
         case MAIN_SKIP:
-            gfx_TextClearBG("initiating secure session...", 20, 190);
+            gfx_TextClearBG("initiating secure session...", 20, 190, true);
             ntwk_send_nodata(REQ_SECURE_SESSION);
             break;
         default:

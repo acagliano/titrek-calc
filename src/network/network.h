@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "../util.h"
+#include "../flags.h"
 
 typedef struct {
     bool network_up;

@@ -3,6 +3,7 @@
 
 #include <hashlib.h>
 #include "colors.h"
+#include "../classes/settings.h"
 #define gfx_RectangleColor(color, x1, y1, w, h) \
     gfx_SetColor((color)); \
     gfx_Rectangle((x1), (y1), (w), (h));
@@ -42,5 +43,6 @@ uint8_t prompt_for(char* prompt, char* buffer, size_t len, uint24_t x, uint8_t y
 
 void srv_request_gfx(hash_ctx *ctx);
 void srv_request_client(hash_ctx *ctx);
+
 
 #endif

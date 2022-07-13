@@ -63,7 +63,7 @@ int text_GetCenterX(char* string){
 }
 
 int num_GetLength(int number){
-    return 1 + (number >= 10) + (number >= 100);
+    return 1 + (number >= 10) + (number >= 100) + (number >= 1000) + (number >= 10000);
 }
 
 uint8_t gfx_VCenterText(uint8_t y, uint8_t box_height, uint8_t font_height){
@@ -80,9 +80,16 @@ void gfx_HighlightedText(const char* string, uint24_t x, uint8_t y, uint8_t text
     gfx_SetTextFGColor(oldcolor);
 }
 
-void gfx_TextClearBG(const char* string, uint24_t x, uint8_t y){
+void gfx_ColoredText(const char* string, uint24_t x, uint8_t y, uint8_t color){
+    uint8_t oldcolor = gfx_SetTextFGColor(color);
+    gfx_PrintStringXY(string, x, y);
+    gfx_SetTextFGColor(oldcolor);
+}
+
+void gfx_TextClearBG(const char* string, uint24_t x, uint8_t y, bool full_line){
     uint8_t old_gfx_color = gfx_SetColor(0);
-    gfx_FillRectangle(x, y, 320, 8);
+    if(full_line) gfx_FillRectangle(0, y, 320, 8);
+    else gfx_FillRectangle(x, y, gfx_GetStringWidth(string), 8);
     gfx_PrintStringXY(string, x, y);
     gfx_SetColor(old_gfx_color);
     gfx_BlitRectangle(gfx_buffer, x, y, 320, 8);
