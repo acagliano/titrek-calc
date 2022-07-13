@@ -9,6 +9,7 @@ extern "C" {
 #include "icon_error.h"
 #include "icon_networkdown.h"
 #include "icon_networkup.h"
+#include "icon_security.h"
 #include "log_debug.h"
 #include "log_error.h"
 #include "log_info.h"

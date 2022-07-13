@@ -56,7 +56,6 @@
 #include <debug.h>
 
 char *settingsappv = "TrekSett";
-char *keyappv = "trekkey";
 char *TEMP_PROGRAM = "_";
 char *MAIN_PROGRAM = "TITREK";
 ship_t Ship = {0};
@@ -67,6 +66,7 @@ gfx_UninitedRLETSprite(splash, splash_size);
 gfx_UninitedRLETSprite(err_icon, icon_error_size);
 gfx_UninitedRLETSprite(icon_netup, icon_networkup_size);
 gfx_UninitedRLETSprite(icon_netdown, icon_networkdown_size);
+gfx_UninitedRLETSprite(icon_security, icon_networkdown_size);
 gfx_UninitedRLETSprite(log_error, log_error_size);
 gfx_UninitedRLETSprite(log_info, log_info_size);
 gfx_UninitedRLETSprite(log_debug, log_debug_size);
@@ -79,13 +79,13 @@ uint24_t ticknum = 0;
 moduleinfo_t ModuleInfo = {0};
 uint24_t ntwk_inactive_clock = 0;
 uint24_t ntwk_inactive_disconnect = 0;
-bridge_config_t bridge_config = {0};
 particles_t particles[MAX_PARTICLES] = {0};
 engine_ref_t engine_ref = {0};
 uint8_t playgame_return = 0;
 bool full_redraw = true;
 bool gfx_loaded = false;
 uint8_t errors = 0;
+serverinfo_t serverinfo = {0};
 
 ti_var_t update_fp = 0;
 
@@ -143,34 +143,79 @@ void MainMenu(void) {
 
 void ServerSelect(void){
     uint8_t i, selected = 0;
-    bool firstrender = true;
-    sk_key_t key;
+    bool render = true;
+    sk_key_t key = 0;
+    char *var_name;
+    void *vat_ptr = NULL;
+    char *filenames = NULL;
+    size_t filect = 0, offset=0;
     if(gameflags.gfx_error) return;
+    
+    // parse VAT for files containing TrekKey string at beginning.
+    while ((var_name = ti_Detect(&vat_ptr, "TrekKey"))){
+        filenames = realloc(filenames, sizeof(filenames)+9);
+        strncpy(9*filect+filenames, var_name, 9);
+        filect++;
+    }
+    if(filenames==NULL) return;
+    
     do {
         key = getKey();
-        if(key == sk_Down) selected += (selected < 9);
-        if(key == sk_Up) selected -= (selected > 0);
+        
         if(key == sk_Clear) break;
-        if((key == sk_Del) && (selected != 0)){
-            prompt_for("Add Server:", settings.servers[selected], 49, 20, 210, 0);
-        }
-        if(key || firstrender){
-            gfx_ZeroScreen();
-            gfx_RenderMenuTitle("Server List", 3, 5);
-            gfx_RenderMenu(settings.servers, 10, selected, 5, 20, 200, 160);
-            gfx_SetTextFGColor(255);
-            gfx_PrintStringXY("[Enter] Select", 210, 30);
-            gfx_PrintStringXY("[Del] Edit/Add", 210, 40);
-            gfx_BlitBuffer();
-            firstrender = false;
-        }
+        if((key == sk_Left) && (offset>0)) {offset--; render=true;}
+        if((key == sk_Right) && (offset<(filect-1))) {offset++; render=true;}
+        
         if(key == sk_Enter){
-            if(settings.servers[selected][0]){
-                bridge_config.server = selected;
-                playgame_return = PlayGame();
-                break;
-            }
+            ti_var_t fp = ti_Open(9*offset+filenames, "r");
+            if(!fp) return;
+            strcpy(serverinfo.appvname, 9*offset+filenames);
+            strcpy(serverinfo.hostname, ti_GetDataPtr(fp)+7);
+            ti_Close(fp);
+            playgame_return = PlayGame();
+            break;
         }
+        
+        if(render){
+            window_data_t win = {3, 260, 20, 90, 195, 2, 181};
+            ti_var_t tfp = ti_Open(9*offset+filenames, "r");
+            gfx_ZeroScreen();
+            
+            // main GUI elements
+            gfx_RenderMenuTitle("Server Info", 3, 5);
+            gfx_RenderWindow(&win);
+            gfx_SetTextFGColor(255);
+            gfx_PrintStringXY("[Enter] Connect to selected host", 5, 120);
+            if(offset>0) gfx_ColoredText("[Left] Select previous server", 5, 130, 255);
+            else gfx_ColoredText("[Left] Select previous server", 5, 130, 74);
+            if(offset<(filect-1)) gfx_ColoredText("[Right] Select next server", 5, 140, 255);
+            else gfx_ColoredText("[Right] Select next server", 5, 140, 74);
+            gfx_SetTextFGColor(0);
+            if(tfp) {
+                // if appv opened
+                size_t filesize = ti_GetSize(tfp);
+                size_t keylen = filesize - strlen(ti_GetDataPtr(tfp)+7);
+                keylen -= 8; keylen *= 8;
+                gfx_PrintStringXY("Keyfile: ", 10, 35);
+                gfx_PrintString(9*offset+filenames);
+                gfx_RLETSprite(log_server, 10, 50);
+                gfx_RLETSprite(icon_security, 10, 65);
+                gfx_PrintStringXY(ti_GetDataPtr(tfp)+7, 25, 50);
+                gfx_SetTextXY(25, 65);
+                gfx_PrintUInt(keylen, num_GetLength(keylen));
+                gfx_PrintString("-bit session key");
+                gfx_PrintStringXY("RSA-<=2048 cipher, key exch", 25, 75);
+                gfx_PrintStringXY("AES-256 cipher, login", 25, 85);
+                
+                ti_Close(tfp);
+            }
+            else {
+                gfx_PrintStringXY("Error opening file", 10, 25);
+            }
+            gfx_BlitBuffer();
+            render = false;
+        }
+        ntwk_process();
        
     } while (1);
 }
@@ -182,19 +227,19 @@ int main(void) {
     ti_CloseAll();
     csrand_init();
     
-    if((savefile = ti_Open(settingsappv, "r")) && (ti_GetSize(savefile) == sizeof(settings))){
-        ti_Read(&settings, sizeof(settings), 1, savefile);
-        ti_Close(savefile);
-    }
-    if(savefile = ti_Open(settingsappv, "r")){
-        
+    if((savefile = ti_Open(settingsappv, "r"))){
+        if(ti_GetSize(savefile) != (sizeof settings)) set_defaults();
+        else {
+            ti_Read(&settings, sizeof(settings), 1, savefile);
+            ti_Close(savefile);
+        }
     } else { set_defaults(); }
 
-    check_import_login_key();
     zx7_Decompress(err_icon, icon_error_compressed);
     zx7_Decompress(splash, splash_compressed);
     zx7_Decompress(icon_netup, icon_networkup_compressed);
     zx7_Decompress(icon_netdown, icon_networkdown_compressed);
+    zx7_Decompress(icon_security, icon_security_compressed);
     zx7_Decompress(log_error, log_error_compressed);
     zx7_Decompress(log_info, log_info_compressed);
     zx7_Decompress(log_debug, log_debug_compressed);
@@ -316,7 +361,6 @@ uint8_t PlayGame(void){
     sk_key_t key = 0;
     uint24_t wait = 10000;
     full_redraw = true;
-    if(!settings.key_loaded) return KEY;
     if(gameflags.gfx_error) return GFX;
     if(!netflags.network_up) return NTWK;
     ntwk_inactive_disconnect = settings.limits.network_timeout * 11 / 10;
@@ -325,7 +369,7 @@ uint8_t PlayGame(void){
     gameflags.exit = false;
     netflags.bridge_up = false;
     gfx_InitModuleIcons();
-    ntwk_send(CONNECT, PS_STR(settings.servers[bridge_config.server]));
+    ntwk_send(CONNECT, PS_STR(serverinfo.hostname));
     gfx_PrintStringXY("Waiting for bridge...", 20, 190);
     gfx_PrintStringXY("[Clear] to stop", 20, 200);
     gfx_BlitBuffer();

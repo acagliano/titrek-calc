@@ -38,8 +38,10 @@ typedef struct {
 } net_mode_t;
 
 typedef struct {
-    uint8_t server;
-} bridge_config_t;
+    char appvname[9];
+    char hostname[256];
+} serverinfo_t;
+extern serverinfo_t serverinfo;
 
 extern net_mode_t mode_srl;
 extern net_mode_t mode_pipe;

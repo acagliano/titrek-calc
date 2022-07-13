@@ -12,8 +12,6 @@ unsigned char TrekGFX_init(void)
     void *base;
     unsigned char i;
 
-    ti_CloseAll();
-
     appvar = ti_Open("TrekGFX", "r");
     if (appvar == 0)
     {
@@ -23,6 +21,7 @@ unsigned char TrekGFX_init(void)
     table = base = (char*)ti_GetDataPtr(appvar) + TrekGFX_HEADER_SIZE;
     if (*table != 31)
     {
+        ti_Close(appvar);
         return 0;
     }
 

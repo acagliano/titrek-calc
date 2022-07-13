@@ -21,9 +21,6 @@ typedef struct {
 typedef struct {
     bool debug;
     limiter_t limits;
-    char servers[10][50];
-    bool key_loaded;
-    uint8_t login_key[LOGIN_TOKEN_SIZE];
 } settings_t;
 extern settings_t settings;
 

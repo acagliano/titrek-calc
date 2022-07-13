@@ -98,3 +98,9 @@ void gfx_ErrorClearBG(const char* error, uint24_t x, uint8_t y){
     gfx_SetColor(old_gfx_color);
     gfx_BlitRectangle(gfx_buffer, x-5, y-1, 320, 10);
 }
+
+void gfx_ColoredText(const char* string, uint24_t x, uint8_t y, uint8_t color){
+    uint8_t oldcolor = gfx_SetTextFGColor(color);
+    gfx_PrintStringXY(string, x, y);
+    gfx_SetTextFGColor(oldcolor);
+}

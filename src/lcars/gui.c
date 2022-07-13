@@ -218,17 +218,20 @@ bool gui_Login(uint8_t* key) {
     aes_ctx ctx;
     uint8_t iv[AES_BLOCKSIZE];
     uint8_t ct[PPT_LEN];
+    ti_var_t tfp = ti_Open(serverinfo.appvname, "r");
+    if(!tfp) return false;
     
     gfx_TextClearBG("encrypting auth token...", 20, 190);
     aes_init(key, &ctx, 32);         // load secret key
     csrand_fill(iv, AES_BLOCKSIZE);     // get IV
     
-    // Pad plaintext
-    //hashlib_AESPadMessage(settings.login_key, LOGIN_TOKEN_SIZE, ppt, SCHM_DEFAULT);
-    // this is no longer necessary as of HASHLIB 8
+    // retrieve pointer to hostname (appv_start + 7)
+    char* hostname = ti_GetDataPtr(tfp) + 7;
+    // pointer to start of key = hostname + strlen(hostname) + 1 (null term)
+    char* keydata = hostname + strlen(hostname) + 1;
     
     // Encrypt the login token with AES-256
-    if(aes_encrypt(settings.login_key, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
+    if(aes_encrypt(keydata, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
     gfx_TextClearBG("logging you in...", 20, 190);
     ntwk_send(LOGIN,
         PS_PTR(iv, AES_BLOCKSIZE),
