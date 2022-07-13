@@ -218,14 +218,8 @@ bool gui_Login(uint8_t* key) {
     aes_ctx ctx;
     uint8_t iv[AES_BLOCKSIZE];
     uint8_t ct[PPT_LEN];
-<<<<<<< HEAD
     ti_var_t tfp = ti_Open(serverinfo.appvname, "r");
     if(!tfp) return false;
-=======
-    char *keyfile = serverinfo.appvname;
-    ti_var_t kf = ti_Open(keyfile, "r");
-    if(!kf) return false;
->>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
     
     gfx_TextClearBG("encrypting auth token...", 20, 190, true);
     aes_init(key, &ctx, 32);         // load secret key
@@ -237,15 +231,8 @@ bool gui_Login(uint8_t* key) {
     char* keydata = hostname + strlen(hostname) + 1;
     
     // Encrypt the login token with AES-256
-<<<<<<< HEAD
-    if(aes_encrypt(keydata, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
-    gfx_TextClearBG("logging you in...", 20, 190);
-=======
-    char* hostname = ti_GetDataPtr(kf)+7;
-    char* keydata = hostname+strlen(hostname)+1;
     if(aes_encrypt(keydata, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK) return false;
     gfx_TextClearBG("logging you in...", 20, 190, true);
->>>>>>> 503e9e92043708743accf1f7808ae956a27dff9e
     ntwk_send(LOGIN,
         PS_PTR(iv, AES_BLOCKSIZE),
         PS_PTR(ct, PPT_LEN)
