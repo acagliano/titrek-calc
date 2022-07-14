@@ -15,6 +15,9 @@ extern "C" {
 #include "log_info.h"
 #include "log_server.h"
 #include "splash.h"
+#include "star_large.h"
+#include "star_medium.h"
+#include "star_small.h"
 
 #ifdef __cplusplus
 }
