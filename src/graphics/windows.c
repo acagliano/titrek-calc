@@ -37,10 +37,23 @@ void box_DrawBox(box_t* box, uint8_t bgcolor, uint8_t bordercolor, uint8_t borde
     window_DrawWindow((window_t*)box, bgcolor, bordercolor, borderwidth);
 }
 
-void box_PrintString(box_t* box, const char* string, uint24_t x, uint8_t y, uint8_t color){
+void box_PrintStringXY(box_t* box, const char* string, uint24_t x, uint8_t y, uint8_t color){
     x += box->x;
     y += box->y;
     uint8_t oldcolor = gfx_SetTextFGColor(color);
     gfx_PrintStringXY(string, x, y);
     gfx_SetTextFGColor(oldcolor);
+}
+
+void box_SetTextXY(box_t* box, uint24_t x, uint8_t y){
+    x += box->x;
+    y += box->y;
+    gfx_SetTextXY(x, y);
+}
+
+
+void box_RenderSprite(box_t* box, gfx_rletsprite_t* sprite, uint24_t x, uint8_t y){
+    x += box->x;
+    y += box->y;
+    gfx_RLETSprite(sprite, x, y);
 }

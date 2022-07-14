@@ -14,14 +14,14 @@ struct _starfield {
 
 #define STAR_OBJ_COUNT 50
 #define STAR_SPRITE_COUNT 3
-#define STAR_SPRITE_SIZE (8*8)
+#define STAR_SPRITE_SIZE 100
 #define SMALL_STAR_IDX 0
 #define MEDIUM_STAR_IDX 1
 #define LARGE_STAR_IDX 2
-#define STAR_ANIM_SPEED 5
+#define STAR_ANIM_SPEED 25
 void anim_MainMenu(uint24_t x_start, uint8_t y_start, uint24_t x_Width, uint8_t y_Height){
     static struct _starfield star_entities[STAR_OBJ_COUNT];
-    static bool starfield_init = false;
+    static bool starfield_init;
     static uint8_t star_sprites[STAR_SPRITE_COUNT][STAR_SPRITE_SIZE];
     static uint24_t tick=STAR_ANIM_SPEED;
     gfx_rletsprite_t *small_star = (gfx_rletsprite_t*)star_sprites[SMALL_STAR_IDX],

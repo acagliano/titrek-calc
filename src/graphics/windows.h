@@ -22,6 +22,8 @@ void window_DrawWindow(window_t* window, uint8_t bgcolor, uint8_t bordercolor, u
 void window_DrawTitle(window_t* window, uint8_t titlebgcolor, uint8_t titlefontcolor, const char* title, bool largetext);
 void box_ParentToWindow(box_t* box, window_t* window);
 void box_DrawBox(box_t* box, uint8_t bgcolor, uint8_t bordercolor, uint8_t borderwidth);
-void box_PrintString(box_t* box, const char* string, uint24_t x, uint8_t y, uint8_t color);
+void box_PrintStringXY(box_t* box, const char* string, uint24_t x, uint8_t y, uint8_t color);
+void box_RenderSprite(box_t* box, gfx_rletsprite_t* sprite, uint24_t x, uint8_t y);
+void box_SetTextXY(box_t* box, uint24_t x, uint8_t y);
 
 #endif
