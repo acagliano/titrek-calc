@@ -15,3 +15,13 @@ void text_PaddedText(char* string, uint24_t x, uint8_t y, uint8_t bgcolor, uint8
     gfx_SetTextScale(1, 1);
     gfx_SetTextFGColor(oldtext);
 }
+
+int num_GetLength(int number){
+    return 1 + (number >= 10) + (number >= 100) + (number >= 1000) + (number >= 10000);
+}
+
+void gfx_ColoredText(const char* string, uint24_t x, uint8_t y, uint8_t color){
+    uint8_t oldcolor = gfx_SetTextFGColor(color);
+    gfx_PrintStringXY(string, x, y);
+    gfx_SetTextFGColor(oldcolor);
+}
