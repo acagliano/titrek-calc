@@ -15,7 +15,7 @@ net_mode_t mode_srl = {
         &srl_write
 };
 
-bool serial_Init(void){
+bool serial_init(void){
     
     srl_error_t srl_error;
     if(!libload_IsLibLoaded(SRLDRVCE)) return false;
