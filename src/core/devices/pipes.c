@@ -15,6 +15,7 @@ bool pipes_init(void){
     if(!cemu_check()) return false;
     
     mode = &mode_pipe;
+    return true;
 }
 
 bool pipe_read_to_size(size_t size) {

@@ -1,4 +1,5 @@
 #include "network.h"
+#include "../graphics/console.h"
 
 uint8_t net_device_buffer[NTWK_BUFFER_SIZE];
 uint8_t net_parse_buffer[NTWK_BUFFER_SIZE>>1];
@@ -12,12 +13,8 @@ bool ntwk_init(void) {
     if(tcp_init()) return true;
     else if(serial_init) return true;
     else if(pipes_init) return true;
-        
-    }
     
-    else { mode = &mode_srl; }
-
-    return mode->init();
+    console_write(ENTRY_ERROR_MSG, "No network device available or init error. Check libraries.");
 }
 
 void ntwk_process(void) {
