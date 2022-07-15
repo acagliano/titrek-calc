@@ -1,18 +1,24 @@
 
 #include <tice.h>
-#include <keypadc.h>
-#include <fileioc.h>
 #include <stdbool.h>
+#include <string.h>
+
+#include <graphx.h>
 #include <usbdrvce.h>
 #include <hashlib.h>
+#include <keypadc.h>
+#include <fileioc.h>
 #include <compression.h>
-#include "controlcodes.h"
+
 #include "network.h"
+#include "gameloop.h"
+#include "controlcodes.h"
+#include "../graphics/text.h"
+#include "../graphics/console.h"
 
 #define SHA256_DIGEST_SIZE SHA256_DIGEST_LEN
 
 uint8_t aes_key[AES_KEYLEN] = {0};
-
 
 #define CEMU_CONSOLE ((char*)0xFB0000)
 void hexdump(uint8_t *addr, size_t len, uint8_t *label){
@@ -40,10 +46,11 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     static size_t file_bytes_written;
     static hash_ctx filestream_hash;
     
-    if(settings.debug){
-        char msg[LOG_LINE_SIZE] = {0};
-        sprintf(&msg, "[RECV]: Ctl: %u Len: %u", in_buff[0], buff_size);
-        gui_SetLog(LOG_DEBUG, msg);
+    if(settings.debug)
+        #define DBG_MSG_EXPECTED_LEN 50
+        static char log_msg[DBG_MSG_EXPECTED_LEN];
+        sprintf(log_msg, "Packet In, Type: %u Size: %u", ctl, buff_size);
+        console_write(ENTRY_DEBUG_MSG, log_msg);
     }
     
     switch(ctl){
@@ -56,40 +63,94 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 size_t keylen = p->kl;
                 uint8_t* key = &p->k;
                 uint8_t msg[256] = {0};
-                uint8_t encr_text[32] = {0};
-                gfx_TextClearBG("generating AES key...", 20, 190, true);
+                uint8_t out_ctl_code = RSA_SEND_SESSION_KEY;
+                
+                console_write(ENTRY_NORMAL, "Exchanging AES secret with server");
                 csrand_fill(aes_key, AES_KEYLEN);
-                sprintf(encr_text, "RSA-%u encrypting...", keylen<<3);
-                gfx_TextClearBG(encr_text, 20, 190, true);
-                hexdump(key, keylen, "---RSA Key---");
                 rsa_encrypt(aes_key, AES_KEYLEN, msg, key, keylen, SHA256);
-                hexdump(msg, keylen, "---Encrypted---");
-                ntwk_send(RSA_SEND_SESSION_KEY, PS_PTR(msg, keylen));
+                
+                ntwk_queue(&out_ctl_code, sizeof out_ctl_code);
+                ntwk_queue(&msg, keylen);
+                ntwk_send();
                 break;
             }
         case RSA_SEND_SESSION_KEY:
-            gui_Login(aes_key);
+        {
+            #define LOGIN_TOKEN_SIZE 128
+            #define PPT_LEN (LOGIN_TOKEN_SIZE+AES_BLOCKSIZE)
+            #define KF_OFFSET_HOSTNAME 7
+            aes_ctx ctx;
+            uint8_t iv[AES_BLOCKSIZE];
+            uint8_t ct[PPT_LEN];
+            ti_var_t tfp = ti_Open(hostinfo.fname, "r");
+            uint8_t ctl_out_code = LOGIN;
+            if(!tfp) {
+                console_write(ENTRY_ERROR_MSG, "Error opening keyfile");
+                break;
+            };
+    
+            console_write(ENTRY_NORMAL, "Securely logging you in");
+            
+            aes_init(aes_key, &ctx, 32);         // load secret key
+            csrand_fill(iv, AES_BLOCKSIZE);     // get IV
+    
+            // retrieve pointer to hostname (appv_start + 7)
+            char* hostname = ti_GetDataPtr(tfp) + KF_OFFSET_HOSTNAME;
+            // pointer to start of key = hostname + strlen(hostname) + 1 (null term)
+            char* keydata = hostname + strlen(hostname) + 1;
+    
+            // close filestream
+            ti_Close(tfp);
+            
+            // Encrypt the login token with AES-256
+            if(aes_encrypt(keydata, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK){
+                console_write(ENTRY_ERROR_MSG, "AES cipher error");
+                break;
+            }
+
+            ntwk_queue(&ctl_out_code, sizeof ctl_out_code);
+            ntwk_queue(iv, AES_BLOCKSIZE);
+            ntwk_queue(ct, PPT_LEN);
+            ntwk_send();
+    
+            // Zero out key schedule, key used, and IV
             break;
+        }
         case CONNECT:
-            netflags.bridge_up = true;
-            srv_request_client(&filestream_hash);
+        {
+            tick_loop_mode = SERVER_CONNECTED;
+            
+            // hash current client binary to check with server
+            uint8_t digest[SHA256_DIGEST_SIZE];
+            uint8_t ctl_out_code = MAIN_REQ_UPDATE;
+            console_write(ENTRY_NORMAL, "Validating client hash with server");
+            hash_init(&filestream_hash, SHA256);
+            if((filehandle = ti_OpenVar("TITREK", "r", OS_TYPE_PROT_PRGM))){
+                hash_update(&filestream_hash, ti_GetDataPtr(filehandle), ti_GetSize(filehandle));
+                ti_Close(filehandle);
+            }
+            hash_final(&filestream_hash, digest);
+            
+            ntwk_queue(&ctl_out_code, sizeof ctl_out_code);
+            ntwk_queue(digest, SHA256_DIGEST_SIZE);
+            ntwk_send();
             break;
+        }
         case DISCONNECT:
-            netflags.logged_in = false;
-            gameflags.exit = true;
+            tick_loop_mode = NO_CONNECTION;
+            network_error = NTWK_PEER_DISCONNECT;
             break;
         case BRIDGE_ERROR:
-            netflags.bridge_error = true;
+            network_error = NTWK_BRIDGE_ERR;
             break;
         case LOGIN:
             if(response == SUCCESS) {
-                netflags.logged_in = true;
+                tick_loop_mode = USER_LOGGED_IN;
                 srv_request_gfx(&filestream_hash);        // see lcars/gui.c
             }
             else if(response==INVALID){
-                gfx_ErrorClearBG("auth token invalid", 20, 190);
-                while(!kb_AnyKey()) kb_Scan();
-                gameflags.login_err = true;
+                console_write(ENTRY_SERVER_MSG, "Invalid session token. Unable to log in.");
+                network_error = NTWK_AUTH_ERR;
             }
             break;
         case FRAMEDATA_REQUEST:
@@ -109,7 +170,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             }
             break;
         case MESSAGE:
-            gui_SetLog(LOG_SERVER, data);
+            console_write(ENTRY_NORMAL, data);
             break;
         case LOAD_SHIP:
             {
@@ -153,7 +214,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         }
             break;
         case PING:
-            ntwk_inactive_clock = 0;
+            ntwk_DisableTimeout();
             break;
         case GET_ENGINE_MAXIMUMS:
             memcpy(&engine_ref.engine[0], data, sizeof(engine_ref_t)-1);
@@ -164,7 +225,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         {
             const char* file = (ctl==MAIN_FRAME_START) ? temp_program : temp_gfx;
             uint8_t out_ctl_code = (ctl==MAIN_FRAME_START) ? MAIN_FRAME_NEXT : GFX_FRAME_NEXT;
-            uint8_t filetype = (ctl==MAIN_FRAME_DONE) ? OS_TYPE_TMP_PRGM : OS_TYPE_APPVAR;
+            uint8_t filetype = (ctl==MAIN_FRAME_DONE) ? OS_TYPE_PROT_PRGM : TI_APPVAR_TYPE;
             hash_init(&filestream_hash, SHA256);
             memcpy(&file_dl_size, data, sizeof(size_t));
             file_bytes_written = 0;
@@ -201,7 +262,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             if(digest_compare(digest, data, SHA256_DIGEST_SIZE)){
                 const char* filein = (ctl==MAIN_FRAME_DONE) ? temp_program : temp_gfx;
                 const char* fileout = (ctl==MAIN_FRAME_DONE) ? main_program : main_gfx;
-                uint8_t filetype = (ctl==MAIN_FRAME_DONE) ? OS_TYPE_TMP_PRGM : OS_TYPE_APPVAR;
+                uint8_t filetype = (ctl==MAIN_FRAME_DONE) ? OS_TYPE_PROT_PRGM : TI_APPVAR_TYPE;
                 ti_DeleteVar(fileout, filetype);
                 if(ctl == GFX_FRAME_DONE) ti_SetArchiveStatus(true, filehandle);
                 ti_Close(filehandle);

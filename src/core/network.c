@@ -1,4 +1,3 @@
-
 #include "network.h"
 
 uint8_t net_device_buffer[NTWK_BUFFER_SIZE];
@@ -7,6 +6,7 @@ uint8_t packet_queue_buffer[NTWK_BUFFER_SIZE>>1] = {0};
 packet_queue_t *packet_queue = (packet_queue_t*)packet_queue_buffer;
 
 net_mode_t *mode;
+network_error_t network_error = NTWK_OK; 
 
 bool ntwk_init(void) {
     if(cemu_check()) {

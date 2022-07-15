@@ -1,5 +1,7 @@
 #include <stdbool.h>
 #include <graphx.h>
+#include <fontlibc.h>
+
 #include "windows.h"
 #include "text.h"
 

@@ -19,13 +19,43 @@ typedef struct {
     bool (*read_to_size)(size_t size);
     void (*write)(void *data, size_t size);
 } net_mode_t;
+bool ntwk_queue(void* data, size_t len);
+bool ntwk_send(void);
+
+typedef struct {
+    uint8_t control;
+    uint8_t data[1];
+} packet_t;
 
 typedef struct _packet_queue_t {
     size_t size;
     uint8_t data[1];
 } packet_queue_t;
 
+typedef struct _hostinfo_t {
+    char fname[9];
+    char hostname[128];
+} hostinfo_t;
+extern hostinfo_t hostinfo;
+
+typedef enum _network_error_t {
+    NTWK_OK,
+    NTWK_BRIDGE_ERR,
+    NTWK_SERVER_DISCONNECT,
+    NTWK_TIMEOUT,
+    NTWK_AUTH_ERR,
+    NTWK_PEER_DISCONNECT = 0xf0
+} network_error_t;
+extern network_error_t network_error;
+
 #define AES_KEYLEN 32
 extern uint8_t aes_key[AES_KEYLEN];
+
+extern uint24_t ntwk_timeout_clock;
+#define ntwk_GetTimeoutEnabled() (ntwk_timeout_clock>>23)
+#define ntwk_EnableTimeout() ntwk_timeout_clock |= 0x800000
+#define ntwk_DisableTimeout() ntwk_timeout_clock &= 0x7fffff
+#define ntwk_SetTimeout(timeout) ntwk_timeout_clock |= timeout
+#define ntwk_GetTimerValue() ntwk_timeoutclock & 0x00ffff
 
 #endif

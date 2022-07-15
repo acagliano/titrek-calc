@@ -11,7 +11,6 @@ extern game_error_t game_error;
 
 typedef enum {
     NO_CONNECTION,
-    BRIDGE_CONNECTED,
     SERVER_CONNECTED,
     USER_LOGGED_IN
 } tick_loop_mode_t;

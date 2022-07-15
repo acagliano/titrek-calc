@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <compression.h>
+#include <fontlibc.h>
 
 #include "../asm/exposure.h"
 #include "animations.h"
@@ -117,7 +118,6 @@ bool menu_SelectKeyFile(char* file){
             gfx_ZeroScreen();
             
             // main GUI elements
-            box_ParentToWindow(&box, &window);
             window_DrawWindow(&window, 149, 24, 3);
             window_DrawTitle(&window, 24, 255, "SERVERS CONFIGURED", false);
             gfx_PrintStringXY(skf_enter_flavor, text_GetCenterX(skf_enter_flavor, 0, 320), 175);
@@ -143,6 +143,7 @@ bool menu_SelectKeyFile(char* file){
                 box_PrintStringXY(&box, "RSA cipher, key exch", 25, 45, 0);
                 box_PrintStringXY(&box, "AES cipher, login", 25, 55, 0);
                 
+                ti_SetArchiveStatus(true, tfp);
                 ti_Close(tfp);
             }
             else {

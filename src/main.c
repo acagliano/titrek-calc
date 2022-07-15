@@ -26,6 +26,7 @@
 #include <graphx.h>
 #include <compression.h>
 #include <keypadc.h>
+#include <fontlibc.h>
 
 
 #include "graphics/menus.h"
@@ -42,6 +43,7 @@ int main(void) {
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
+    fontlib_SetTransparency(true);
     
     menu_MainMenu();
     
