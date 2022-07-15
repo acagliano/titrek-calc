@@ -72,4 +72,7 @@ bool serial_init(void);
 // usb process events
 void usb_process(void);
 
+// usb device declaration
+extern usb_device_t device;
+
 #endif

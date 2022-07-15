@@ -21,7 +21,7 @@ bool serial_init(void){
     if(!libload_IsLibLoaded(SRLDRVCE)) return false;
     
     // initialize usb device
-    init_usb();     // perhaps PASS the descriptors for the serial device to init_usb???
+    init_usb(srl_GetCDCStandardDescriptors(), srl_handle_usb_event);
     
     srl_error = srl_Open(&srl, device, srl_buf, NTWK_BUFFER_SIZE, SRL_INTERFACE_ANY, 115200);
     if(srl_error) return false;
@@ -42,4 +42,33 @@ bool srl_read_to_size(size_t size){
 
 void srl_write(void *buf, size_t size) {
     srl_Write(&srl, buf, size);
+}
+
+static usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
+                                    usb_callback_data_t *callback_data) {
+    usb_error_t err;
+    /* Delegate to srl USB callback */
+    if ((err = srl_UsbEventCallback(event, event_data, callback_data)) != USB_SUCCESS)
+        return err;
+    /* Enable newly connected devices */
+    if(event == USB_DEVICE_CONNECTED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE)) {
+        usb_device_t device = event_data;
+        printf("device connected\n");
+        usb_ResetDevice(device);
+    }
+    if(event == USB_HOST_CONFIGURE_EVENT) {
+        usb_device_t host = usb_FindDevice(NULL, NULL, USB_SKIP_HUBS);
+        if(host) device = host;
+    }
+    /* When a device is connected, or when connected to a computer */
+    if((event == USB_DEVICE_ENABLED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE))) {
+        device = event_data;
+    }
+    if(event == USB_DEVICE_DISCONNECTED_EVENT) {
+        srl_Close(&srl);
+        tick_loop_mode = NO_CONNECTION;
+        device = NULL;
+    }
+
+    return USB_SUCCESS;
 }
