@@ -164,10 +164,11 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         {
             const char* file = (ctl==MAIN_FRAME_START) ? temp_program : temp_gfx;
             uint8_t out_ctl_code = (ctl==MAIN_FRAME_START) ? MAIN_FRAME_NEXT : GFX_FRAME_NEXT;
+            uint8_t filetype = (ctl==MAIN_FRAME_DONE) ? OS_TYPE_TMP_PRGM : OS_TYPE_APPVAR;
             hash_init(&filestream_hash, SHA256);
             memcpy(&file_dl_size, data, sizeof(size_t));
             file_bytes_written = 0;
-            if(!(filehandle = ti_Open(file, "w"))) break;
+            if(!(filehandle = ti_OpenVar(file, "w", filetype))) break;
             ntwk_queue(&out_ctl_code, sizeof out_ctl_code);
             ntwk_send();
             break;
