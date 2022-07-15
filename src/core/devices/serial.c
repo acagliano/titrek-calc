@@ -35,7 +35,7 @@ bool serial_init(void){
 
 bool srl_read_to_size(size_t size){
     static size_t bytes_read = 0;
-    bytes_read += srl_Read(&srl, &net_buf[bytes_read], size - bytes_read);
+    bytes_read += srl_Read(&srl, &net_parse_buffer[bytes_read], size - bytes_read);
     if(bytes_read >= size) {bytes_read = 0; return true;}
     else return false;
 }
