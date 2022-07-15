@@ -9,10 +9,12 @@ net_mode_t *mode;
 network_error_t network_error = NTWK_OK; 
 
 bool ntwk_init(void) {
-    if(cemu_check()) {
-        dbg_sprintf(dbgout, "Running in CEmu pipe mode\n");
-        mode = &mode_pipe;
+    if(tcp_init()) return true;
+    else if(serial_init) return true;
+    else if(pipes_init) return true;
+        
     }
+    
     else { mode = &mode_srl; }
 
     return mode->init();

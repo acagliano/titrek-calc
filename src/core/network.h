@@ -19,8 +19,11 @@ typedef struct {
     bool (*read_to_size)(size_t size);
     void (*write)(void *data, size_t size);
 } net_mode_t;
-bool ntwk_queue(void* data, size_t len);
-bool ntwk_send(void);
+
+bool ntwk_init(void);       // initialize devices in preference order tcp, serial, pipes
+void ntwk_process(void);    // process usb events
+bool ntwk_queue(void* data, size_t len);    // write partial frame to packet queue
+bool ntwk_send(void);                       // send packet queue and reset queue
 
 typedef struct {
     uint8_t control;
@@ -40,6 +43,7 @@ extern hostinfo_t hostinfo;
 
 typedef enum _network_error_t {
     NTWK_OK,
+    NTWK_DEVICE_INIT_ERR,
     NTWK_BRIDGE_ERR,
     NTWK_SERVER_DISCONNECT,
     NTWK_TIMEOUT,
@@ -57,5 +61,15 @@ extern uint24_t ntwk_timeout_clock;
 #define ntwk_DisableTimeout() ntwk_timeout_clock &= 0x7fffff
 #define ntwk_SetTimeout(timeout) ntwk_timeout_clock |= timeout
 #define ntwk_GetTimerValue() ntwk_timeoutclock & 0x00ffff
+
+
+/* Callers for Device Initializers */
+
+bool init_usb(void);
+bool tcp_init(void);
+bool serial_init(void);
+
+// usb process events
+void usb_process(void);
 
 #endif
