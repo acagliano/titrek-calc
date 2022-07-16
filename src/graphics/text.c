@@ -1,5 +1,6 @@
 
 #include <graphx.h>
+#define LINE_SPACING 10
 
 int text_GetCenterX(char* string, uint24_t start_x, uint24_t width){
     return start_x + ((width - gfx_GetStringWidth(string))>>1);

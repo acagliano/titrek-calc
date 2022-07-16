@@ -1,6 +1,7 @@
 #ifndef windows_h
 #define windows_h
 
+#include <graphx.h>
 
 typedef struct _window_t {
     uint24_t x, w;

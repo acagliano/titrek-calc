@@ -28,7 +28,7 @@
 #include <keypadc.h>
 #include <fontlibc.h>
 
-
+#include "graphics/font/trekfont.h"
 #include "graphics/menus.h"
 
 

@@ -1,12 +1,17 @@
 
 #include <stdbool.h>
-#include "network.h"
+#include "../network.h"
 
 uint8_t *tcp_buf = net_device_buffer;
 
+net_mode_t mode_tcp = {
+        MODE_TCP,
+        NULL,
+        NULL,
+        NULL
+};
 
-
-void tcp_init(void){
+bool tcp_init(void){
     return false;
     // placeholder code for tcp library
 }

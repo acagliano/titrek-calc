@@ -2,17 +2,23 @@
 #include <libload.h>
 #include <srldrvce.h>
 #include <stdbool.h>
-#include "network.h"
+#include "../network.h"
+#include "../gameloop.h"
+
+static usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
+                                    usb_callback_data_t *callback_data);
+bool serial_read_to_size(size_t size);
+void serial_write(void *buf, size_t size);
+
 
 srl_device_t srl;
 uint8_t *srl_buf = net_device_buffer;
 
 net_mode_t mode_srl = {
         MODE_SERIAL,
-        &init_usb,
-        &usb_process,
-        &srl_read_to_size,
-        &srl_write
+        usb_process,
+        serial_read_to_size,
+        serial_write
 };
 
 bool serial_init(void){
@@ -33,14 +39,14 @@ bool serial_init(void){
 }
 
 
-bool srl_read_to_size(size_t size){
+bool serial_read_to_size(size_t size){
     static size_t bytes_read = 0;
     bytes_read += srl_Read(&srl, &net_parse_buffer[bytes_read], size - bytes_read);
     if(bytes_read >= size) {bytes_read = 0; return true;}
     else return false;
 }
 
-void srl_write(void *buf, size_t size) {
+void serial_write(void *buf, size_t size) {
     srl_Write(&srl, buf, size);
 }
 
@@ -53,7 +59,6 @@ static usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
     /* Enable newly connected devices */
     if(event == USB_DEVICE_CONNECTED_EVENT && !(usb_GetRole() & USB_ROLE_DEVICE)) {
         usb_device_t device = event_data;
-        printf("device connected\n");
         usb_ResetDevice(device);
     }
     if(event == USB_HOST_CONFIGURE_EVENT) {

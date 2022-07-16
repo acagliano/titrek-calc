@@ -13,6 +13,7 @@
 #include "network.h"
 #include "gameloop.h"
 #include "controlcodes.h"
+#include "settings.h"
 #include "../graphics/text.h"
 #include "../graphics/console.h"
 
@@ -31,6 +32,16 @@ void hexdump(uint8_t *addr, size_t len, uint8_t *label){
     sprintf(CEMU_CONSOLE, "\n");
 }
 
+void versioncheck_hash_file(char* file, uint8_t type, uint8_t* digest){
+    ti_var_t tfp;
+    hash_ctx ctx;
+    hash_init(&ctx, SHA256);
+    if((tfp = ti_Open(file, "r"))){
+        hash_update(&ctx, ti_GetDataPtr(tfp), ti_GetSize(tfp));
+        ti_Close(tfp);
+    }
+    hash_final(&ctx, digest);
+}
 
 void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     uint8_t ctl = in_buff->control;
@@ -46,7 +57,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     static size_t file_bytes_written;
     static hash_ctx filestream_hash;
     
-    if(settings.debug)
+    if(settings.debug_mode){
         #define DBG_MSG_EXPECTED_LEN 50
         static char log_msg[DBG_MSG_EXPECTED_LEN];
         sprintf(log_msg, "Packet In, Type: %u Size: %u", ctl, buff_size);
@@ -124,12 +135,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             uint8_t digest[SHA256_DIGEST_SIZE];
             uint8_t ctl_out_code = MAIN_REQ_UPDATE;
             console_write(ENTRY_NORMAL, "Validating client hash with server");
-            hash_init(&filestream_hash, SHA256);
-            if((filehandle = ti_OpenVar("TITREK", "r", OS_TYPE_PROT_PRGM))){
-                hash_update(&filestream_hash, ti_GetDataPtr(filehandle), ti_GetSize(filehandle));
-                ti_Close(filehandle);
-            }
-            hash_final(&filestream_hash, digest);
+            versioncheck_hash_file(main_program, OS_TYPE_PROT_PRGM, digest);
             
             ntwk_queue(&ctl_out_code, sizeof ctl_out_code);
             ntwk_queue(digest, SHA256_DIGEST_SIZE);
@@ -146,7 +152,16 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case LOGIN:
             if(response == SUCCESS) {
                 tick_loop_mode = USER_LOGGED_IN;
-                srv_request_gfx(&filestream_hash);        // see lcars/gui.c
+                
+                // hash current graphics binary to check with server
+                uint8_t digest[SHA256_DIGEST_SIZE];
+                uint8_t ctl_out_code = GFX_REQ_UPDATE;
+                console_write(ENTRY_NORMAL, "Validating graphics hash with server");
+                versioncheck_hash_file(main_gfx, TI_APPVAR_TYPE, TI_APPVAR_TYPE);
+                
+                ntwk_queue(&ctl_out_code, sizeof ctl_out_code);
+                ntwk_queue(digest, SHA256_DIGEST_SIZE);
+                ntwk_send();
             }
             else if(response==INVALID){
                 console_write(ENTRY_SERVER_MSG, "Invalid session token. Unable to log in.");
@@ -173,6 +188,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             console_write(ENTRY_NORMAL, data);
             break;
         case LOAD_SHIP:
+        /*
             {
                 uint24_t i;
                 bool main_set = false, tact_set = false;
@@ -184,8 +200,10 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                     if(main_set && tact_set) break;
                 }
             }
+        */
             break;
         case MODULE_STATE_CHANGE:
+        /*
             {
                 struct {
                     uint8_t slot;
@@ -194,38 +212,39 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 module_t* thismodule = &Ship.system[packet->slot];
                 memcpy(thismodule, &packet->newdata, sizeof(module_t));
             }
+            */
             break;
-        case MODULE_INFO_REQUEST:
+        case MODULE_INFO_REQUEST: /*
             {
                 struct {
                     uint8_t slot;
                     moduleinfo_t info;
                 } *packet = (void*)data;
                 memcpy(&ModuleInfo, &packet->info, sizeof(ModuleInfo));
-            }
+            } */
             break;
-        case ENGINE_SETSPEED:
+        case ENGINE_SETSPEED: /*
         {
             struct {
                 uint8_t slot;
                 uint24_t speed;
             } *packet = (void*)data;
             engine_ref.engine[packet->slot].current_speed = packet->speed;
-        }
+        } */
             break;
         case PING:
             ntwk_DisableTimeout();
             break;
-        case GET_ENGINE_MAXIMUMS:
+        case GET_ENGINE_MAXIMUMS: /*
             memcpy(&engine_ref.engine[0], data, sizeof(engine_ref_t)-1);
-            engine_ref.loaded = true;
+            engine_ref.loaded = true; */
             break;
         case MAIN_FRAME_START:
         case GFX_FRAME_START:               // 91
         {
             const char* file = (ctl==MAIN_FRAME_START) ? temp_program : temp_gfx;
             uint8_t out_ctl_code = (ctl==MAIN_FRAME_START) ? MAIN_FRAME_NEXT : GFX_FRAME_NEXT;
-            uint8_t filetype = (ctl==MAIN_FRAME_DONE) ? OS_TYPE_PROT_PRGM : TI_APPVAR_TYPE;
+            uint8_t filetype = (ctl==MAIN_FRAME_DONE) ? OS_TYPE_PROT_PRGM : OS_TYPE_APPVAR;
             hash_init(&filestream_hash, SHA256);
             memcpy(&file_dl_size, data, sizeof(size_t));
             file_bytes_written = 0;
@@ -237,16 +256,16 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case MAIN_FRAME_IN:
         case GFX_FRAME_IN:                   // 92
         {
-            char msg[LOG_LINE_SIZE] = {0};
+            char msg[DBG_MSG_EXPECTED_LEN] = {0};
             char fname[9] = {0};
             uint8_t out_ctl_code = (ctl==MAIN_FRAME_IN) ? MAIN_FRAME_NEXT : GFX_FRAME_NEXT;
             if(!filehandle) break;
             ti_GetName(fname, filehandle);
-            if(ti_Write(data, buff_size-1, 1, gfx_fp))
+            if(ti_Write(data, buff_size-1, 1, filehandle))
                 file_bytes_written += buff_size-1;
             hash_update(&filestream_hash, data, buff_size-1);
-            sprintf(msg, "%s download: %u%%", fname, (100*gfx_bytes_written/gfx_dl_size));
-            gfx_TextClearBG(msg, 20, 190, true);
+            sprintf(msg, "%s download: %u%%", fname, (100*file_bytes_written/file_dl_size));
+            console_write(ENTRY_NORMAL, msg);
             ntwk_queue(&out_ctl_code, sizeof out_ctl_code);
             ntwk_send();
             break;
@@ -254,15 +273,15 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         case MAIN_FRAME_DONE:
         case GFX_FRAME_DONE:        // 94
         {
+            const char* filein = (ctl==MAIN_FRAME_DONE) ? temp_program : temp_gfx;
+            const char* fileout = (ctl==MAIN_FRAME_DONE) ? main_program : main_gfx;
             char fname[9] = {0};
             if(!filehandle) break;
-            ti_GetName(fname, filehandle)
+            ti_GetName(fname, filehandle);
             uint8_t digest[SHA256_DIGEST_SIZE];
             hash_final(&filestream_hash, digest);
             if(digest_compare(digest, data, SHA256_DIGEST_SIZE)){
-                const char* filein = (ctl==MAIN_FRAME_DONE) ? temp_program : temp_gfx;
-                const char* fileout = (ctl==MAIN_FRAME_DONE) ? main_program : main_gfx;
-                uint8_t filetype = (ctl==MAIN_FRAME_DONE) ? OS_TYPE_PROT_PRGM : TI_APPVAR_TYPE;
+                uint8_t filetype = (ctl==MAIN_FRAME_DONE) ? OS_TYPE_PROT_PRGM : OS_TYPE_APPVAR;
                 ti_DeleteVar(fileout, filetype);
                 if(ctl == GFX_FRAME_DONE) ti_SetArchiveStatus(true, filehandle);
                 ti_Close(filehandle);
@@ -276,42 +295,51 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                     os_RunPrgm(fileout, NULL, 0, NULL);
                 }
                 else if(ctl == GFX_FRAME_DONE){
-                    if(TrekGFX_init()){
-                        gfx_InitModuleIcons();
-                        gfx_VersionCheck();
-                        ntwk_send_nodata(LOAD_SHIP);
-                    }
+                    //if(TrekGFX_init()){
+                       // gfx_InitModuleIcons();
+                       // gfx_VersionCheck();
+                      //  ntwk_send_nodata(LOAD_SHIP);
+                    //}
                 }
             }
             else {
-                
+                char msg[DBG_MSG_EXPECTED_LEN] = {0};
+                uint8_t ctl_out_code = (ctl == MAIN_FRAME_DONE) ? MAIN_REQ_UPDATE : GFX_REQ_UPDATE;
+                uint8_t filetype = (ctl == MAIN_FRAME_DONE) ? OS_TYPE_PROT_PRGM : OS_TYPE_APPVAR;
                 ti_Close(filehandle);
                 ti_Delete(filein);
-                if(ctl == MAIN_FRAME_DONE) {
-                    gfx_ErrorClearBG("client download error", 20, 190);
-                    srv_request_client(&filestream_hash);
-                }
-                else if(ctl == GFX_FRAME_DONE) {
-                    gfx_ErrorClearBG("gfx download error", 20, 190);
-                    srv_request_gfx(&filestream_hash);
-                }
+                sprintf(msg, "%s download error, retrying download", fname);
+                console_write(ENTRY_ERROR_MSG, msg);
+                versioncheck_hash_file(fname, filetype, digest);
+                
+                ntwk_queue(&ctl_out_code, sizeof ctl_out_code);
+                ntwk_queue(digest, SHA256_DIGEST_SIZE);
+                ntwk_send();
             }
             break;
         }
         case GFX_SKIP:
+        /*
             gameflags.gfx_loaded = TrekGFX_init();
             if(gameflags.gfx_loaded){
                 gfx_InitModuleIcons();
                 gfx_VersionCheck();
                 ntwk_send_nodata(LOAD_SHIP);
-            }
+            }*/
             break;
         case MAIN_SKIP:
-            gfx_TextClearBG("initiating secure session...", 20, 190, true);
-            ntwk_send_nodata(REQ_SECURE_SESSION);
+            {
+                uint8_t ctl_out_code = REQ_SECURE_SESSION;
+                ntwk_queue(&ctl_out_code, sizeof ctl_out_code);
+                ntwk_send();
             break;
+            }
         default:
-            gui_SetLog(LOG_ERROR, "unknown packet received");
+        {
+            char msg[DBG_MSG_EXPECTED_LEN] = {0};
+            sprintf(msg, "unknown packet received, type %u", ctl);
+            console_write(ENTRY_ERROR_MSG, msg);
+        }
     }
 }
 

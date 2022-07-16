@@ -2,7 +2,7 @@
 #include <tice.h>
 #include <usbdrvce.h>
 #include "../../asm/exposure.h"
-#include "network.h"
+#include "../network.h"
 
 usb_device_t device;
 static usb_error_t handle_usb_event(usb_event_t event, void *event_data,

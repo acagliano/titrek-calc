@@ -2,23 +2,26 @@
 #ifndef network_h
 #define network_h
 
+#include <usbdrvce.h>
+
 #define NTWK_BUFFER_SIZE 5120
 extern uint8_t net_device_buffer[NTWK_BUFFER_SIZE];
 extern uint8_t net_parse_buffer[NTWK_BUFFER_SIZE>>1];
 extern uint8_t packet_queue_buffer[NTWK_BUFFER_SIZE>>1];
 
 enum net_mode_id {
+    MODE_TCP,
     MODE_SERIAL,
     MODE_CEMU_PIPE
 };
 
 typedef struct {
     uint8_t id;
-    bool (*init)(void);
     void (*process)(void);
     bool (*read_to_size)(size_t size);
     void (*write)(void *data, size_t size);
 } net_mode_t;
+extern net_mode_t *mode;
 
 bool ntwk_init(void);       // initialize devices in preference order tcp, serial, pipes
 void ntwk_process(void);    // process usb events
@@ -65,14 +68,21 @@ extern uint24_t ntwk_timeout_clock;
 
 /* Callers for Device Initializers */
 
-bool init_usb(void);
+bool init_usb(
+        usb_standard_descriptors_t* descriptors,
+        usb_error_t (*handle_usb_event)(usb_event_t event,
+                                        void *event_data,
+                                        usb_callback_data_t *callback_data));
 bool tcp_init(void);
 bool serial_init(void);
+bool pipe_init(void);
 
 // usb process events
 void usb_process(void);
 
 // usb device declaration
 extern usb_device_t device;
+
+void conn_HandleInput(packet_t *in_buff, size_t buff_size);
 
 #endif
