@@ -8,6 +8,7 @@ DESCRIPTION = "TI-Trek Multiplayer"
 COMPRESSED = NO
 ARCHIVED = NO
 HAS_PRINTF := NO
+LTO = YES
 
 
 CFLAGS = -Wall -Wextra -Oz
@@ -20,3 +21,10 @@ $(error CEDEV environment path variable is not set)
 endif
 
 include $(CEDEV)/meta/makefile.mk
+
+
+#$(OBJDIR)/trekfont.src: $(SRCDIR)/trekfont.inc
+
+# Convert a .fnt file into a .inc file
+#$(SRCDIR)/trekfont.inc: $(SRCDIR)/trekfont.fnt
+#    convfont -o carray -f $(SRCDIR)/trekfont.fnt $(SRCDIR)/trekfont.inc

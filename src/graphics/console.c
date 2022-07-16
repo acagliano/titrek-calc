@@ -27,9 +27,9 @@ void console_render(void){
                     
     if(!render_console) return;
     if(!console_icons_loaded){
-        zx7_Decompress(console_icon_server, log_server_compressed);
-        zx7_Decompress(console_icon_error, log_error_compressed);
-        zx7_Decompress(console_icon_debug, log_error_compressed);
+        zx0_Decompress(console_icon_server, log_server_compressed);
+        zx0_Decompress(console_icon_error, log_error_compressed);
+        zx0_Decompress(console_icon_debug, log_error_compressed);
         console_icons_loaded = true;
     }
     window_t window = {20, 280, 120, 120};

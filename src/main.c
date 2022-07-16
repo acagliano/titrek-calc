@@ -43,6 +43,7 @@ int main(void) {
     gfx_SetDrawBuffer();
     gfx_SetTextTransparentColor(1);
     gfx_SetTextBGColor(1);
+    fontlib_SetFont(trekfont, 0);
     fontlib_SetTransparency(true);
     
     menu_MainMenu();

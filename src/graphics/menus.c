@@ -88,8 +88,8 @@ bool menu_SelectKeyFile(char* file){
     sk_key_t key = 0;
     
     if(!skf_spritesloaded){
-        zx7_Decompress(server_icon, log_server_compressed);
-        zx7_Decompress(security_icon, icon_security_compressed);
+        zx0_Decompress(server_icon, log_server_compressed);
+        zx0_Decompress(security_icon, icon_security_compressed);
         skf_spritesloaded = true;
     }
     
