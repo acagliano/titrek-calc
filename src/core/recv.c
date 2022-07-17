@@ -14,6 +14,8 @@
 #include "gameloop.h"
 #include "controlcodes.h"
 #include "settings.h"
+#include "ship.h"
+
 #include "../graphics/text.h"
 #include "../graphics/console.h"
 
@@ -32,11 +34,11 @@ void hexdump(uint8_t *addr, size_t len, uint8_t *label){
     sprintf(CEMU_CONSOLE, "\n");
 }
 
-void versioncheck_hash_file(char* file, uint8_t type, uint8_t* digest){
+void versioncheck_hash_file(const char* file, uint8_t type, uint8_t* digest){
     ti_var_t tfp;
     hash_ctx ctx;
     hash_init(&ctx, SHA256);
-    if((tfp = ti_Open(file, "r"))){
+    if((tfp = ti_OpenVar(file, "r", type))){
         hash_update(&ctx, ti_GetDataPtr(tfp), ti_GetSize(tfp));
         ti_Close(tfp);
     }
@@ -72,11 +74,11 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                     uint8_t k[1];
                 } *p = (void*)data;
                 size_t keylen = p->kl;
-                uint8_t* key = &p->k;
+                uint8_t* key = p->k;
                 uint8_t msg[256] = {0};
                 uint8_t out_ctl_code = RSA_SEND_SESSION_KEY;
                 
-                console_write(ENTRY_NORMAL, "Exchanging AES secret with server");
+                console_write(ENTRY_NORMAL, "Exchanging AES secret with server.");
                 csrand_fill(aes_key, AES_KEYLEN);
                 rsa_encrypt(aes_key, AES_KEYLEN, msg, key, keylen, SHA256);
                 
@@ -96,11 +98,11 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             ti_var_t tfp = ti_Open(hostinfo.fname, "r");
             uint8_t ctl_out_code = LOGIN;
             if(!tfp) {
-                console_write(ENTRY_ERROR_MSG, "Error opening keyfile");
+                console_write(ENTRY_ERROR_MSG, "Error opening keyfile.");
                 break;
             };
     
-            console_write(ENTRY_NORMAL, "Securely logging you in");
+            console_write(ENTRY_NORMAL, "Securely logging you in.");
             
             aes_init(aes_key, &ctx, 32);         // load secret key
             csrand_fill(iv, AES_BLOCKSIZE);     // get IV
@@ -115,7 +117,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             
             // Encrypt the login token with AES-256
             if(aes_encrypt(keydata, LOGIN_TOKEN_SIZE, ct, &ctx, iv, AES_MODE_CBC, SCHM_DEFAULT) != AES_OK){
-                console_write(ENTRY_ERROR_MSG, "AES cipher error");
+                console_write(ENTRY_ERROR_MSG, "AES cipher error.");
                 break;
             }
 
@@ -134,7 +136,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             // hash current client binary to check with server
             uint8_t digest[SHA256_DIGEST_SIZE];
             uint8_t ctl_out_code = MAIN_REQ_UPDATE;
-            console_write(ENTRY_NORMAL, "Validating client hash with server");
+            console_write(ENTRY_NORMAL, "Validating client hash with server.");
             versioncheck_hash_file(main_program, OS_TYPE_PROT_PRGM, digest);
             
             ntwk_queue(&ctl_out_code, sizeof ctl_out_code);
@@ -156,8 +158,8 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 // hash current graphics binary to check with server
                 uint8_t digest[SHA256_DIGEST_SIZE];
                 uint8_t ctl_out_code = GFX_REQ_UPDATE;
-                console_write(ENTRY_NORMAL, "Validating graphics hash with server");
-                versioncheck_hash_file(main_gfx, TI_APPVAR_TYPE, TI_APPVAR_TYPE);
+                console_write(ENTRY_NORMAL, "Validating graphics hash with server.");
+                versioncheck_hash_file(main_gfx, OS_TYPE_APPVAR, digest);
                 
                 ntwk_queue(&ctl_out_code, sizeof ctl_out_code);
                 ntwk_queue(digest, SHA256_DIGEST_SIZE);
@@ -188,19 +190,16 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             console_write(ENTRY_NORMAL, data);
             break;
         case LOAD_SHIP:
-        /*
+            memcpy(ship_systems, data, buff_size-1);
+            break;
+        case MODULE_INFO_REQUEST: /*
             {
-                uint24_t i;
-                bool main_set = false, tact_set = false;
-                memcpy(&Ship, data, sizeof(ship_t));
-                for(i = 0; i < MAX_MODULES; i++){
-                    module_t *m = &Ship.system[i];
-                    if((m->techclass == mSystem) && !main_set) { select.mains = i; main_set = true;}
-                    if((m->techclass == mTactical) && !tact_set) { select.tactical = i; tact_set = true;}
-                    if(main_set && tact_set) break;
-                }
-            }
-        */
+                struct {
+                    uint8_t slot;
+                    moduleinfo_t info;
+                } *packet = (void*)data;
+                memcpy(&ModuleInfo, &packet->info, sizeof(ModuleInfo));
+            } */
             break;
         case MODULE_STATE_CHANGE:
         /*
@@ -213,15 +212,6 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 memcpy(thismodule, &packet->newdata, sizeof(module_t));
             }
             */
-            break;
-        case MODULE_INFO_REQUEST: /*
-            {
-                struct {
-                    uint8_t slot;
-                    moduleinfo_t info;
-                } *packet = (void*)data;
-                memcpy(&ModuleInfo, &packet->info, sizeof(ModuleInfo));
-            } */
             break;
         case ENGINE_SETSPEED: /*
         {
@@ -294,20 +284,14 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                     usb_Cleanup();
                     os_RunPrgm(fileout, NULL, 0, NULL);
                 }
-                else if(ctl == GFX_FRAME_DONE){
-                    //if(TrekGFX_init()){
-                       // gfx_InitModuleIcons();
-                       // gfx_VersionCheck();
-                      //  ntwk_send_nodata(LOAD_SHIP);
-                    //}
-                }
+                else if(ctl == GFX_FRAME_DONE) ship_load_info();
             }
             else {
                 char msg[DBG_MSG_EXPECTED_LEN] = {0};
                 uint8_t ctl_out_code = (ctl == MAIN_FRAME_DONE) ? MAIN_REQ_UPDATE : GFX_REQ_UPDATE;
                 uint8_t filetype = (ctl == MAIN_FRAME_DONE) ? OS_TYPE_PROT_PRGM : OS_TYPE_APPVAR;
                 ti_Close(filehandle);
-                ti_Delete(filein);
+                ti_DeleteVar(filein, filetype);
                 sprintf(msg, "%s download error, retrying download", fname);
                 console_write(ENTRY_ERROR_MSG, msg);
                 versioncheck_hash_file(fname, filetype, digest);
@@ -319,20 +303,14 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             break;
         }
         case GFX_SKIP:
-        /*
-            gameflags.gfx_loaded = TrekGFX_init();
-            if(gameflags.gfx_loaded){
-                gfx_InitModuleIcons();
-                gfx_VersionCheck();
-                ntwk_send_nodata(LOAD_SHIP);
-            }*/
+            ship_load_info();
             break;
         case MAIN_SKIP:
             {
                 uint8_t ctl_out_code = REQ_SECURE_SESSION;
                 ntwk_queue(&ctl_out_code, sizeof ctl_out_code);
                 ntwk_send();
-            break;
+                break;
             }
         default:
         {

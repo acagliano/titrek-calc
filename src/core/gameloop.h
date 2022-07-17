@@ -6,6 +6,7 @@ typedef enum {
     NO_ERROR,
     KEY_NOT_FOUND,
     KEY_IO_ERROR,
+    GFX_LOAD_ERROR
 } game_error_t;
 extern game_error_t game_error;
 
