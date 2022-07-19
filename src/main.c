@@ -30,6 +30,7 @@
 
 #include "graphics/font/trekfont.h"
 #include "graphics/menus.h"
+#include "core/settings.h"
 
 
 int main(void) {
@@ -45,6 +46,13 @@ int main(void) {
     gfx_SetTextBGColor(1);
     fontlib_SetFont(trekfont, 0);
     fontlib_SetTransparency(true);
+    fontlib_SetBackgroundColor(0);
+    fontlib_SetWindowFullScreen();
+    fontlib_SetAlternateStopCode(' ');
+    fontlib_SetLineSpacing(1, 1);
+    fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP | FONTLIB_PRECLEAR_NEWLINE | FONTLIB_AUTO_SCROLL);
+    
+    if(!settings_load()) settings_write();
     
     menu_MainMenu();
     

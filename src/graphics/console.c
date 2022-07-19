@@ -3,9 +3,11 @@
 #include <string.h>
 #include <graphx.h>
 #include <fontlibc.h>
+#include <stdio.h>
 
 #include "windows.h"
 #include "console.h"
+#include "text.h"
 
 #define CONSOLE_RESERVED_SIZE 1024
 #define CONSOLE_BLOCK_SIZE 64
@@ -14,12 +16,14 @@
 #define CONSOLE_ICONS_NUM 3
 #define CONSOLE_ICONS_SIZE 100
 
-char console[CONSOLE_NUM_BLOCKS][CONSOLE_BLOCK_SIZE] = {0};
+char console[CONSOLE_RESERVED_SIZE] = {0};
 bool render_console = true;
 
 
 
 void console_render(void){
+
+    char* render_this = console;
     window_t window = {20, 280, 120, 120};
     window_DrawWindow(&window, 0, 0, 0);
         
@@ -30,30 +34,38 @@ void console_render(void){
     fontlib_HomeUp();
     fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP | FONTLIB_PRECLEAR_NEWLINE | FONTLIB_AUTO_SCROLL);
         
-    for(int i = CONSOLE_NUM_BLOCKS-1; i >= 0; i--){
-        fontlib_DrawString(console[i]);
-    }
+    while(render_this < &console[CONSOLE_RESERVED_SIZE-1])
+        render_this = fontlib_RenderAll(render_this, 255, true);
+    
     render_console = false;
+    fontlib_SetWindowFullScreen();
 }
 
-void console_write(console_log_codes code, char* line){
-    char log_prefix_str[4];
-    char idx=0;
-    for(int i=0; i<(CONSOLE_NUM_BLOCKS-1); i++)
-        strncpy(console[i], console[i+1], CONSOLE_BLOCK_SIZE);
+void console_write(uint8_t code, char* line){
+    static bool console_init = false;
+    static char *console_start, *console_end, *console_writein;
+    char *console_clear = console_start;
+    size_t stringlen = (sizeof code) + (sizeof code) + strlen(line);
+    size_t deletelen = 0;
     
-    switch(code){
-        case ENTRY_SERVER_MSG:
-            strncpy(console[0], "\x01 ", 2);
-            break;
-        case ENTRY_ERROR_MSG:
-            strncpy(console[0], "\x02 ", 2);
-            break;
-        case ENTRY_DEBUG_MSG:
-            strncpy(console[0], "\x03 ", 2);
+    if(!console_init){
+        console_start = console;
+        console_end = &console[CONSOLE_RESERVED_SIZE-1];
+        console_writein = console_start;
+        console_init = true;
     }
-    if(code > ENTRY_NORMAL) idx = 2;
     
-    strncpy(&console[0][idx], line, CONSOLE_BLOCK_SIZE);
+    while((console_writein + stringlen - deletelen) > console_end){
+        deletelen += strlen(console_clear) + 1;
+        console_clear = console_start + deletelen;
+    }
+    memcpy(console_start, console_clear, console_writein - console_start);
+    console_writein -= deletelen;
+    
+    if(code) console_writein += sprintf(console_writein, "%c ", code);
+        
+    console_writein += sprintf(console_writein, "%s%c\n", line, 4);
+    console_writein++;
+    
     render_console = true;
 }

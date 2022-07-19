@@ -191,6 +191,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             break;
         case LOAD_SHIP:
             memcpy(ship_systems, data, buff_size-1);
+            render_frame = true;
             break;
         case MODULE_INFO_REQUEST: /*
             {
@@ -284,7 +285,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                     usb_Cleanup();
                     os_RunPrgm(fileout, NULL, 0, NULL);
                 }
-                else if(ctl == GFX_FRAME_DONE) ship_load_info();
+                else if(ctl == GFX_FRAME_DONE) ship_get_info();
             }
             else {
                 char msg[DBG_MSG_EXPECTED_LEN] = {0};
@@ -303,7 +304,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             break;
         }
         case GFX_SKIP:
-            ship_load_info();
+            ship_get_info();
             break;
         case MAIN_SKIP:
             {

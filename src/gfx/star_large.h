@@ -7,9 +7,9 @@ extern "C" {
 
 #define star_large_width 8
 #define star_large_height 8
-#define star_large_size 73
-#define star_large_compressed_size 55
-extern unsigned char star_large_compressed[55];
+#define star_large_size 74
+#define star_large_compressed_size 53
+extern unsigned char star_large_compressed[53];
 
 #ifdef __cplusplus
 }

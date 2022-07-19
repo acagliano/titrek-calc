@@ -16,8 +16,8 @@ network_error_t network_error = NTWK_OK;
 
 bool ntwk_init(void) {
     if(tcp_init()) return true;
-    else if(serial_init) return true;
-    else if(pipe_init) return true;
+    else if(serial_init()) return true;
+    else if(pipe_init()) return true;
     
     console_write(ENTRY_ERROR_MSG, "No network device available or init error. Check libraries.");
 }

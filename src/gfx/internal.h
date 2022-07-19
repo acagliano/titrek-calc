@@ -12,7 +12,6 @@ extern "C" {
 #include "icon_security.h"
 #include "log_debug.h"
 #include "log_error.h"
-#include "log_info.h"
 #include "log_server.h"
 #include "splash.h"
 #include "star_large.h"

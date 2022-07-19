@@ -8,8 +8,8 @@ extern "C" {
 #define star_small_width 8
 #define star_small_height 8
 #define star_small_size 25
-#define star_small_compressed_size 21
-extern unsigned char star_small_compressed[21];
+#define star_small_compressed_size 19
+extern unsigned char star_small_compressed[19];
 
 #ifdef __cplusplus
 }

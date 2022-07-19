@@ -37,9 +37,9 @@ void anim_MainMenu(uint24_t x_start, uint8_t y_start, uint24_t x_Width, uint8_t 
             else if(i<44) star_entities[i].size = 1;
             else star_entities[i].size = 2;
         }
-        zx7_Decompress(small_star, star_small_compressed);
-        zx7_Decompress(medium_star, star_medium_compressed);
-        zx7_Decompress(large_star, star_large_compressed);
+        zx0_Decompress(small_star, star_small_compressed);
+        zx0_Decompress(medium_star, star_medium_compressed);
+        zx0_Decompress(large_star, star_large_compressed);
         starfield_init = true;
     }
     

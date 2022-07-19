@@ -5,8 +5,6 @@
 #include "../network.h"
 
 usb_device_t device;
-static usb_error_t handle_usb_event(usb_event_t event, void *event_data,
-                                    usb_callback_data_t *callback_data);
 
 bool init_usb(usb_standard_descriptors_t* descriptors,
             usb_error_t (*handle_usb_event)(usb_event_t event,
@@ -17,7 +15,7 @@ bool init_usb(usb_standard_descriptors_t* descriptors,
     usb_error = usb_Init(handle_usb_event, NULL, descriptors, USB_DEFAULT_INIT_FLAGS);
     do {
         usb_HandleEvents();
-        key = os_GetCSC();
+        key = getKey();
     } while((!device) && (key!= sk_Clear));
     if(!device) return false;
     return true;

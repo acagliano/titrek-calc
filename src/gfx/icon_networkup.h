@@ -8,8 +8,8 @@ extern "C" {
 #define icon_networkup_width 18
 #define icon_networkup_height 18
 #define icon_networkup_size 370
-#define icon_networkup_compressed_size 183
-extern unsigned char icon_networkup_compressed[183];
+#define icon_networkup_compressed_size 173
+extern unsigned char icon_networkup_compressed[173];
 
 #ifdef __cplusplus
 }

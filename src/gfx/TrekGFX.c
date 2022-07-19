@@ -7,7 +7,7 @@ unsigned char *TrekGFX_appvar[31];
 
 unsigned char TrekGFX_init(void)
 {
-    ti_var_t appvar;
+    uint8_t appvar;
     unsigned int *table;
     void *base;
     unsigned char i;
