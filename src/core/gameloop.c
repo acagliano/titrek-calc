@@ -48,5 +48,6 @@ void PlayGame(void){
             gfx_RLETSprite(shipinterior_left, 0, 0);
             gfx_RLETSprite(shipinterior_right, (320>>1), 0);
         }
+        ntwk_process();
     } while(tick_loop_mode > NO_CONNECTION);
 }

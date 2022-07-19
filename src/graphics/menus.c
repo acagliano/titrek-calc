@@ -13,6 +13,7 @@
 #include "uiflags.h"
 #include "../core/metadata.h"
 #include "../core/gameloop.h"
+#include "../core/network.h"
 #include "../gfx/internal.h"
 
 void menu_Settings(void);
@@ -23,6 +24,12 @@ char menu_strings[4][12] = {
     "SETTINGS",
     "ABOUT",
     "EXIT"
+};
+
+char netmode_strings[3][5] = {
+    "TCP",
+    "SRL",
+    "PIPE",
 };
 
 enum _menu_options {
@@ -56,6 +63,7 @@ void menu_MainMenu(void){
             window_DrawTitle(&window, MAINMENU_BORDERCOLOR, 255, "TI-TREK", false);
             box_ParentToWindow(&box, &window);
             text_PaddedText(version, 130-55, 187, 24, 255, 5, 1);
+            text_PaddedText(netmode_strings[net_device], 280, 220, 24, 255, 5, 1);
             fontlib_SetForegroundColor(0);
             for(int i=0; i<4; i++){
                 uint8_t boxcol = (selected == i) ? MENU_SELECTED_BGCOLOR : MAINMENU_BGCOLOR;
@@ -138,11 +146,11 @@ bool menu_SelectKeyFile(char* file){
                 box_RenderSprite(&box, server_icon, 5, 20);
                 box_RenderSprite(&box, security_icon, 5, 35);
                 
-                fontlib_SetCursorPosition(box.x+25, box.y+20);
+                fontlib_SetCursorPosition(box.x+20, box.y+20);
                 fontlib_DrawString(ti_GetDataPtr(tfp)+7);
                 //box_PrintStringXY(&box, ti_GetDataPtr(tfp)+7, 25, 20, 0);
                 
-                fontlib_SetCursorPosition(box.x+25, box.y+35);
+                fontlib_SetCursorPosition(box.x+20, box.y+35);
                 fontlib_DrawUInt(keylen, num_GetLength(keylen));
                 fontlib_SetAlternateStopCode(0);
                 fontlib_DrawString("-bit session key");

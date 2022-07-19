@@ -27,7 +27,7 @@ bool serial_init(void){
     if(!libload_IsLibLoaded(SRLDRVCE)) return false;
     
     // initialize usb device
-    init_usb(srl_GetCDCStandardDescriptors(), srl_handle_usb_event);
+    init_usb(srl_GetCDCStandardDescriptors(), DEVICE_INIT_TIMEOUT_MS, srl_handle_usb_event);
     
     srl_error = srl_Open(&srl, device, srl_buf, NTWK_BUFFER_SIZE, SRL_INTERFACE_ANY, 115200);
     if(srl_error) return false;
@@ -53,6 +53,7 @@ void serial_write(void *buf, size_t size) {
 static usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
                                     usb_callback_data_t *callback_data) {
     usb_error_t err;
+    
     /* Delegate to srl USB callback */
     if ((err = srl_UsbEventCallback(event, event_data, callback_data)) != USB_SUCCESS)
         return err;
@@ -74,6 +75,6 @@ static usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
         tick_loop_mode = NO_CONNECTION;
         device = NULL;
     }
-
+    
     return USB_SUCCESS;
 }

@@ -12,14 +12,19 @@ uint8_t packet_queue_buffer[NTWK_BUFFER_SIZE>>1] = {0};
 packet_queue_t *packet_queue = (packet_queue_t*)packet_queue_buffer;
 
 net_mode_t *mode;
-network_error_t network_error = NTWK_OK; 
+network_error_t network_error = NTWK_OK;
+uint24_t ntwk_timeout_clock = 0;
+uint8_t net_device = 0xff;
 
-bool ntwk_init(void) {
-    if(tcp_init()) return true;
-    else if(serial_init()) return true;
-    else if(pipe_init()) return true;
+uint8_t ntwk_init(void) {
+    if(tcp_init()) net_device = MODE_TCP;
+        
+     return MODE_TCP;
+    else if(serial_init()) return MODE_SERIAL;
+    else if(pipe_init()) return MODE_CEMU_PIPE;
     
     console_write(ENTRY_ERROR_MSG, "No network device available or init error. Check libraries.");
+    return MODE_NTWK_ERROR;
 }
 
 void ntwk_process(void) {

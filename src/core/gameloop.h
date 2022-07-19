@@ -6,13 +6,16 @@ typedef enum {
     NO_ERROR,
     KEY_NOT_FOUND,
     KEY_IO_ERROR,
-    GFX_LOAD_ERROR
+    GFX_LOAD_ERROR,
+    NTWK_FAIL_ERROR
 } game_error_t;
 extern game_error_t game_error;
 
 typedef enum {
     NO_CONNECTION,
-    SERVER_CONNECTED,
+    DEVICE_UP,
+    BRIDGE_UP,
+    SERVER_UP,
     USER_LOGGED_IN
 } tick_loop_mode_t;
 extern tick_loop_mode_t tick_loop_mode;

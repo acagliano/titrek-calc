@@ -31,6 +31,7 @@
 #include "graphics/font/trekfont.h"
 #include "graphics/menus.h"
 #include "core/settings.h"
+#include "core/network.h"
 
 
 int main(void) {
@@ -52,6 +53,7 @@ int main(void) {
     fontlib_SetLineSpacing(1, 1);
     fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP | FONTLIB_PRECLEAR_NEWLINE | FONTLIB_AUTO_SCROLL);
     
+    net_device = ntwk_init();
     if(!settings_load()) settings_write();
     
     menu_MainMenu();
