@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <string.h>
+#include <fontlibc.h>
 
 #include "../graphics/console.h"
 #include "network.h"
@@ -16,15 +17,22 @@ network_error_t network_error = NTWK_OK;
 uint24_t ntwk_timeout_clock = 0;
 uint8_t net_device = 0xff;
 
-uint8_t ntwk_init(void) {
+bool ntwk_init(void) {
     if(tcp_init()) net_device = MODE_TCP;
-        
-     return MODE_TCP;
-    else if(serial_init()) return MODE_SERIAL;
-    else if(pipe_init()) return MODE_CEMU_PIPE;
+    else {
+        fontlib_DrawString("failed\n");
+        if(serial_init()) net_device = MODE_SERIAL;
+        else {
+            fontlib_DrawString("failed\n");
+            if(pipe_init()) net_device = MODE_CEMU_PIPE;
+        }
+    }
+    if(net_device != 0xff) {
+        tick_loop_mode = DEVICE_UP;
+        return true;
+    }
     
-    console_write(ENTRY_ERROR_MSG, "No network device available or init error. Check libraries.");
-    return MODE_NTWK_ERROR;
+    return false;
 }
 
 void ntwk_process(void) {

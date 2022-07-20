@@ -1,5 +1,7 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <fontlibc.h>
+#include <graphx.h>
 
 #include "../../asm/exposure.h"
 #include "../network.h"
@@ -16,6 +18,8 @@ net_mode_t mode_pipe = {
 };
 
 bool pipe_init(void){
+    fontlib_DrawString("init cemu pipes... ");
+    gfx_BlitBuffer();
     if(!cemu_check()) return false;
     mode = &mode_pipe;
     return true;

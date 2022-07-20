@@ -82,6 +82,8 @@ char* fontlib_RenderAll(const char* string, uint8_t fontcolor, bool xcolor){
     char* render = string;
     uint24_t x_last;
     uint8_t printmin = fontlib_GetFirstPrintableCodePoint();
+    fontlib_SetAlternateStopCode(' ');
+    fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP | FONTLIB_PRECLEAR_NEWLINE | FONTLIB_AUTO_SCROLL);
     do {
         x_last = fontlib_DrawString(render);
         render = fontlib_GetLastCharacterRead();
@@ -109,5 +111,7 @@ char* fontlib_RenderAll(const char* string, uint8_t fontcolor, bool xcolor){
         if((fontlib_GetStringWidth(render) + x_last) >= 310) fontlib_Newline();
         else fontlib_DrawGlyph(0);
     } while(render < (string + strlen(string)));
+    fontlib_SetAlternateStopCode(0);
+    fontlib_SetNewlineOptions(0);
     return render;
 }

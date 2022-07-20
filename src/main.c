@@ -27,6 +27,7 @@
 #include <compression.h>
 #include <keypadc.h>
 #include <fontlibc.h>
+#include <hashlib.h>
 
 #include "graphics/font/trekfont.h"
 #include "graphics/menus.h"
@@ -49,15 +50,18 @@ int main(void) {
     fontlib_SetTransparency(true);
     fontlib_SetBackgroundColor(0);
     fontlib_SetWindowFullScreen();
-    fontlib_SetAlternateStopCode(' ');
     fontlib_SetLineSpacing(1, 1);
-    fontlib_SetNewlineOptions(FONTLIB_ENABLE_AUTO_WRAP | FONTLIB_PRECLEAR_NEWLINE | FONTLIB_AUTO_SCROLL);
-    
-    net_device = ntwk_init();
+    fontlib_SetNewlineOptions(0);
+    fontlib_DrawString("init cryptographic rng... ");
+    gfx_BlitBuffer();
+    if(!csrand_init()) return 1;
+    fontlib_DrawString("success\n");
+    ntwk_init();
     if(!settings_load()) settings_write();
     
     menu_MainMenu();
     
     // cleanup the program
     gfx_End();
+    usb_Cleanup();
 }

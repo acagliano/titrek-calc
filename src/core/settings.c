@@ -20,8 +20,9 @@ bool settings_load(void){
     return rv;
 }
 
+#define CEMU_CONSOLE ((char*)0xFB0000)
 bool settings_write(void){
-    ti_var_t sfp = ti_Open(settingsvar, "r+");
+    ti_var_t sfp = ti_Open(settingsvar, "w");
     if(!sfp) return false;
     bool rv = ti_Write(&settings, sizeof settings, 1, sfp);
     ti_SetArchiveStatus(true, sfp);

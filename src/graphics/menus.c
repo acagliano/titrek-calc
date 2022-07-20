@@ -18,6 +18,9 @@
 
 void menu_Settings(void);
 void About(void);
+#define gfx_FillColorRectangle(x, y, w, h, color) \
+        gfx_SetColor((color)); \
+        gfx_FillRectangle((x), (y), (w), (h))
 
 char menu_strings[4][12] = {
     "PLAY GAME",
@@ -30,6 +33,7 @@ char netmode_strings[3][5] = {
     "TCP",
     "SRL",
     "PIPE",
+    "NO NTWK"
 };
 
 enum _menu_options {
@@ -42,9 +46,30 @@ enum _menu_options {
 bool splash_render = true;
 
 void menu_MainMenu(void){
+    static bool netstat_icon_init = false;
+    #define NETSTAT_ICON_SIZE 300
+    static char netstat_icon_data[NETSTAT_ICON_SIZE];
+    gfx_rletsprite_t *netstat_icon = netstat_icon_data;
     sk_key_t key = 0;
     int8_t selected = 0;
     window_t window = {40, 100, 80, 100};
+    if(!netstat_icon_init){
+        gfx_rletsprite_t *tmp = icon_no_ntwk_compressed;
+        switch(net_device){
+            case MODE_TCP:
+                tmp = icon_tcp_up_compressed;
+                break;
+            case MODE_SERIAL:
+                tmp = icon_serial_up_compressed;
+                break;
+            case MODE_CEMU_PIPE:
+                tmp = icon_pipe_up_compressed;
+                break;
+        }
+        zx0_Decompress(netstat_icon, tmp);
+        netstat_icon_init = true;
+    }
+    
     while(1){
         key = getKey();
         anim_MainMenu(0, 0, 320, 240);
@@ -61,9 +86,15 @@ void menu_MainMenu(void){
             box_t box = {0, 0, 0, 25};
             window_DrawWindow(&window, MAINMENU_BGCOLOR, MAINMENU_BORDERCOLOR, MAINMENU_BORDERWIDTH);
             window_DrawTitle(&window, MAINMENU_BORDERCOLOR, 255, "TI-TREK", false);
+            fontlib_SetWindowFullScreen();
             box_ParentToWindow(&box, &window);
             text_PaddedText(version, 130-55, 187, 24, 255, 5, 1);
-            text_PaddedText(netmode_strings[net_device], 280, 220, 24, 255, 5, 1);
+            //text_PaddedText(netmode_strings[net_device], 280, 220, 24, 255, 5, 1);
+            gfx_FillColorRectangle(240, 210, 70, 25, (net_device < 4) ? 3 : 192);
+            gfx_RLETSprite(netstat_icon, 245, 214);
+            fontlib_SetCursorPosition(265, 217);
+            fontlib_SetForegroundColor(255);
+            fontlib_DrawString(netmode_strings[(net_device < 4) ? net_device : 3]);
             fontlib_SetForegroundColor(0);
             for(int i=0; i<4; i++){
                 uint8_t boxcol = (selected == i) ? MENU_SELECTED_BGCOLOR : MAINMENU_BGCOLOR;
@@ -74,6 +105,7 @@ void menu_MainMenu(void){
                 box.y+=25;
             }
             splash_render = false;
+            ntwk_process();
             gfx_BlitBuffer();
         }
     }
@@ -154,7 +186,6 @@ bool menu_SelectKeyFile(char* file){
                 fontlib_DrawUInt(keylen, num_GetLength(keylen));
                 fontlib_SetAlternateStopCode(0);
                 fontlib_DrawString("-bit session key");
-                fontlib_SetAlternateStopCode(' ');
                 
                 ti_SetArchiveStatus(true, tfp);
                 ti_Close(tfp);

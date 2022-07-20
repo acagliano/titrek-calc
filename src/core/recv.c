@@ -131,7 +131,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         }
         case CONNECT:
         {
-            tick_loop_mode = SERVER_CONNECTED;
+            tick_loop_mode = SERVER_UP;
             
             // hash current client binary to check with server
             uint8_t digest[SHA256_DIGEST_SIZE];

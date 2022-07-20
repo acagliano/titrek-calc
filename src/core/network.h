@@ -10,7 +10,6 @@ extern uint8_t net_parse_buffer[NTWK_BUFFER_SIZE>>1];
 extern uint8_t packet_queue_buffer[NTWK_BUFFER_SIZE>>1];
 extern uint8_t net_device;
 typedef uint24_t netwait_timeout_t;
-#define DEVICE_INIT_TIMEOUT_MS  5000
 
 enum net_mode_id {
     MODE_TCP,
@@ -28,7 +27,7 @@ typedef struct {
 } net_mode_t;
 extern net_mode_t *mode;
 
-uint8_t ntwk_init(void);       // initialize devices in preference order tcp, serial, pipes
+bool ntwk_init(void);       // initialize devices in preference order tcp, serial, pipes
 void ntwk_process(void);    // process usb events
 bool ntwk_queue(void* data, size_t len);    // write partial frame to packet queue
 bool ntwk_send(void);                       // send packet queue and reset queue

@@ -2,6 +2,8 @@
 #include <libload.h>
 #include <srldrvce.h>
 #include <stdbool.h>
+#include <fontlibc.h>
+#include <graphx.h>
 #include "../network.h"
 #include "../gameloop.h"
 
@@ -21,19 +23,23 @@ net_mode_t mode_srl = {
         serial_write
 };
 
+#define DEVICE_INIT_TIMEOUT_SECONDS 5
+#define DEVICE_INIT_TIMEOUT_TPS 175000
+#define DEVICE_INIT_TIMEOUT (DEVICE_INIT_TIMEOUT_TPS * DEVICE_INIT_TIMEOUT_SECONDS)
 bool serial_init(void){
     
     srl_error_t srl_error;
     if(!libload_IsLibLoaded(SRLDRVCE)) return false;
     
+    fontlib_DrawString("init serial device... ");
+    gfx_BlitBuffer();
     // initialize usb device
-    init_usb(srl_GetCDCStandardDescriptors(), DEVICE_INIT_TIMEOUT_MS, srl_handle_usb_event);
+    init_usb(srl_GetCDCStandardDescriptors(), DEVICE_INIT_TIMEOUT, srl_handle_usb_event);
     
     srl_error = srl_Open(&srl, device, srl_buf, NTWK_BUFFER_SIZE, SRL_INTERFACE_ANY, 115200);
     if(srl_error) return false;
     
     mode = &mode_srl;
-    
     return true;
     
 }

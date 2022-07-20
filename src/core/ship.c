@@ -20,7 +20,8 @@ void ship_get_info(void){
 }
 
 void ship_render_interior(void){
-
+    gfx_RLETSprite(shipinterior_left, 0, 0);
+    gfx_RLETSprite(shipinterior_right, (320>>1), 0);
 }
 
 void ship_render_sysoverview(ship_system_data_t* sys){

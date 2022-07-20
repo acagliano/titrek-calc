@@ -11,6 +11,7 @@
 #include "../asm/exposure.h"
 #include "gameloop.h"
 #include "network.h"
+#include "ship.h"
 
 game_error_t game_error = NO_ERROR;
 tick_loop_mode_t tick_loop_mode = NO_CONNECTION;
@@ -45,8 +46,7 @@ void PlayGame(void){
         // rendering switches for console/game ui
         if(console_up) console_render();
         else if(render_frame){
-            gfx_RLETSprite(shipinterior_left, 0, 0);
-            gfx_RLETSprite(shipinterior_right, (320>>1), 0);
+            ship_render_interior();
         }
         ntwk_process();
     } while(tick_loop_mode > NO_CONNECTION);
