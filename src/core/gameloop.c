@@ -10,6 +10,7 @@
 #include "../gfx/TrekGFX.h"
 #include "../asm/exposure.h"
 #include "gameloop.h"
+#include "controlcodes.h"
 #include "network.h"
 #include "ship.h"
 
@@ -25,6 +26,7 @@ void PlayGame(void){
     char *keyfile_start, *keyfile_hostname;
     ti_var_t kf;
     bool console_up = false;
+    uint24_t timeout = 200000;
     
     if(!menu_SelectKeyFile(keyfile)) { game_error = KEY_NOT_FOUND; return; }
     if(!(kf = ti_Open(keyfile, "r"))) { game_error = KEY_IO_ERROR; return; }
@@ -38,6 +40,15 @@ void PlayGame(void){
     keyfile_hostname = keyfile_start + KF_OFFSET_HOSTNAME;
     strncpy(hostinfo.hostname, keyfile_hostname, strlen(keyfile_hostname));
     
+    
+    uint8_t out_ctl_code = CONNECT;
+    
+    #define CEMU_CONSOLE ((char*)0xFB0000)
+    sprintf(CEMU_CONSOLE, "ctl: %u, file: %s\n", out_ctl_code, hostinfo.hostname);
+    ntwk_queue(&out_ctl_code, sizeof out_ctl_code);
+    ntwk_queue(hostinfo.hostname, strlen(hostinfo.hostname));
+    ntwk_send();
+
     do {
         sk_key_t key = getKey();
         
@@ -49,5 +60,5 @@ void PlayGame(void){
             ship_render_interior();
         }
         ntwk_process();
-    } while(tick_loop_mode > NO_CONNECTION);
+    } while((tick_loop_mode > NO_CONNECTION) || timeout--);
 }

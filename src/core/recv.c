@@ -18,6 +18,7 @@
 
 #include "../graphics/text.h"
 #include "../graphics/console.h"
+#include "../graphics/lcars-ui/components.h"
 
 #define SHA256_DIGEST_SIZE SHA256_DIGEST_LEN
 
@@ -235,7 +236,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
         {
             const char* file = (ctl==MAIN_FRAME_START) ? temp_program : temp_gfx;
             uint8_t out_ctl_code = (ctl==MAIN_FRAME_START) ? MAIN_FRAME_NEXT : GFX_FRAME_NEXT;
-            uint8_t filetype = (ctl==MAIN_FRAME_DONE) ? OS_TYPE_PROT_PRGM : OS_TYPE_APPVAR;
+            uint8_t filetype = (ctl==MAIN_FRAME_START) ? OS_TYPE_PROT_PRGM : OS_TYPE_APPVAR;
             hash_init(&filestream_hash, SHA256);
             memcpy(&file_dl_size, data, sizeof(size_t));
             file_bytes_written = 0;
@@ -255,8 +256,9 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             if(ti_Write(data, buff_size-1, 1, filehandle))
                 file_bytes_written += buff_size-1;
             hash_update(&filestream_hash, data, buff_size-1);
-            sprintf(msg, "%s download: %u%%", fname, (100*file_bytes_written/file_dl_size));
-            console_write(ENTRY_NORMAL, msg);
+            sprintf(msg, "%s download", fname);
+            lcars_DrawPercentGraphic(msg, 5, 200, 310, 5, 100*file_bytes_written/file_dl_size, 24, 2, 23, 74);
+            //console_write(ENTRY_NORMAL, msg);
             ntwk_queue(&out_ctl_code, sizeof out_ctl_code);
             ntwk_send();
             break;

@@ -1,6 +1,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <fontlibc.h>
+#include <stdio.h>
 
 #include "../graphics/console.h"
 #include "network.h"
@@ -9,7 +10,7 @@
 
 uint8_t net_device_buffer[NTWK_BUFFER_SIZE];
 uint8_t net_parse_buffer[NTWK_BUFFER_SIZE>>1];
-uint8_t packet_queue_buffer[NTWK_BUFFER_SIZE>>1] = {0};
+uint8_t packet_queue_buffer[NTWK_BUFFER_SIZE>>1] = {0, 0};
 packet_queue_t *packet_queue = (packet_queue_t*)packet_queue_buffer;
 
 net_mode_t *mode;
@@ -65,10 +66,12 @@ bool ntwk_queue(void* data, size_t len){
     return true;
 }
 
-
+#define CEMU_CONSOLE ((char*)0xFB0000)
 bool ntwk_send(void) {
 
-    mode->write(packet_queue->size, sizeof(packet_queue->size));
+    sprintf(CEMU_CONSOLE, "Sending a %u-byte size word: %u\n", sizeof(size_t), packet_queue->size);
+    mode->write(&packet_queue->size, sizeof(size_t));
+    sprintf(CEMU_CONSOLE, "Sending %u bytes of data.\n", packet_queue->size);
     mode->write(packet_queue->data, packet_queue->size);
     packet_queue->size = 0;
 
