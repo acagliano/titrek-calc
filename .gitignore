@@ -101,7 +101,7 @@ build/
 #     FROM COMMENTS: Apple is wrong; Apple code is too buggy to trust; there are no known negative side-effects to ignoring Apple's unofficial advice and instead doing the thing that actively fixes bugs in Xcode
 # Up to you, but ... current advice: ignore it.
 *.xccheckout
-
+*.xcworkspace
 #
 #
 # OPTION 1: ---------------------------------
