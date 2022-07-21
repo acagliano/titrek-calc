@@ -5,12 +5,27 @@
 #define SHIP_MAX_MODULES 16
 
 enum _system_types {
-    SYS_EMPTY,
+    SYS_NO_SYS,     // empty (0x00)
+    
+    // core systems (0x01 => 0x3f)
+    SYS_HULL,
+    SYS_ENVCTL,
     SYS_POWER,
-    SYS_MAIN,
+    SYS_ENGINE,
+    
+    // offensive systems (0x40 => 0x7f)
+    SYS_LASER = 0x40,
     SYS_WEAPON,
     SYS_DEFENSE,
     SYS_MISC,
+    
+    // defensive systems (0x80 => 0xbf)
+    SYS_ARMOR = 0x80,
+    SYS_SHIELD = 0x81,
+    
+    // miscellaneous systems (0xc0 => 0xef)
+    
+    // special cases (0xf*)
     SYS_SLOT_UNAVAILABLE = 0xff
 };
 
@@ -30,6 +45,7 @@ typedef struct _ship_system_data {
     uint8_t system_name[11];
     health_t health;
     power_t power;
+    uint8_t icon[66];
 } ship_system_data_t;
 extern ship_system_data_t ship_systems[SHIP_MAX_MODULES];
 

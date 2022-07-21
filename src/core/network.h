@@ -16,7 +16,8 @@ enum net_mode_id {
     MODE_SERIAL,
     MODE_CEMU_PIPE,
     
-    MODE_NTWK_ERROR = 0xff
+    MODE_NTWK_ERROR = 0xff,
+    MODE_NTWK_NONE = MODE_NTWK_ERROR
 };
 
 typedef struct {

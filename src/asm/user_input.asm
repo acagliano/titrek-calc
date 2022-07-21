@@ -17,7 +17,7 @@ extern _gfx_Blit
 extern _getKey
 extern _kb_AnyKey
 
-;uint8_t user_input(char *buffer,size_t length,uint8_t flags);
+;uint8_t user_input(char *buffer, size_t length ,uint8_t flags);
 _user_input:
     call _kb_AnyKey
     jq nz,_user_input

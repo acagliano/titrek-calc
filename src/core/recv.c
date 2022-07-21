@@ -241,6 +241,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
             memcpy(&file_dl_size, data, sizeof(size_t));
             file_bytes_written = 0;
             if(!(filehandle = ti_OpenVar(file, "w", filetype))) break;
+            lcars_SetBarColors(24, 23, 74);
             ntwk_queue(&out_ctl_code, sizeof out_ctl_code);
             ntwk_send();
             break;
@@ -257,7 +258,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 file_bytes_written += buff_size-1;
             hash_update(&filestream_hash, data, buff_size-1);
             sprintf(msg, "%s download", fname);
-            lcars_DrawPercentGraphic(msg, 5, 200, 310, 5, 100*file_bytes_written/file_dl_size, 24, 2, 23, 74);
+            lcars_DrawLoadBar(msg, 5, 200, 310, 5, 100*file_bytes_written/file_dl_size);
             //console_write(ENTRY_NORMAL, msg);
             ntwk_queue(&out_ctl_code, sizeof out_ctl_code);
             ntwk_send();
