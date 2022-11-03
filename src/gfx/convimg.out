@@ -10,6 +10,8 @@ icon_serial_up.h
 icon_serial_up.c
 icon_tcp_up.h
 icon_tcp_up.c
+icon_user.h
+icon_user.c
 log_debug.h
 log_debug.c
 log_error.h
@@ -23,6 +25,6 @@ star_medium.c
 star_small.h
 star_small.c
 internal.h
-TrekGFX.h
-TrekGFX.c
-TrekGFX.8xv
+uxassets.h
+uxassets.c
+uxassets.8xv

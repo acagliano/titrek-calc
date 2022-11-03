@@ -6,7 +6,7 @@
 #include "controlcodes.h"
 #include "network.h"
 #include "gameloop.h"
-#include "../gfx/TrekGFX.h"
+#include "../gfx/uxassets.h"
 
 #define num_InRange(min, max, num)  \
         (((min) < (num)) && ((num) < (max)))
@@ -14,7 +14,7 @@
 ship_system_data_t ship_systems[SHIP_MAX_MODULES];
 
 void ship_get_info(void){
-    if(!TrekGFX_init()){
+    if(!uxassets_init()){
         game_error = GFX_LOAD_ERROR;
         return;
     }

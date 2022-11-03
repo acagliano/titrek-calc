@@ -22,6 +22,10 @@ endif
 
 include $(CEDEV)/meta/makefile.mk
 
+uxassets.bin: $(GFXDIR)/uxassets.bin
+$(GFXDIR)/uxassets.bin: $(GFXDIR)/uxassets.8xv
+	$(CONVBIN) -i $(GFXDIR)/uxassets.8xv -o $(GFXDIR)/uxassets.bin -j 8x -k bin
+
 
 #$(OBJDIR)/trekfont.src: $(SRCDIR)/trekfont.inc
 

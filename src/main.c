@@ -21,47 +21,43 @@
 
 /* Other available headers */
 // stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
-#include <libload.h>
-#include <fileioc.h>
 #include <graphx.h>
-#include <compression.h>
-#include <keypadc.h>
-#include <fontlibc.h>
-#include <hashlib.h>
 
-#include "graphics/font/trekfont.h"
-#include "graphics/menus.h"
-#include "core/settings.h"
-#include "core/network.h"
+#include "rendering/init.h"
+#include "inet/devices.h"
+
+#include "ev.h"
+
+#define LOAD_CRYPTX_LIBS	\
+		(libload_IsLibLoaded(HASHLIB) && libload_IsLibLoaded(ENCRYPT))
+
+gamestate_t gamestate = {0};
+
+void exit_cleanup(void){
+	usb_CleanUp();
+	gfx_End();
+	prgm_CleanUp();
+}
 
 
 int main(void) {
 
     // init the program
-    srandom(rtc_Time());
-    
-    // init the graphics
-    gfx_Begin();
-    gfx_SetDefaultPalette(gfx_8bpp);
-    gfx_SetDrawBuffer();
-    gfx_SetTextTransparentColor(1);
-    gfx_SetTextBGColor(1);
-    fontlib_SetFont(trekfont, 0);
-    fontlib_SetTransparency(true);
-    fontlib_SetBackgroundColor(0);
-    fontlib_SetWindowFullScreen();
-    fontlib_SetLineSpacing(1, 1);
-    fontlib_SetNewlineOptions(0);
-    fontlib_DrawString("init cryptographic rng... ");
-    gfx_BlitBuffer();
-    if(!csrand_init()) return 1;
-    fontlib_DrawString("success\n");
-    ntwk_init();
-    if(!settings_load()) settings_write();
-    
-    menu_MainMenu();
-    
-    // cleanup the program
-    gfx_End();
-    usb_Cleanup();
+	bool listener_active = true;
+	atexit(exit_cleanup);
+	
+	// initialize cryptographic libraries, disable encryption if not found
+	gamestate.inet_data.inet_flags |= (LOAD_CRYPTX_LIBS<<INET_ENABLE_ENCRYPTION);
+	
+	gfx_Begin();
+	ntwk_init();
+	
+	while(listener_active){
+		for(;queue_start != queue_stop; queue_start++){
+			listener_t *runner = &listener_queue[queue_start];
+			runner->exec(runner->data);
+			if(runner->requeue) enqueue(runner->exec, runner->data, runner->requeue);
+		}
+	}
+	exit(0);
 }

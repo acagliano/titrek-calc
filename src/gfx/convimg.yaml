@@ -24,23 +24,7 @@ converts:
       style: rlet
       images:
         - particles/*.png
-    - name: moduleicons
-      palette: xlibc
-      transparent-color-index: 0
-      style: rlet
-      images:
-        - modules/lifesupport
-        - modules/core
-        - modules/thrusters
-        - modules/engines
-        - modules/warpdrive
-        - modules/navsens
-        - modules/transporter
-        - modules/shields
-        - modules/armor
-        - modules/phasers
-        - modules/torpedo
-        - modules/targsens
+
 
 outputs:
     - type: c
@@ -48,14 +32,12 @@ outputs:
       converts:
         - internal
     - type: appvar
-      name: TrekGFX
+      name: uxassets
       source-format: c
-      include-file: TrekGFX.h
+      include-file: uxassets.h
       lut-entries: true
       archived: true
-      header-string: "\x01\x05"
       converts:
         - guiicons
         - particles
         - ship
-        - moduleicons

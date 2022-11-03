@@ -34,6 +34,7 @@ typedef struct _lcars_config {
 extern lcars_config_t lcars_config;
 
 extern bool render_frame;
+extern bool render_console;
 
 void PlayGame(void);
 

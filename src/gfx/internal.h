@@ -12,6 +12,7 @@ extern "C" {
 #include "icon_security.h"
 #include "icon_serial_up.h"
 #include "icon_tcp_up.h"
+#include "icon_user.h"
 #include "log_debug.h"
 #include "log_error.h"
 #include "log_server.h"

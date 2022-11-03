@@ -7,28 +7,26 @@ enum ControlCodes {
     // 0 - 9
     CONNECT,            // 0
     DISCONNECT,         // 1
-    REGISTER,           // 2
-    LOGIN,              // 3
-    REQ_SECURE_SESSION,     // 4
-    RSA_SEND_SESSION_KEY,   // 5
-    WELCOME,            // 6
+    RSA_KEY_FROM_SERV,     // 2
+    SEND_AES_SECRET,   // 3
+    LOGIN,            // 4
     // This is for the client not up to date response , See response codes. VERSION_* must be the second byte of packet
-       
+      
+	// Ship Interfacing: 20 - 29
+	LOAD_SHIP = 0x10,
+	MODULE_INFO_REQUEST,            // 21
+	MODULE_CONFIG,            // 22
+	NEW_GAME_REQUEST,               // 23
+	GET_ENGINE_MAXIMUMS,            // 24
+	ENGINE_SETSPEED,                // 25
+	
     // GAMEPLAY
     // Map Interfacing: 10 - 19
-    FRAMEDATA_REQUEST = 10,
+    FRAMEDATA_REQUEST = 0x20,
     SENSOR_DATA_REQUEST,        // 11
     PLAYER_MOVE,                // 12
     POSITION_REQUEST,           // 13
        
-    // Ship Interfacing: 20 - 29
-    LOAD_SHIP = 20,
-    MODULE_INFO_REQUEST,            // 21
-    MODULE_STATE_CHANGE,            // 22
-    NEW_GAME_REQUEST,               // 23
-    GET_ENGINE_MAXIMUMS,            // 24
-    ENGINE_SETSPEED,                // 25
-    
     // Map Streaming : 30 - 39
     RENDER_FBUF_OBJ = 30,
     RENDER_FBUF_DATA,
