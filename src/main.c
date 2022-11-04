@@ -6,22 +6,14 @@
 //--------------------------------------
 
 /* Keep these headers */
+/* Standard headers - it's recommended to leave them included */
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
-#include <tice.h>
-#include <intce.h>
-
-/* Standard headers - it's recommended to leave them included */
-#include <math.h>
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-
-/* Other available headers */
-// stdarg.h, setjmp.h, assert.h, ctype.h, float.h, iso646.h, limits.h, errno.h, debug.h
 #include <graphx.h>
+#include <encrypt.h>
 
 #include "rendering/init.h"
 #include "inet/devices.h"
@@ -33,30 +25,29 @@
 
 gamestate_t gamestate = {0};
 
-void exit_cleanup(void){
-	usb_CleanUp();
-	gfx_End();
-	prgm_CleanUp();
-}
-
-
 int main(void) {
 
     // init the program
-	bool listener_active = true;
-	atexit(exit_cleanup);
+	gamestate.gameflags |= (1<<EV_LISTENER_ACTV);
+	atexit(usb_CleanUp);
+	atexit(gfx_End);
+	atexit(prgm_CleanUp);
 	
 	// initialize cryptographic libraries, disable encryption if not found
 	gamestate.inet_data.inet_flags |= (LOAD_CRYPTX_LIBS<<INET_ENABLE_ENCRYPTION);
 	
 	gfx_Begin();
+	gfx_SetDrawBuffer();
 	ntwk_init();
+	srandom(rtc_Time());
+	gamestate.screen_up = SCRN_SPLASH;
+	enqueue(gfx_BlitBuffer, true);
 	
-	while(listener_active){
+	while((gamestate.gameflags>>EV_LISTENER_ACTV) & 1){
 		for(;queue_start != queue_stop; queue_start++){
 			listener_t *runner = &listener_queue[queue_start];
-			runner->exec(runner->data);
-			if(runner->requeue) enqueue(runner->exec, runner->data, runner->requeue);
+			runner->exec();
+			if(runner->requeue) enqueue(runner->exec, runner->requeue);
 		}
 	}
 	exit(0);

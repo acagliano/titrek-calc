@@ -36,7 +36,7 @@ void ntwk_init(void){
 	
 	for(uint8_t i=0; i<INET_DEVICES;i++){
 		if (inet_devices>>i) {
-			if(usb_Init(usb_handlers[i],
+			if (usb_Init(usb_handlers[i],
 					 NULL,
 					 descriptors[i],
 					 USB_DEFAULT_INIT_FLAGS))
