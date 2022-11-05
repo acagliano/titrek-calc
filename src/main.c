@@ -13,9 +13,8 @@
 #include <stdlib.h>
 
 #include <graphx.h>
-#include <encrypt.h>
 
-#include "rendering/init.h"
+#include "rendering/frames.h"
 #include "inet/devices.h"
 
 #include "ev.h"
@@ -41,7 +40,7 @@ int main(void) {
 	ntwk_init();
 	srandom(rtc_Time());
 	gamestate.screen_up = SCRN_SPLASH;
-	enqueue(gfx_BlitBuffer, true);
+	enqueue(frame_render, true);
 	
 	while((gamestate.gameflags>>EV_LISTENER_ACTV) & 1){
 		for(;queue_start != queue_stop; queue_start++){
