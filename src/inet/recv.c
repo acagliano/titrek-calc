@@ -1,4 +1,4 @@
-
+/*
 #include <tice.h>
 #include <stdbool.h>
 #include <string.h>
@@ -210,7 +210,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                     moduleinfo_t info;
                 } *packet = (void*)data;
                 memcpy(&ModuleInfo, &packet->info, sizeof(ModuleInfo));
-            } */
+            }
             break;
         case MODULE_CONFIG:
         /*
@@ -222,7 +222,7 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 module_t* thismodule = &Ship.system[packet->slot];
                 memcpy(thismodule, &packet->newdata, sizeof(module_t));
             }
-            */
+            
             break;
         case ENGINE_SETSPEED: /*
         {
@@ -231,14 +231,14 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
                 uint24_t speed;
             } *packet = (void*)data;
             engine_ref.engine[packet->slot].current_speed = packet->speed;
-        } */
+        }
             break;
         case PING:
             ntwk_DisableTimeout();
             break;
         case GET_ENGINE_MAXIMUMS: /*
             memcpy(&engine_ref.engine[0], data, sizeof(engine_ref_t)-1);
-            engine_ref.loaded = true; */
+            engine_ref.loaded = true;
             break;
         case MAIN_FRAME_START:
         case GFX_FRAME_START:               // 91
@@ -334,4 +334,4 @@ void conn_HandleInput(packet_t *in_buff, size_t buff_size) {
     }
 }
 
-
+*/

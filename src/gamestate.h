@@ -18,8 +18,8 @@ enum _screens {
 	SCRN_SERVERLIST,
 	SCRN_SETTINGS,
 	SCRNS_TOTAL
-}
-struct screendata_t {uint8_t selected, uint8_t num_opts};
+};
+struct screendata_t {uint8_t selected; uint8_t num_opts;};
 typedef struct _gamestate_t {
 	uint24_t gameflags;
 	uint24_t screen_up;

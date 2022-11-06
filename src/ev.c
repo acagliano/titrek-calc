@@ -6,7 +6,9 @@ uint8_t queue_start = 0;
 uint8_t queue_stop = 0;
 
 
-bool enqueue(int (exec*)(), bool requeue){
+bool enqueue(void (*exec)(), bool requeue){
 	if(exec == NULL) return false;
-	listener_queue[queue_stop++] = {exec, requeue};
+	listener_t *lst = &listener_queue[queue_stop++];
+	lst->exec = exec;
+	lst->requeue = requeue;
 }

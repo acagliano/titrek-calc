@@ -5,7 +5,7 @@
 
 #define NET_BUFFER_SIZE	4096
 extern usb_device_t usb_device;
-extern net_buffer[NET_BUFFER_SIZE];
+extern uint8_t net_buffer[NET_BUFFER_SIZE];
 
 // inet_flags is a series of bits that indicate network status/config
 #define INET_ACTIVE		0

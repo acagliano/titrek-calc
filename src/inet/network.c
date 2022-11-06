@@ -1,4 +1,5 @@
-#include <stdbool.h>
+/*
+ #include <stdbool.h>
 #include <string.h>
 #include <fontlibc.h>
 #include <stdio.h>
@@ -34,10 +35,10 @@ void ntwk_process(void) {
     for(i = 0; i < 2 * settings.packet_limit.current; i++ ) {
         if(mode->process) mode->process();
 
-        /* If the device was disconnected, exit */
+        /* If the device was disconnected, exit
         if(tick_loop_mode == NO_CONNECTION) return;
 
-        /* Handle input */
+        /* Handle input 
         if(packet_size) {
             if(mode->read_to_size(packet_size)) {
                 conn_HandleInput((packet_t *)net_parse_buffer, packet_size);
@@ -69,3 +70,4 @@ bool ntwk_send(void) {
     return true;
 }
 
+*/
