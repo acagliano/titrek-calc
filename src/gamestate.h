@@ -7,6 +7,22 @@
 
 #include "inet/devices.h"
 
+
+struct _cli_version { uint8_t maj; uint8_t min; uint24_t build; };
+
+#define VMAJOR	0
+#define VMINOR	1
+#define VBUILD	112
+
+#ifdef VBUILD
+struct _cli_version cli_version = { VMAJOR, VMINOR, VBUILD };
+#define VSTRING	VMAJOR "." VMINOR "(" VBUILD ")"
+#else
+struct _cli_version cli_version = { VMAJOR, VMINOR, 0 };
+#define VSTRING	VMAJOR "." VMINOR
+#endif
+
+
 enum _gameflags {
 	FRAME_DIRTY 		= 0,
 	EV_LISTENER_ACTV	= 23
