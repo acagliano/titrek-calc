@@ -8,8 +8,8 @@ extern "C" {
 #define icon_security_width 9
 #define icon_security_height 9
 #define icon_security_size 92
-#define icon_security_compressed_size 33
-extern unsigned char icon_security_compressed[33];
+#define icon_security_compressed_size 36
+extern unsigned char icon_security_compressed[36];
 
 #ifdef __cplusplus
 }

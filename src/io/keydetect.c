@@ -20,6 +20,7 @@ void io_keydetect(void){
 					if (sel == 0) gamestate.screen_up = SCRN_SERVERLIST;
 					else if (sel == 1) gamestate.screen_up = SCRN_SETTINGS;
 					else exit(EXIT_OK);
+					break;
 				}
 				_skip = true;
 			case SCRN_SERVERLIST:

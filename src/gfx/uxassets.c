@@ -7,7 +7,7 @@ unsigned char *uxassets_appvar[19];
 
 unsigned char uxassets_init(void)
 {
-    uint8_t appvar;
+    ti_var_t appvar;
     unsigned int *table;
     void *base;
     unsigned char i;

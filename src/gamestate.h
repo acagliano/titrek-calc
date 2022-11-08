@@ -14,12 +14,12 @@ struct _cli_version { uint8_t maj; uint8_t min; uint24_t build; };
 #define VMINOR	1
 #define VBUILD	112
 
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
 #ifdef VBUILD
-struct _cli_version cli_version = { VMAJOR, VMINOR, VBUILD };
-#define VSTRING	VMAJOR "." VMINOR "(" VBUILD ")"
+#define VSTRING	"v" TOSTRING(VMAJOR) "." TOSTRING(VMINOR) " (" TOSTRING(VBUILD) ")"
 #else
-struct _cli_version cli_version = { VMAJOR, VMINOR, 0 };
-#define VSTRING	VMAJOR "." VMINOR
+#define VSTRING	"v" TOSTRING(VMAJOR) "." TOSTRING(VMINOR)
 #endif
 
 
@@ -27,6 +27,7 @@ enum _gameflags {
 	FRAME_DIRTY 		= 0,
 	EV_LISTENER_ACTV	= 23
 };
+#define MARK_FRAME_DIRTY	gamestate.gameflags |= (1<<FRAME_DIRTY)
 
 enum _screens {
 	SCRN_NONE,
