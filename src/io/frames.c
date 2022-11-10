@@ -42,6 +42,7 @@ void frame_screen_up(uint8_t screen_up){
 	enqueue(screen_render[screen_up], PROC_RENDER, true);
 	enqueue(gfx_SwapDraw, PROC_RENDER, true);
 	gamestate.screen_up = screen_up;
+	MARK_FRAME_DIRTY;
 }
 
 #define SPLASH_BORDERCOLOR	19
@@ -108,6 +109,7 @@ void frame_render_splash(void){
 }
 
 void frame_render_about(void){
+	if (!((gamestate.gameflags>>FRAME_DIRTY) & 1)) return;
 	static const char *scrn_title = "About TI-Trek";
 	uint24_t stringw = gfx_GetStringWidth(scrn_title);
 	gamestate.screendata[SCRN_ABOUT].num_opts = 1;
@@ -129,7 +131,7 @@ void frame_render_about(void){
 	gfx_PrintStringXY("Client/Server Dev:", 5, 86);
 		gfx_PrintStringXY("Anthony Cagliano", 150, 86);
 		gfx_PrintStringXY("Adam Beckingham", 150, 96);
-	gfx_PrintStringXY("Ntwk/Bridge Support: John Caesarz", 5, 106);
+	gfx_PrintStringXY("Ntwk/Bridge Support: John Cesarz", 5, 106);
 	gfx_PrintStringXY("Gfx Support:", 5, 116);
 		gfx_PrintStringXY("Bailey Conrad", 150, 116);
 		gfx_PrintStringXY("Ampersand", 150, 126);
@@ -143,10 +145,17 @@ void frame_render_about(void){
 }
 
 void frame_render_serverlist(void){
+	if (!((gamestate.gameflags>>FRAME_DIRTY) & 1)) return;
 	void *vat_ptr = NULL;
 	char *appv_name;
 	static const char *scrn_title = "TI-Trek Server Metafiles";
 	static const char *prefix_str = "TrekIdentity";
+	static uint8_t icon_user[8*8+2];
+	static bool icon_extracted = false;
+	if(!icon_extracted){
+		zx7_Decompress(icon_user, icon_user_compressed);
+		icon_extracted = true;
+	}
 	uint8_t opt_selected = gamestate.screendata[gamestate.screen_up].selected;
 	uint8_t idx = 0,  i;
 	ti_var_t fp;
@@ -168,13 +177,21 @@ void frame_render_serverlist(void){
 	gfx_SetColor(SPLASH_ACTVCOLOR);
 	gfx_FillRectangle(2, opt_selected*10+15, 320-4, 10);
 	for(i=0; i<idx; i++){
-		if ((fp = ti_Open(gamestate.server_identities[i], 'r'))){
+		if ((fp = ti_Open(gamestate.server_identities[i], "r"))){
+			uint24_t x = 5;
+			uint8_t y = i*10+16;
 			uint8_t *dptr = ti_GetDataPtr(fp);
 			dptr += strlen(prefix_str);
-			
-		} else {
-			// error
-		}
+			gfx_SetTextXY(x, y);
+			gfx_PrintString(dptr);
+			x = 200;
+			dptr += strlen(dptr)+1;
+			gfx_RLETSprite((gfx_rletsprite_t*)icon_user, x, y);
+			x+=12;
+			gfx_SetTextXY(x, y);
+			gfx_PrintString(dptr);
+			ti_Close(fp);
+		} else gfx_PrintStringXY("error opening metafile", 5, i*10+16);
 	}
 	gfx_PrintStringXY("Back to main menu", 5, i*10+16);
 }
