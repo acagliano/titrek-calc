@@ -100,7 +100,7 @@ void frame_render_serverlist(void){
 	uint24_t stringw = gfx_GetStringWidth(scrn_title);
 	while((appv_name = ti_Detect(&vat_ptr, prefix_str)))
 		strncpy(gamestate.server_identities[idx++], appv_name, 8);
-	gamestate.screendata[SCRN_SERVERLIST].num_opts = idx;
+	gamestate.screendata[SCRN_SERVERLIST].num_opts = idx+1;
 	gfx_ZeroScreen();
 	
 	gfx_SetColor(SPLASH_BORDERCOLOR);

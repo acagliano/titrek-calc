@@ -58,7 +58,7 @@ int main(void) {
 	enqueue(screendata_init, PROC_RENDER, false);
 	enqueue(frame_render_splash, PROC_RENDER, true);
 	enqueue(gfx_SwapDraw, PROC_RENDER, true);
-	enqueue(io_keydetect_splash, PROC_KEYDETECT, true);
+	enqueue(io_keydetect_menu, PROC_KEYDETECT, true);
 	MARK_FRAME_DIRTY;
 	
 	while((gamestate.gameflags>>EV_LISTENER_ACTV) & 1){
