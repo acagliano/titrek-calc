@@ -36,12 +36,15 @@ enum _screens {
 	SCRN_SETTINGS,
 	SCRNS_TOTAL
 };
+
+#define MAX_SERVER_COUNT	10
 struct screendata_t {uint8_t selected; uint8_t num_opts;};
 typedef struct _gamestate_t {
 	uint24_t gameflags;
 	uint24_t screen_up;
 	struct screendata_t screendata[SCRNS_TOTAL];
 	sk_key_t key;
+	char server_identities[MAX_SERVER_COUNT][9];
 	struct inet_data_t inet_data;
 } gamestate_t;
 extern gamestate_t gamestate;

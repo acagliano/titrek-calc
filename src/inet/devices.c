@@ -11,7 +11,7 @@
 
 #define INET_TCP 		0
 #define INET_SERIAL 	1
-#define INET_DEVICES	2
+#define INET_DEVICECT	2
 
 #define ntwk_process(data)	usb_HandleEvents()
 usb_device_t usb_device = NULL;
@@ -21,7 +21,7 @@ struct _device_init_t {
 	const usb_standard_descriptors_t* descriptors;
 	usb_error_t (*usb_handler)();
 };
-struct _device_init_t device_idata[INET_DEVICES] = {
+struct _device_init_t device_idata[INET_DEVICECT] = {
 	{NULL, NULL},
 	{srl_GetCDCStandardDescriptors, srl_handle_usb_event}
 };
@@ -37,8 +37,8 @@ void ntwk_init(void){
 	
 	gamestate.inet_data.inet_process = usb_HandleEvents;
 	
-	for(uint8_t i=0; i<INET_DEVICES;i++){
-		if (inet_devices>>i) {
+	for(uint8_t i=0; i<INET_DEVICECT;i++){
+		if ((inet_devices>>i) & 1) {
 			if (usb_Init(device_idata[i].usb_handler,
 					 NULL,
 					 device_idata[i].descriptors,
@@ -57,6 +57,7 @@ srl_device_t srl;
 bool serial_open(void){
 	if(!srl_Open(&srl, usb_device, net_buffer, sizeof net_buffer, SRL_INTERFACE_ANY, 115200)){
 		gamestate.inet_data.inet_flags |= (1<<INET_ACTIVE);
+		gamestate.inet_data.inet_flags |= (DEVICE_SRL<<INET_DEVICE);
 		MARK_FRAME_DIRTY;
 		gamestate.inet_data.inet_recv = srl_Read;
 		gamestate.inet_data.inet_send = srl_Write;

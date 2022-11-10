@@ -19,7 +19,7 @@ bool enqueue(void (*exec)(), uint8_t proc_id, bool requeue){
 void dequeue(uint8_t proc_id, uint8_t max_count){
 // removes any functions of proc_id from the event queue (up to max_count functions)
 	for(int i=queue_start; i<queue_stop; i++){
-		listener_t *lst = &listener_queue[queue_stop++];
+		listener_t *lst = &listener_queue[i];
 		if(proc_id == lst->proc_id){
 			lst->proc_id = PROC_SKIP;
 			if(!max_count--) break;

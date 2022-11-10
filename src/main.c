@@ -19,6 +19,7 @@
 #include "inet/devices.h"
 #include "io/keydetect.h"
 #include "io/frames.h"
+#include "io/fonts.h"
 #include "gamestate.h"
 
 #include "ev.h"
@@ -49,12 +50,15 @@ int main(void) {
 	gfx_SetDrawBuffer();
 	gfx_SetTextTransparentColor(1);
 	gfx_SetTextBGColor(1);
+	gfx_SetFontData(font_haxor8);
+	gfx_SetMonospaceFont(7);
 	ntwk_init();
 	srandom(rtc_Time());
 	gamestate.screen_up = SCRN_SPLASH;
 	enqueue(screendata_init, PROC_RENDER, false);
 	enqueue(frame_render_splash, PROC_RENDER, true);
-	enqueue(io_keydetect, PROC_KEYDETECT, true);
+	enqueue(gfx_SwapDraw, PROC_RENDER, true);
+	enqueue(io_keydetect_splash, PROC_KEYDETECT, true);
 	MARK_FRAME_DIRTY;
 	
 	while((gamestate.gameflags>>EV_LISTENER_ACTV) & 1){

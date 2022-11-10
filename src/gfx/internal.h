@@ -6,8 +6,9 @@ extern "C" {
 #endif
 
 #define internal_palette_offset 0
+#include "calc_splash.h"
+#include "icon_encrypt.h"
 #include "icon_error.h"
-#include "icon_security.h"
 #include "icon_usb.h"
 #include "icon_user.h"
 #include "log_debug.h"

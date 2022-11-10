@@ -9,12 +9,17 @@ extern uint8_t net_buffer[NET_BUFFER_SIZE];
 
 // inet_flags is a series of bits that indicate network status/config
 #define INET_ACTIVE		0
-#define INET_CONNECTED	1
+#define INET_DEVICE		1
+#define INET_CONNECTED	3
 #define INET_ENABLE_ENCRYPTION 7
-extern bool inet_flags;
+enum _inet_devices {
+	DEVICE_TCP,
+	DEVICE_SRL
+};
+
 
 struct inet_data_t {
-	bool inet_flags;
+	uint8_t inet_flags;
 	void (*inet_process)();
 	void (*inet_recv)();
 	void (*inet_send)();
