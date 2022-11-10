@@ -7,11 +7,12 @@
 #include "gfx/internal.h"
 #include "inet/devices.h"
 #include "../gamestate.h"
+#include "../ev.h"
 
 #define MM_OPTCOUNT 3
 const char mm_optstrings[MM_OPTCOUNT][12] = {
 	"Play Game",
-	"Settings",
+	"About Game",
 	"Exit"
 };
 const char mm_devicestmp[3][5] = {
@@ -25,6 +26,23 @@ void screendata_init(void){
 	gamestate.screendata[SCRN_SPLASH].num_opts = 3;
 }
 
+void frame_render_splash(void);
+void frame_render_serverlist(void);
+void frame_render_about(void);
+
+void (*screen_render[SCRNS_TOTAL])() = {
+	NULL,
+	frame_render_splash,
+	frame_render_serverlist,
+	frame_render_about
+};
+
+void frame_screen_up(uint8_t screen_up){
+	dequeue(PROC_RENDER, -1);
+	enqueue(screen_render[screen_up], PROC_RENDER, true);
+	enqueue(gfx_SwapDraw, PROC_RENDER, true);
+	gamestate.screen_up = screen_up;
+}
 
 #define SPLASH_BORDERCOLOR	19
 #define SPLASH_BGCOLOR		190
@@ -89,11 +107,46 @@ void frame_render_splash(void){
 		gfx_RLETSprite((gfx_rletsprite_t*)icon_encrypt, 150-20, 190);
 }
 
+void frame_render_about(void){
+	static const char *scrn_title = "About TI-Trek";
+	uint24_t stringw = gfx_GetStringWidth(scrn_title);
+	gamestate.screendata[SCRN_ABOUT].num_opts = 1;
+	gfx_ZeroScreen();
+	
+	gfx_SetColor(SPLASH_BORDERCOLOR);
+	gfx_FillRectangle(0, 0, 320, 12);
+	
+	gfx_SetTextFGColor(255);
+	gfx_PrintStringXY(scrn_title, (320-stringw)>>1, 2);
+	
+	gfx_PrintStringXY("A space-combat MMO for your", 5, 16);
+	gfx_PrintStringXY("TI-84+ CE graphing calculator.", 5, 26);
+	gfx_PrintStringXY("++++++++", 5, 36);
+	gfx_PrintStringXY("Powered by SRL/USB & TCP/USB", 5, 46);
+	gfx_PrintStringXY("Encryption via CryptX", 5, 56);
+	gfx_PrintStringXY("++++++++", 5, 66);
+	gfx_PrintStringXY("Concept by Anthony Cagliano", 5, 76);
+	gfx_PrintStringXY("Client/Server Dev:", 5, 86);
+		gfx_PrintStringXY("Anthony Cagliano", 150, 86);
+		gfx_PrintStringXY("Adam Beckingham", 150, 96);
+	gfx_PrintStringXY("Ntwk/Bridge Support: John Caesarz", 5, 106);
+	gfx_PrintStringXY("Gfx Support:", 5, 116);
+		gfx_PrintStringXY("Bailey Conrad", 150, 116);
+		gfx_PrintStringXY("Ampersand", 150, 126);
+		gfx_PrintStringXY("Pieman", 150, 136);
+		gfx_PrintStringXY("Mike Camardella", 150, 146);
+	gfx_PrintStringXY("Astrophysics Support: Bailey Conrad", 5, 156);
+	gfx_PrintStringXY("++++++++", 5, 166);
+	gfx_PrintStringXY("http://titrek.us", 5, 176);
+	
+	
+}
+
 void frame_render_serverlist(void){
 	void *vat_ptr = NULL;
 	char *appv_name;
-	const char *scrn_title = "TI-Trek Server Metafiles";
-	const char *prefix_str = "TrekIdentity";
+	static const char *scrn_title = "TI-Trek Server Metafiles";
+	static const char *prefix_str = "TrekIdentity";
 	uint8_t opt_selected = gamestate.screendata[gamestate.screen_up].selected;
 	uint8_t idx = 0,  i;
 	ti_var_t fp;

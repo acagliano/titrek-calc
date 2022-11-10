@@ -14,27 +14,14 @@ void io_keydetect_menu(void){
 	uint8_t sel = gamestate.screendata[gamestate.screen_up].selected,
 			num_opts = gamestate.screendata[gamestate.screen_up].num_opts;
 	if ((key == sk_Enter) || (key == sk_2nd)) {
-		dequeue(PROC_RENDER, -1);
 		switch(gamestate.screen_up){
 			case SCRN_SPLASH:
-				if (sel == 0) {
-					enqueue(frame_render_serverlist, PROC_RENDER, true);
-					enqueue(gfx_SwapDraw, PROC_RENDER, true);
-					gamestate.screen_up = SCRN_SERVERLIST;
-				}
-				else if (sel == 1) {
-					//enqueue(frame_render_settings, PROC_RENDER, true);
-					//enqueue(io_keydetect_settings, PROC_KEYDETECT, true);
-					gamestate.screen_up = SCRN_SETTINGS;
-				}
+				if (sel == 0) frame_screen_up(SCRN_SERVERLIST);
+				else if (sel == 1) frame_screen_up(SCRN_ABOUT);
 				else exit(EXIT_OK);
 				break;
 			case SCRN_SERVERLIST:
-				if((sel+1) == num_opts){
-					enqueue(frame_render_splash, PROC_RENDER, true);
-					enqueue(gfx_SwapDraw, PROC_RENDER, true);
-					gamestate.screen_up = SCRN_SPLASH;
-				}
+				if((sel+1) == num_opts) frame_screen_up(SCRN_SPLASH);
 				else {
 					// not implemented
 				}
@@ -48,7 +35,17 @@ void io_keydetect_menu(void){
 	} else if (key == sk_Up) {
 		sel += (num_opts-1);
 		sel %= num_opts;
-	} else if (key == sk_Clear) exit(EXIT_OK);
+	} else if (key == sk_Clear) {
+		switch(gamestate.screen_up){
+			case SCRN_SPLASH:
+				exit(EXIT_OK);
+				break;
+			case SCRN_SERVERLIST:
+			case SCRN_ABOUT:
+				frame_screen_up(SCRN_SPLASH);
+				break;
+		}
+	}
 	gamestate.screendata[gamestate.screen_up].selected = sel;
 	MARK_FRAME_DIRTY;
 }

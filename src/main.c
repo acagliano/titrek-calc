@@ -43,8 +43,8 @@ int main(void) {
 	atexit(gfx_End);
 	//atexit(prgm_CleanUp);
 	
-	// initialize cryptographic libraries, disable encryption if not found
-	gamestate.inet_data.inet_flags |= (LOAD_CRYPTX_LIBS<<INET_ENABLE_ENCRYPTION);
+	// initialize cryptographic libraries, exit w/ err if not present
+	if(!LOAD_CRYPTX_LIBS) exit(ERR_CRYPTOGRAPHY);
 	
 	gfx_Begin();
 	gfx_SetDrawBuffer();
@@ -54,10 +54,8 @@ int main(void) {
 	gfx_SetMonospaceFont(7);
 	ntwk_init();
 	srandom(rtc_Time());
-	gamestate.screen_up = SCRN_SPLASH;
+	frame_screen_up(SCRN_SPLASH);
 	enqueue(screendata_init, PROC_RENDER, false);
-	enqueue(frame_render_splash, PROC_RENDER, true);
-	enqueue(gfx_SwapDraw, PROC_RENDER, true);
 	enqueue(io_keydetect_menu, PROC_KEYDETECT, true);
 	MARK_FRAME_DIRTY;
 	
