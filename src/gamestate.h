@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <tice.h>
 
-#include "inet/devices.h"
+#include "inet/inet.h"
 
 
 struct _cli_version { uint8_t maj; uint8_t min; uint24_t build; };
@@ -45,7 +45,7 @@ typedef struct _gamestate_t {
 	struct screendata_t screendata[SCRNS_TOTAL];
 	sk_key_t key;
 	char server_identities[MAX_SERVER_COUNT][9];
-	struct inet_data_t inet_data;
+	inetcfg_t inet;
 } gamestate_t;
 extern gamestate_t gamestate;
 

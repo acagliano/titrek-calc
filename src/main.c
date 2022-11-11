@@ -16,7 +16,7 @@
 #include <libload.h>
 #include <graphx.h>
 
-#include "inet/devices.h"
+#include "inet/inet.h"
 #include "io/keydetect.h"
 #include "io/frames.h"
 #include "io/fonts.h"
@@ -52,7 +52,7 @@ int main(void) {
 	gfx_SetTextBGColor(1);
 	gfx_SetFontData(font_haxor8);
 	gfx_SetMonospaceFont(7);
-	ntwk_init();
+	inet_init();
 	srandom(rtc_Time());
 	frame_screen_up(SCRN_SPLASH);
 	enqueue(screendata_init, PROC_RENDER, false);

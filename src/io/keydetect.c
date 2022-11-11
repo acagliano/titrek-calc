@@ -5,6 +5,7 @@
 #include "../ev.h"
 #include "../asm/exposure.h"
 #include "frames.h"
+#include "../inet/conn.h"
 
 sk_key_t key = 0;
 
@@ -22,12 +23,9 @@ void io_keydetect_menu(void){
 				break;
 			case SCRN_SERVERLIST:
 				if((sel+1) == num_opts) frame_screen_up(SCRN_SPLASH);
-				else {
-					// not implemented
-				}
+				else bridge->ping();
 				break;
 		}
-		
 	}
 	else if (key == sk_Down) {
 		sel++;

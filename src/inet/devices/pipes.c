@@ -4,10 +4,9 @@
 #include <graphx.h>
 
 #include "../../asm/exposure.h"
-#include "../network.h"
 
 #define CEMU_CONSOLE ((char*)0xFB0000)
-
+/*
 bool pipe_read_to_size(size_t size);
 
 net_mode_t mode_pipe = {
@@ -46,3 +45,4 @@ bool pipe_read_to_size(size_t size) {
     return false;
 }
 
+*/
