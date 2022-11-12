@@ -45,6 +45,7 @@ enum _screens {
 #define MARK_FRAME_CLEAN	RESET_FLAG(gamestate.gameflags, FRAME_DIRTY)
 
 #define MAX_SERVER_COUNT	20
+
 struct screendata_t {uint8_t selected; uint8_t num_opts;};
 typedef struct _gamestate_t {
 	uint24_t gameflags;
