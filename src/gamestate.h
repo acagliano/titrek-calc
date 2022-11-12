@@ -27,17 +27,24 @@ enum _gameflags {
 	FRAME_DIRTY 		= 0,
 	EV_LISTENER_ACTV	= 23
 };
-#define MARK_FRAME_DIRTY	gamestate.gameflags |= (1<<FRAME_DIRTY)
 
 enum _screens {
 	SCRN_NONE,
 	SCRN_SPLASH,
 	SCRN_SERVERLIST,
 	SCRN_ABOUT,
+	SCRN_CONSOLE,
 	SCRNS_TOTAL
 };
 
-#define MAX_SERVER_COUNT	10
+#define SET_FLAG(flagLoc, flagName)	((flagLoc) |= (1<<(flagName)))
+#define RESET_FLAG(flagLoc, flagName) ((flagLoc) &= (1<<(flagName)))
+#define GET_FLAG(flagLoc, flagName) ((flagLoc) & (1<<(flagName)))
+
+#define MARK_FRAME_DIRTY	SET_FLAG(gamestate.gameflags, FRAME_DIRTY)
+#define MARK_FRAME_CLEAN	RESET_FLAG(gamestate.gameflags, FRAME_DIRTY)
+
+#define MAX_SERVER_COUNT	20
 struct screendata_t {uint8_t selected; uint8_t num_opts;};
 typedef struct _gamestate_t {
 	uint24_t gameflags;

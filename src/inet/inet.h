@@ -7,15 +7,14 @@
 
 // inet_flags is a series of bits that indicate network status/config (see inet_flags)
 #define INET_ACTIVE		0
-#define INET_DEVICE		1
-#define INET_CONNECTED	3
-#define INET_ENABLE_ENCRYPTION 7
+#define INET_CONNECTED	1
 enum _inet_devices {
 	DEVICE_TCP,
 	DEVICE_SRL
 };
 typedef struct _inetcfg_t {
 	uint8_t flags;
+	uint8_t device_id;
 	void *device;
 	void (*process)();
 	size_t (*recv)();

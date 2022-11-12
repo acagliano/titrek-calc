@@ -30,7 +30,7 @@ void bridge_ping(void){ inet_send_packet(0, PING_BRIDGE); }
 void bridge_connect(const char *metafile) {
 	ti_var_t fp = ti_Open(metafile, "r");
 	if(!fp) { conn.error = METAFILE_IO_ERROR; return; }
-	uint8_t device_type = (gamestate.inet.flags>>INET_DEVICE) & 3;
+	uint8_t device_type = gamestate.inet.device_id;
 	char *hptr = ti_GetDataPtr(fp) + strlen("TrekIdentity");
 	const char *scrn_title = "Connection Status";
 	strncpy(hostinfo, hptr, strlen(hptr));

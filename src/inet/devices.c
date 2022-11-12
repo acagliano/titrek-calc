@@ -1,5 +1,5 @@
 #include <stdlib.h>
-
+#include <stdio.h>
 #include <libload.h>
 #include <usbdrvce.h>
 #include <srldrvce.h>
@@ -7,25 +7,22 @@
 #include "../ev.h"
 #include "../gamestate.h"
 #include "devices.h"
+#include "inet.h"
 
 usb_device_t usb_device = NULL;
 uint8_t net_buffer[NET_BUFFER_SIZE];
 
 #define INET_TCP 		0
 #define INET_SERIAL 	1
-device_init_t device_idata[INET_DEVICECT] = {
-	{NULL, NULL},
-	{srl_GetCDCStandardDescriptors, srl_handle_usb_event}
-};
-
 
 // SERIAL
 srl_device_t srl;
 
+#define CEMU_CONSOLE ((char*)0xFB0000)
 bool serial_open(void){
 	if(!srl_Open(&srl, usb_device, net_buffer, sizeof net_buffer, SRL_INTERFACE_ANY, 115200)){
-		gamestate.inet.flags |= (1<<INET_ACTIVE);
-		gamestate.inet.flags |= (DEVICE_SRL<<INET_DEVICE);
+		SET_FLAG(gamestate.inet.flags, INET_ACTIVE);
+		gamestate.inet.device_id = DEVICE_SRL;
 		MARK_FRAME_DIRTY;
 		gamestate.inet.recv = srl_Read;
 		gamestate.inet.send = srl_Write;
@@ -35,7 +32,7 @@ bool serial_open(void){
 	return false;
 }
 
-static usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
+usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
 										usb_callback_data_t *callback_data) {
 	
 	usb_error_t err;
@@ -66,7 +63,7 @@ static usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
 			// break;
 		case USB_DEVICE_DISCONNECTED_EVENT:
 			srl_Close(&srl);
-			gamestate.inet.flags &= ~(1<<INET_ACTIVE);
+			RESET_FLAG(gamestate.inet.flags, INET_ACTIVE);
 			return USB_SUCCESS;
 			
 	}

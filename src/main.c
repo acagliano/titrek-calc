@@ -11,6 +11,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <tice.h>
 
 #include <libload.h>
@@ -33,8 +34,7 @@ gamestate_t gamestate = {0};
 #else
 	struct _cli_version cli_version = { VMAJOR, VMINOR, 0 };
 #endif
-
-
+#define CEMU_CONSOLE ((char*)0xFB0000)
 int main(void) {
 
     // init the program
@@ -42,7 +42,6 @@ int main(void) {
 	atexit(usb_Cleanup);
 	atexit(gfx_End);
 	//atexit(prgm_CleanUp);
-	
 	// initialize cryptographic libraries, exit w/ err if not present
 	if(!LOAD_CRYPTX_LIBS) exit(ERR_CRYPTOGRAPHY);
 	

@@ -3,36 +3,31 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include <libload.h>
 #include <usbdrvce.h>
 #include "inet.h"
+#include "devices.h"
+#include "../asm/exposure.h"
 #include "../gamestate.h"
 #include "../ev.h"
 
 void inet_process_packet(void *data, size_t len);
 
+#define CEMU_CONSOLE ((char*)0xFB0000)
 void inet_init(void){
-	uint8_t inet_devices = 0;
 	
 	if (!libload_IsLibLoaded(USBDRVCE)) exit(ERR_USBDRV_NOT_FOUND);
 	
-	inet_devices |= libload_IsLibLoaded(TCPDRVCE);
-	inet_devices |= (libload_IsLibLoaded(SRLDRVCE)<<1);
-	if (!inet_devices) exit(ERR_IFACE_NOT_FOUND);
-	
-	gamestate.inet.process = usb_HandleEvents;
-	
-	for(uint8_t i=0; i<INET_DEVICECT;i++){
-		if ((inet_devices>>i) & 1) {
-			if (usb_Init(device_idata[i].usb_handler,
-						 NULL,
-						 device_idata[i].descriptors,
-						 USB_DEFAULT_INIT_FLAGS))
-				exit(ERR_USBDRV_ERROR);
-			enqueue(gamestate.inet.process, PROC_NTWK, true);
-			return;
-		}
+	if(libload_IsLibLoaded(TCPDRVCE)) return;	// unimplemented
+	else if(libload_IsLibLoaded(SRLDRVCE)) {
+		gamestate.inet.process = usb_HandleEvents();
+		if(usb_Init(srl_handle_usb_event, NULL,
+					srl_GetCDCStandardDescriptors, USB_DEFAULT_INIT_FLAGS))
+			exit(ERR_USBDRV_ERROR);
+		enqueue(gamestate.inet.process, PROC_NTWK, true);
 	}
+	else exit(ERR_IFACE_NOT_FOUND);
 }
 
 

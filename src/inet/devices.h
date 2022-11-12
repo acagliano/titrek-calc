@@ -16,7 +16,7 @@ typedef struct _device_init_t {
 extern device_init_t device_idata[INET_DEVICECT];
 
 // Serial event callback handler
-static usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
+usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
 										usb_callback_data_t *callback_data);
 
 // TCP event callback handler

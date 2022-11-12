@@ -5,7 +5,7 @@
 #include <fileioc.h>
 
 #include "gfx/internal.h"
-#include "inet/devices.h"
+#include "inet/inet.h"
 #include "../gamestate.h"
 #include "../ev.h"
 
@@ -46,6 +46,7 @@ void frame_screen_up(uint8_t screen_up){
 }
 
 #define SPLASH_BORDERCOLOR	19
+#define SPLASH_TITREKCOLOR	20
 #define SPLASH_BGCOLOR		190
 #define SPLASH_ACTVCOLOR	223
 void frame_render_headerbar(const char *title){
@@ -58,16 +59,18 @@ void frame_render_headerbar(const char *title){
 }
 
 #define CEMU_CONSOLE ((char*)0xFB0000)
-#define SPLASH_DEVICE_ID ((gamestate.inet.flags>>INET_DEVICE) & 3)
 void frame_render_splash(void){
-	if (!((gamestate.gameflags>>FRAME_DIRTY) & 1)) return;
-	static bool icons_extracted = false;
+	if(!GET_FLAG(gamestate.gameflags, FRAME_DIRTY)) return;
+	static bool splash_icons_extracted = false;
 	static uint8_t icon_usb[15*15+2];
+	static uint8_t icon_usb_error[15*15+2];
+	const char *gamename = "TI-TREK";
 //	static uint8_t icon_encrypt[15*15+2];
-	if(!icons_extracted){
+	if(!splash_icons_extracted){
 		zx7_Decompress(icon_usb, icon_usb_compressed);
+		zx7_Decompress(icon_usb_error, icon_usb_error_compressed);
 		//zx7_Decompress(icon_encrypt, icon_encrypt_compressed);
-		icons_extracted = true;
+		splash_icons_extracted = true;
 	}
 	gfx_SetTransparentColor(0);
 	uint8_t opt_selected = gamestate.screendata[gamestate.screen_up].selected;
@@ -76,47 +79,54 @@ void frame_render_splash(void){
 	
 	// draw header (version string)
 	
-	gfx_SetColor(224); gfx_FillTriangle(0, 95, 320, 128, 320, 141);
-	gfx_SetColor(255); gfx_FillTriangle(0, 95, 320, 131, 320, 138);
-	
-	gfx_SetColor(SPLASH_BORDERCOLOR);
-	gfx_FillRectangle(20, 94, stringw+24, 16);
+	gfx_SetColor(224); gfx_FillTriangle(0, 65, 320, 128, 320, 141);
+	gfx_SetColor(255); gfx_FillTriangle(0, 65, 320, 131, 320, 138);
 	gfx_SetTextFGColor(255);
-	gfx_SetTextScale(3,3);
-	gfx_PrintStringXY("TI-TREK", 165, 85);
+	gfx_SetColor(SPLASH_BORDERCOLOR);
+	
+	// version string bg
+	gfx_FillRectangle(20, 104, stringw+24, 16);
+	
+	// TI-TREK text
+	gfx_FillRectangle(110, 20, 320-110-5, 40);
+	gfx_SetTextScale(4,4);
+	gfx_PrintStringXY(gamename, 115, 25);
 	gfx_SetTextScale(1,1);
+	
 	gfx_PrintStringXY("A space-combat MMO", 170, 150);
 	gfx_PrintStringXY("for your calculator", 170, 160);
 	gfx_PrintStringXY("http://titrek.us", 170, 175);
-	gfx_PrintStringXY(VSTRING, 32, 98);
+	gfx_PrintStringXY(VSTRING, 32, 108);
 	gfx_SetTextFGColor(0);
 	// draw footer
-	gfx_FillRectangle(20, 191, 130, 16);
+	gfx_FillRectangle(20, 201, 130, 16);
 	
 	// draw 3px border
-	gfx_Rectangle(20, 110, 130, 81);
-	gfx_Rectangle(21, 111, 128, 79);
-	gfx_Rectangle(22, 112, 126, 77);
+	gfx_Rectangle(20, 120, 130, 81);
+	gfx_Rectangle(21, 121, 128, 79);
+	gfx_Rectangle(22, 122, 126, 77);
 	// draw menu background
 	gfx_SetColor(SPLASH_BGCOLOR);
-	gfx_FillRectangle(23, 113, 124, 75);
+	gfx_FillRectangle(23, 123, 124, 75);
 	
 	// draw menu tabs
 	gfx_SetColor(SPLASH_ACTVCOLOR);			// set color for active tab
-	gfx_FillRectangle(23, opt_selected*25+112, 124, 25);
+	gfx_FillRectangle(23, opt_selected*25+122, 124, 25);
 	for(int i=0; i<MM_OPTCOUNT; i++){
-		gfx_PrintStringXY(mm_optstrings[i], 37, i*25+120);
+		gfx_PrintStringXY(mm_optstrings[i], 37, i*25+130);
 	}
-	
-	if((gamestate.inet.flags>>INET_ACTIVE) & 1){
+	sprintf(CEMU_CONSOLE, "netstatus: %u, device: %u\n", gamestate.inet.flags, gamestate.inet.device_id);
+	if(GET_FLAG(gamestate.inet.flags, INET_ACTIVE)){
 		gfx_SetTextFGColor(255);
-		gfx_RLETSprite((gfx_rletsprite_t*)icon_usb, 22, 190);
-		gfx_PrintStringXY(mm_devicestmp[SPLASH_DEVICE_ID], 38, 194);
+		gfx_RLETSprite((gfx_rletsprite_t*)icon_usb, 22, 253);
+		gfx_PrintStringXY(mm_devicestmp[gamestate.inet.device_id], 38, 254);
 	}
+	else gfx_RLETSprite((gfx_rletsprite_t*)icon_usb_error, 22, 253);
+	MARK_FRAME_CLEAN;
 }
 
 void frame_render_about(void){
-	if (!((gamestate.gameflags>>FRAME_DIRTY) & 1)) return;
+	if(!GET_FLAG(gamestate.gameflags, FRAME_DIRTY)) return;
 	static const char *scrn_title = "About TI-Trek";
 	gamestate.screendata[SCRN_ABOUT].num_opts = 1;
 	gfx_ZeroScreen();
@@ -142,21 +152,21 @@ void frame_render_about(void){
 	gfx_PrintStringXY("Astrophysics Support: Bailey Conrad", 5, 156);
 	gfx_PrintStringXY("++++++++", 5, 166);
 	gfx_PrintStringXY("http://titrek.us", 5, 176);
-	
+	MARK_FRAME_CLEAN;
 	
 }
 
 void frame_render_serverlist(void){
-	if (!((gamestate.gameflags>>FRAME_DIRTY) & 1)) return;
+	if(!GET_FLAG(gamestate.gameflags, FRAME_DIRTY)) return;
 	void *vat_ptr = NULL;
 	char *appv_name;
 	static const char *scrn_title = "TI-Trek Server Metafiles";
 	static const char *prefix_str = "TrekIdentity";
 	static uint8_t icon_user[8*8+2];
-	static bool icon_extracted = false;
-	if(!icon_extracted){
+	static bool serverlist_icons_extracted = false;
+	if(!serverlist_icons_extracted){
 		zx7_Decompress(icon_user, icon_user_compressed);
-		icon_extracted = true;
+		serverlist_icons_extracted = true;
 	}
 	uint8_t opt_selected = gamestate.screendata[gamestate.screen_up].selected;
 	uint8_t idx = 0,  i;
@@ -192,4 +202,5 @@ void frame_render_serverlist(void){
 		} else gfx_PrintStringXY("error opening metafile", 5, i*10+16);
 	}
 	gfx_PrintStringXY("Back to main menu", 5, i*10+16);
+	MARK_FRAME_CLEAN;
 }
