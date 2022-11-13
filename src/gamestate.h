@@ -38,7 +38,7 @@ enum _screens {
 };
 
 #define SET_FLAG(flagLoc, flagName)	((flagLoc) |= (1<<(flagName)))
-#define RESET_FLAG(flagLoc, flagName) ((flagLoc) &= (1<<(flagName)))
+#define RESET_FLAG(flagLoc, flagName) ((flagLoc) &= ~(1<<(flagName)))
 #define GET_FLAG(flagLoc, flagName) ((flagLoc) & (1<<(flagName)))
 
 #define MARK_FRAME_DIRTY	SET_FLAG(gamestate.gameflags, FRAME_DIRTY)

@@ -20,7 +20,8 @@ srl_device_t srl;
 
 #define CEMU_CONSOLE ((char*)0xFB0000)
 bool serial_open(void){
-	if(!srl_Open(&srl, usb_device, net_buffer, sizeof net_buffer, SRL_INTERFACE_ANY, 115200)){
+	srl_error_t s_err;
+	if(!(s_err = srl_Open(&srl, usb_device, net_buffer, sizeof net_buffer, SRL_INTERFACE_ANY, 115200))){
 		SET_FLAG(gamestate.inet.flags, INET_ACTIVE);
 		gamestate.inet.device_id = DEVICE_SRL;
 		MARK_FRAME_DIRTY;
@@ -29,6 +30,7 @@ bool serial_open(void){
 		gamestate.inet.setdown = srl_Close;
 		return true;
 	}
+	sprintf(CEMU_CONSOLE, "%u\n", s_err);
 	return false;
 }
 
@@ -56,14 +58,18 @@ usb_error_t srl_handle_usb_event(usb_event_t event, void *event_data,
 			break;
 		}
 			// break;
+		case USB_DEVICE_RESUMED_EVENT:
 		case USB_DEVICE_ENABLED_EVENT:
 			usb_device = event_data;
 			if(serial_open()) return USB_SUCCESS;
 			break;
 			// break;
+		case USB_DEVICE_SUSPENDED_EVENT:
+		case USB_DEVICE_DISABLED_EVENT:
 		case USB_DEVICE_DISCONNECTED_EVENT:
 			srl_Close(&srl);
 			RESET_FLAG(gamestate.inet.flags, INET_ACTIVE);
+			MARK_FRAME_DIRTY;
 			return USB_SUCCESS;
 			
 	}

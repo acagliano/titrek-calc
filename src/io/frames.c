@@ -40,7 +40,6 @@ void (*screen_render[SCRNS_TOTAL])() = {
 void frame_screen_up(uint8_t screen_up){
 	dequeue(PROC_RENDER, -1);
 	enqueue(screen_render[screen_up], PROC_RENDER, true);
-	enqueue(gfx_SwapDraw, PROC_RENDER, true);
 	gamestate.screen_up = screen_up;
 	MARK_FRAME_DIRTY;
 }
@@ -88,9 +87,9 @@ void frame_render_splash(void){
 	gfx_FillRectangle(20, 104, stringw+24, 16);
 	
 	// TI-TREK text
-	gfx_FillRectangle(110, 20, 320-110-5, 40);
+	gfx_FillRectangle(90, 20, 320-110-5, 40);
 	gfx_SetTextScale(4,4);
-	gfx_PrintStringXY(gamename, 115, 25);
+	gfx_PrintStringXY(gamename, 95, 25);
 	gfx_SetTextScale(1,1);
 	
 	gfx_PrintStringXY("A space-combat MMO", 170, 150);
@@ -115,13 +114,14 @@ void frame_render_splash(void){
 	for(int i=0; i<MM_OPTCOUNT; i++){
 		gfx_PrintStringXY(mm_optstrings[i], 37, i*25+130);
 	}
-	sprintf(CEMU_CONSOLE, "netstatus: %u, device: %u\n", gamestate.inet.flags, gamestate.inet.device_id);
+	
 	if(GET_FLAG(gamestate.inet.flags, INET_ACTIVE)){
 		gfx_SetTextFGColor(255);
-		gfx_RLETSprite((gfx_rletsprite_t*)icon_usb, 22, 253);
-		gfx_PrintStringXY(mm_devicestmp[gamestate.inet.device_id], 38, 254);
+		gfx_RLETSprite((gfx_rletsprite_t*)icon_usb, 25, 201);
+		gfx_PrintStringXY(mm_devicestmp[gamestate.inet.device_id], 43, 205);
 	}
-	else gfx_RLETSprite((gfx_rletsprite_t*)icon_usb_error, 22, 253);
+	else gfx_RLETSprite((gfx_rletsprite_t*)icon_usb_error, 25, 201);
+	gfx_SwapDraw();
 	MARK_FRAME_CLEAN;
 }
 
@@ -152,6 +152,7 @@ void frame_render_about(void){
 	gfx_PrintStringXY("Astrophysics Support: Bailey Conrad", 5, 156);
 	gfx_PrintStringXY("++++++++", 5, 166);
 	gfx_PrintStringXY("http://titrek.us", 5, 176);
+	gfx_SwapDraw();
 	MARK_FRAME_CLEAN;
 	
 }
@@ -202,5 +203,6 @@ void frame_render_serverlist(void){
 		} else gfx_PrintStringXY("error opening metafile", 5, i*10+16);
 	}
 	gfx_PrintStringXY("Back to main menu", 5, i*10+16);
+	gfx_SwapDraw();
 	MARK_FRAME_CLEAN;
 }

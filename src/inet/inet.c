@@ -23,7 +23,7 @@ void inet_init(void){
 	else if(libload_IsLibLoaded(SRLDRVCE)) {
 		gamestate.inet.process = usb_HandleEvents;
 		if(usb_Init(srl_handle_usb_event, NULL,
-					srl_GetCDCStandardDescriptors, USB_DEFAULT_INIT_FLAGS))
+					srl_GetCDCStandardDescriptors(), USB_DEFAULT_INIT_FLAGS))
 			exit(ERR_USBDRV_ERROR);
 		enqueue(gamestate.inet.process, PROC_NTWK, true);
 	}
