@@ -82,6 +82,39 @@ void inet_get_packet(void){
 }
 
 
-void inet_process_packet(void *data, size_t len){
-	
+void inet_process_packet(uint8_t *data, size_t len){
+	uint8_t ctl = *data;
+	uint8_t *pkt_content = &data[1];
+	if(ctl==PING_BRIDGE)
+		SET_FLAG(gamestate.inet.flags, INET_BRIDGE_UP);
+	else if(GET_FLAG(gamestate.inet.flags, INET_BRIDGE_UP)){
+		if(ctl==CONNECT){
+			if(!(*pkt_content)){
+				// do if success
+				SET_FLAG(gamestate.inet.flags, INET_CONNECTED);
+			} else {
+				// do if failed
+			}
+		}
+		else if(GET_FLAG(gamestate.inet.flags, INET_CONNECTED)){
+			if(ctl==DISCONNECT){
+				// disconnect
+			} else if(ctl==RSA_SETUP){
+				// generate aes key, encrypt and send
+			} else if(ctl==AES_SECRET_ACK){
+				// aes-encrypt token, send to server
+			}
+			else if(ctl==LOGIN){
+				// result of login to server
+				if(!(*pkt_content)){
+					SET_FLAG(gamestate.inet.flags, INET_LOGGED_IN);
+				}
+			}
+			else if(GET_FLAG(gamestate.inet.flags, INET_LOGGED_IN)){
+				if(ctl==LOAD_SHIP){
+					
+				} else ...
+			}
+		}
+	}
 }

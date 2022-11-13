@@ -7,7 +7,9 @@
 
 // inet_flags is a series of bits that indicate network status/config (see inet_flags)
 #define INET_ACTIVE		0
-#define INET_CONNECTED	1
+#define INET_BRIDGE_UP	1
+#define INET_CONNECTED	2
+#define INET_LOGGED_IN	3
 enum _inet_devices {
 	DEVICE_TCP,
 	DEVICE_SRL
@@ -29,9 +31,9 @@ enum _packetids {
 	PING_BRIDGE,
 	CONNECT,            // 0
 	DISCONNECT,         // 1
-	RSA_KEY_FROM_SERV,     // 2
-	SEND_AES_SECRET,   // 3
-	LOGIN,            // 4
+	RSA_SETUP,     		// 2
+	AES_SECRET_ACK,   	// 3
+	LOGIN,            	// 4
 	// This is for the client not up to date response , See response codes. VERSION_* must be the second byte of packet
 	
 	// Ship Interfacing: 20 - 29
