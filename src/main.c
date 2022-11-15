@@ -16,6 +16,7 @@
 
 #include <libload.h>
 #include <graphx.h>
+#include <encrypt.h>
 
 #include "inet/inet.h"
 #include "io/keydetect.h"
@@ -44,6 +45,7 @@ int main(void) {
 	//atexit(prgm_CleanUp);
 	// initialize cryptographic libraries, exit w/ err if not present
 	if(!LOAD_CRYPTX_LIBS) exit(ERR_CRYPTOGRAPHY);
+	if(!csrand_init()) exit(ERR_CRYPTOGRAPHY);
 	
 	gfx_Begin();
 	gfx_SetDrawBuffer();

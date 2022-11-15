@@ -27,6 +27,11 @@ extern conn_t conn;
 extern bridge_funcs *bridge;
 extern server_funcs *server;
 
-
+#define TOKEN_LEN			64
+#define HOSTNAME_MAX_LEN	64
+#define USERNAME_MAX_LEN	16
+extern uint8_t token[TOKEN_LEN];
+extern uint8_t hostinfo[HOSTNAME_MAX_LEN+1];
+extern uint8_t username[USERNAME_MAX_LEN+1];
 
 #endif

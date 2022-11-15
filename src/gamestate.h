@@ -63,6 +63,7 @@ enum _exitcodes {
 	ERR_USBDRV_NOT_FOUND,
 	ERR_USBDRV_ERROR,
 	ERR_IFACE_NOT_FOUND,
+	ERR_ALLOCATION
 };
 
 #endif

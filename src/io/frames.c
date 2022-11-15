@@ -20,7 +20,6 @@ const char mm_devicestmp[3][5] = {
 	"SRL"
 };
 
-
 void screendata_init(void){
 	gamestate.screendata[SCRN_SPLASH].selected = 0;
 	gamestate.screendata[SCRN_SPLASH].num_opts = 3;
@@ -29,12 +28,14 @@ void screendata_init(void){
 void frame_render_splash(void);
 void frame_render_serverlist(void);
 void frame_render_about(void);
+void frame_render_console(void);
 
 void (*screen_render[SCRNS_TOTAL])() = {
 	NULL,
 	frame_render_splash,
 	frame_render_serverlist,
-	frame_render_about
+	frame_render_about,
+	frame_render_console
 };
 
 void frame_screen_up(uint8_t screen_up){
@@ -205,4 +206,50 @@ void frame_render_serverlist(void){
 	gfx_PrintStringXY("Back to main menu", 5, i*10+16);
 	gfx_SwapDraw();
 	MARK_FRAME_CLEAN;
+}
+
+
+#define CONSOLE_LINECT	22
+#define CONSOLE_LINEW	32
+uint8_t console_buf[CONSOLE_LINECT][CONSOLE_LINEW+2] = {0};
+uint8_t console_start_idx = 0;
+uint8_t console_stop_idx = 0;
+
+
+void frame_render_console(void){
+	if(!GET_FLAG(gamestate.gameflags, FRAME_DIRTY)) return;
+	
+	static const char *scrn_title = "Console";
+	uint8_t line_y = 16;
+	frame_render_headerbar(scrn_title);
+	gfx_SetColor(SPLASH_BGCOLOR);
+	gfx_FillRectangle(5, 15, 320-10, 240-15);
+	
+	for(uint8_t i = console_start_idx; i != console_stop_idx; i = ((i+1)%22)){
+		uint8_t *ln = &console_buf[console_stop_idx];
+		gfx_SetTextFGColor(ln[0]);
+		gfx_PrintStringXY(&ln[1], 10, line_y);
+		line_y += 10;
+	}
+	gfx_SwapDraw();
+	MARK_FRAME_CLEAN;
+}
+
+#define MIN(x, y) (x < y ? x : y)
+void console_insert_line(const char *line, uint8_t msg_type){
+	size_t len = strlen(line);
+	for(size_t i = 0; i < len;){
+		size_t copylen = MIN(len-i, CONSOLE_LINEW);
+		uint8_t *ln = &console_buf[console_stop_idx];
+		ln[0] = msg_type;
+		memcpy(&ln[1], line+i, copylen);
+		ln[copylen+1] = 0;
+		i += copylen;
+		console_stop_idx++;
+		console_stop_idx %= CONSOLE_LINECT;
+		if(console_stop_idx==console_start_idx){
+			console_start_idx++;
+			console_start_idx %= CONSOLE_LINECT;
+		}
+	}
 }

@@ -7,9 +7,8 @@
 #include "../gamestate.h"
 #include "../io/frames.h"
 
-char hostinfo[64] = {0};
-char username[32] = {0};
-#define TOKEN_LEN	64
+uint8_t hostinfo[HOSTNAME_MAX_LEN+1] = {0};
+uint8_t username[USERNAME_MAX_LEN+1] = {0};
 uint8_t token[TOKEN_LEN] = {0};
 
 void bridge_ping(void);
@@ -32,7 +31,6 @@ void bridge_connect(const char *metafile) {
 	if(!fp) { conn.error = METAFILE_IO_ERROR; return; }
 	uint8_t device_type = gamestate.inet.device_id;
 	char *hptr = ti_GetDataPtr(fp) + strlen("TrekIdentity");
-	const char *scrn_title = "Connection Status";
 	strncpy(hostinfo, hptr, strlen(hptr));
 	hptr += strlen(hptr) + 1;
 	strncpy(username, hptr, strlen(hptr));

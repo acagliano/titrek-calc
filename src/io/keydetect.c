@@ -23,7 +23,12 @@ void io_keydetect_menu(void){
 				break;
 			case SCRN_SERVERLIST:
 				if((sel+1) == num_opts) frame_screen_up(SCRN_SPLASH);
-				else bridge->ping();
+				else {
+					frame_screen_up(SCRN_CONSOLE);
+					console_insert_line("pinging bridge for status", MSG_NORMAL);
+					bridge->ping();
+					enqueue(inet_get_packet, PROC_NTWK, true);
+				}
 				break;
 		}
 	}
