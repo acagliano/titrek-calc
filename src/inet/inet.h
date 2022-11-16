@@ -56,23 +56,7 @@ enum _packetids {
 	RENDER_FBUF_DATA,
 	
 	// File Streaming
-	GFX_REQ_UPDATE = 0xe0,
-	GFX_FRAME_START,                // 0xe1
-	GFX_FRAME_IN,                   // 0xe2
-	GFX_FRAME_NEXT,                 // 0xe3
-	GFX_FRAME_DONE,                 // 0xe4
-	GFX_SKIP,                       // 0xe5
-	
-	MAIN_REQ_UPDATE,                // 0xe6
-	MAIN_FRAME_START,               // 0xe7
-	MAIN_FRAME_IN,                  // 0xe8
-	MAIN_FRAME_NEXT,                // 0xe9
-	MAIN_FRAME_DONE,                // 0xea
-	MAIN_SKIP,                // 0xeb
-	
-	PRGMUPDATE = 90,
-	GFXUPDATE,
-	CACHE_SPRITE,
+	LOAD_SPRITE = 0xe0,
 	
 	// DEBUG: 0xf*
 	BRIDGE_ERROR = 0xf0,

@@ -5,7 +5,7 @@
 #include "inet.h"
 #include "conn.h"
 #include "../gamestate.h"
-#include "../io/frames.h"
+#include "../iface/frames.h"
 
 uint8_t hostinfo[HOSTNAME_MAX_LEN+1] = {0};
 uint8_t username[USERNAME_MAX_LEN+1] = {0};

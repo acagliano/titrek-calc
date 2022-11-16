@@ -19,9 +19,9 @@
 #include <encrypt.h>
 
 #include "inet/inet.h"
-#include "io/keydetect.h"
-#include "io/frames.h"
-#include "io/fonts.h"
+#include "iface/keydetect.h"
+#include "iface/frames.h"
+#include "iface/fonts.h"
 #include "gamestate.h"
 
 #include "ev.h"

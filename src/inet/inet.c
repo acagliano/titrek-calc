@@ -12,7 +12,8 @@
 #include "conn.h"
 #include "devices.h"
 #include "../asm/exposure.h"
-#include "../io/frames.h"
+#include "../iface/frames.h"
+#include "../iface/ships.h"
 #include "../gamestate.h"
 #include "../ev.h"
 
@@ -173,9 +174,11 @@ void inet_process_packet(uint8_t *data, size_t len){
 				}
 			}
 			else if(GET_FLAG(gamestate.inet.flags, INET_LOGGED_IN)){
-				if(ctl==LOAD_SHIP){
+				if(ctl==LOAD_SPRITE) {
 					
 				}
+				else if(ctl==LOAD_SHIP) ship_load_data(pkt_content, len-1);
+				else if(ctl==)
 			}
 		}
 	}

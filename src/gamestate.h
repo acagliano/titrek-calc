@@ -6,6 +6,7 @@
 #include <tice.h>
 
 #include "inet/inet.h"
+#include "iface/ships.h"
 
 
 struct _cli_version { uint8_t maj; uint8_t min; uint24_t build; };
@@ -54,6 +55,7 @@ typedef struct _gamestate_t {
 	sk_key_t key;
 	char server_identities[MAX_SERVER_COUNT][9];
 	inetcfg_t inet;
+	shipdata_t ship;
 } gamestate_t;
 extern gamestate_t gamestate;
 
