@@ -119,10 +119,10 @@ void inet_process_packet(uint8_t *data, size_t len){
 				uint8_t e_buf[rsa_len];
 				console_insert_line("generating secrets.", MSG_NORMAL);
 				// generate secrets
-				csrand_fill(secrets, sizeof secrets);
+				cryptx_csrand_fill(secrets, sizeof secrets);
 				console_insert_line("rsa encrypting secrets.", MSG_NORMAL);
 				// encrypt secrets
-				rsa_encrypt(secrets, sizeof secrets, e_buf, pkt_content, rsa_len, SHA256);
+				cryptx_rsa_encrypt(secrets, sizeof secrets, e_buf, pkt_content, rsa_len, SHA256);
 				console_insert_line("sending secrets.", MSG_NORMAL);
 				inet_send_packet(1, AES_SECRET_ACK, e_buf, rsa_len);
 				
@@ -131,25 +131,25 @@ void inet_process_packet(uint8_t *data, size_t len){
 				size_t username_len = strlen(username);
 				uint8_t pt[TOKEN_LEN + username_len];
 				uint8_t ct[TOKEN_LEN + username_len];
-				uint8_t iv[AES_IVSIZE];
-				uint8_t hmac_digest[SHA256_DIGEST_LEN];
-				hmac_ctx hmac;
-				aes_ctx aes;
+				uint8_t iv[CRYPTX_AES_IV_SIZE];
+				uint8_t hmac_digest[CRYPTX_SHA256_DIGEST_LEN];
+				struct cryptx_hmac_ctx hmac;
+				struct cryptx_aes_ctx aes;
 					
 				// copy token and username into plaintext buffer
 				memcpy(pt, token, TOKEN_LEN);
 				memcpy(&pt[TOKEN_LEN], username, username_len);
 				
 				// generate iv, intialize AES context and encrypt
-				csrand_fill(iv, sizeof iv);
-				aes_init(&aes, secrets, AES_SECRET_LEN, iv, AES_MODE_CTR);
-				aes_encrypt(&aes, pt, sizeof pt, ct);
+				cryptx_csrand_fill(iv, sizeof iv);
+				cryptx_aes_init(&aes, secrets, AES_SECRET_LEN, iv, AES_MODE_CTR);
+				cryptx_aes_encrypt(&aes, pt, sizeof pt, ct);
 				
 				// generate authentication tag for data
-				hmac_init(&hmac, &secrets[AES_SECRET_LEN], HMAC_SECRET_LEN, SHA256);
-				hmac_update(&hmac, iv, sizeof iv);
-				hmac_update(&hmac, ct, sizeof ct);
-				hmac_final(&hmac, hmac_digest);
+				cryptx_hmac_init(&hmac, &secrets[AES_SECRET_LEN], HMAC_SECRET_LEN, SHA256);
+				cryptx_hmac_update(&hmac, iv, sizeof iv);
+				cryptx_hmac_update(&hmac, ct, sizeof ct);
+				cryptx_hmac_final(&hmac, hmac_digest);
 				
 				// send iv + encrypted data + auth tag
 				console_insert_line("sending token.", MSG_NORMAL);
@@ -174,11 +174,12 @@ void inet_process_packet(uint8_t *data, size_t len){
 				}
 			}
 			else if(GET_FLAG(gamestate.inet.flags, INET_LOGGED_IN)){
-				if(ctl==LOAD_SPRITE) {
-					
-				}
-				else if(ctl==LOAD_SHIP) ship_load_data(pkt_content, len-1);
-				else if(ctl==)
+				//if(ctl==GFXCACHE_INIT) sprite_open_cache();
+				//else if(ctl==GFXCACHE_LOAD) {
+				//	static uint8_t gfxcache_idx = 0;
+				//	gfx_cache_ptrs[gfxcache_idx++] = sprite_append_to_cache(pkt_content, len - 1);
+			//	} else if(ctl==GFXCACHE_DONE) sprite_close_cache();
+			//	else if(ctl==LOAD_SHIP) ship_load_data(pkt_content, len-1);
 			}
 		}
 	}

@@ -40,19 +40,26 @@ int main(void) {
 
     // init the program
 	gamestate.gameflags |= (1<<EV_LISTENER_ACTV);
+	
+	// set actions to take at program quit
 	atexit(usb_Cleanup);
 	atexit(gfx_End);
 	//atexit(prgm_CleanUp);
-	// initialize cryptographic libraries, exit w/ err if not present
-	if(!LOAD_CRYPTX_LIBS) exit(ERR_CRYPTOGRAPHY);
-	if(!csrand_init()) exit(ERR_CRYPTOGRAPHY);
 	
+	// initialize cryptographic libraries, exit with error if fail
+	// init RNG, exit with error if fail
+	if(!LOAD_CRYPTX_LIBS) exit(ERR_CRYPTOGRAPHY);
+	if(!cryptx_csrand_init(SAMPLING_THOROUGH)) exit(ERR_CRYPTOGRAPHY);
+	
+	// set up graphics
 	gfx_Begin();
 	gfx_SetDrawBuffer();
 	gfx_SetTextTransparentColor(1);
 	gfx_SetTextBGColor(1);
 	gfx_SetFontData(font_haxor8);
 	gfx_SetMonospaceFont(7);
+	
+	// internet up
 	inet_init();
 	srandom(rtc_Time());
 	frame_screen_up(SCRN_SPLASH);

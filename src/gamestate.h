@@ -13,7 +13,7 @@ struct _cli_version { uint8_t maj; uint8_t min; uint24_t build; };
 
 #define VMAJOR	0
 #define VMINOR	1
-#define VBUILD	112
+#define VBUILD	113
 
 #define STRINGIFY(x) #x
 #define TOSTRING(x) STRINGIFY(x)
@@ -26,6 +26,7 @@ struct _cli_version { uint8_t maj; uint8_t min; uint24_t build; };
 
 enum _gameflags {
 	FRAME_DIRTY 		= 0,
+	ENABLE_SECURE_INET	= 22,
 	EV_LISTENER_ACTV	= 23
 };
 

@@ -28,12 +28,12 @@ typedef struct _inetcfg_t {
 enum _packetids {
 	// CONNECTION/ADMIN
 	// 0 - 9
-	PING_BRIDGE,
-	CONNECT,            // 0
-	DISCONNECT,         // 1
-	RSA_SETUP,     		// 2
-	AES_SECRET_ACK,   	// 3
-	LOGIN,            	// 4
+	PING_BRIDGE,		// 0
+	CONNECT,            // 1
+	DISCONNECT,         // 2
+	RSA_SETUP,     		// 3
+	AES_SECRET_ACK,   	// 4
+	LOGIN,            	// 5
 	// This is for the client not up to date response , See response codes. VERSION_* must be the second byte of packet
 	
 	// Ship Interfacing: 20 - 29
@@ -56,11 +56,13 @@ enum _packetids {
 	RENDER_FBUF_DATA,
 	
 	// File Streaming
-	LOAD_SPRITE = 0xe0,
+	GFXCACHE_INIT	= 0xe0,
+	GFXCACHE_LOAD	= 0xe1,
+	GFXCACHE_DONE	= 0xe2,
 	
 	// DEBUG: 0xf*
 	BRIDGE_ERROR = 0xf0,
-	PING_SERVER = 0xfc,
+	PING_SERVER = 0xf1,
 	MESSAGE,
 	DEBUG,
 	SERVINFO

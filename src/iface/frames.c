@@ -59,16 +59,37 @@ void frame_render_headerbar(const char *title){
 }
 
 #define CEMU_CONSOLE ((char*)0xFB0000)
+struct splash_starfield { size_t x; uint8_t y; uint8_t color };
+uint8_t starfld_colors[5] = {
+	191,	/* STARFLDCOL_LBLUE */
+	158,	/* STARFLDCOL_DBLUE */
+	223,	/* STARFLDCOL_BLUEWHITE */
+	255,	/* STARFLDCOL_WHITE */
+	247		/* STARFLDCOL_PYELLOW*/
+};
+#define STARFLD_DENSITY	150
 void frame_render_splash(void){
 	if(!GET_FLAG(gamestate.gameflags, FRAME_DIRTY)) return;
 	static bool splash_icons_extracted = false;
 	static uint8_t icon_usb[15*15+2];
 	static uint8_t icon_usb_error[15*15+2];
+	static uint8_t icon_ship_splash[65*52+2];
+	static struct splash_starfield starfield[STARFLD_DENSITY];
+	static bool starfield_generated = false;
 	const char *gamename = "TI-TREK";
 //	static uint8_t icon_encrypt[15*15+2];
+	if(!starfield_generated){
+		for(int i = 0; i < STARFLD_DENSITY; i++){
+			starfield[i].x = randInt(0, 320);
+			starfield[i].y = randInt(0, 240);
+			starfield[i].color = randInt(0, 4);
+		}
+		starfield_generated = true;
+	}
 	if(!splash_icons_extracted){
 		zx7_Decompress(icon_usb, icon_usb_compressed);
 		zx7_Decompress(icon_usb_error, icon_usb_error_compressed);
+		zx7_Decompress(icon_ship_splash, calc_splash_img_compressed);
 		//zx7_Decompress(icon_encrypt, icon_encrypt_compressed);
 		splash_icons_extracted = true;
 	}
@@ -77,34 +98,45 @@ void frame_render_splash(void){
 	uint24_t stringw = gfx_GetStringWidth(VSTRING);
 	gfx_ZeroScreen();					// zero screen
 	
-	// draw header (version string)
+	// draw background
+	for(int i = 0; i < STARFLD_DENSITY; i++){
+		gfx_SetColor(starfld_colors[starfield[i].color]);
+		gfx_SetPixel(starfield[i].x, starfield[i].y);
+	}
 	
-	gfx_SetColor(224); gfx_FillTriangle(0, 65, 320, 128, 320, 141);
-	gfx_SetColor(255); gfx_FillTriangle(0, 65, 320, 131, 320, 138);
-	gfx_SetTextFGColor(255);
-	gfx_SetColor(SPLASH_BORDERCOLOR);
+	// draw ship
+	#define ICON_SHIP_W 65
+	#define ICON_SHIP_H 52
+	gfx_RLETSprite(icon_ship_splash, 25, 20);
 	
-	// version string bg
-	gfx_FillRectangle(20, 104, stringw+24, 16);
+	// draw lines behind ship
+	#define TEXT_AND_LINES_COLOR	159
+	gfx_SetColor(TEXT_AND_LINES_COLOR);
+	gfx_FillRectangle(90, 25, 320-100, 3);
+	gfx_FillRectangle(90, 65, 320-100, 3);
 	
-	// TI-TREK text
-	gfx_FillRectangle(90, 20, 320-110-5, 40);
-	gfx_SetTextScale(4,4);
-	gfx_PrintStringXY(gamename, 95, 25);
+	// draw title
+	gfx_SetTextScale(4,3);
+	gfx_SetTextFGColor(TEXT_AND_LINES_COLOR);
+	gfx_PrintStringXY("TI-TREK", 100, 36);
 	gfx_SetTextScale(1,1);
+	
+	// draw version string
+	//#define OTHER_TEXT_COLOR	23
+	gfx_SetTextFGColor(TEXT_AND_LINES_COLOR);
+	gfx_PrintStringXY(VSTRING, 100, 80);
 	
 	gfx_PrintStringXY("A space-combat MMO", 170, 150);
 	gfx_PrintStringXY("for your calculator", 170, 160);
 	gfx_PrintStringXY("http://titrek.us", 170, 175);
-	gfx_PrintStringXY(VSTRING, 32, 108);
 	gfx_SetTextFGColor(0);
 	// draw footer
-	gfx_FillRectangle(20, 201, 130, 16);
+	//gfx_FillRectangle(20, 201, 130, 16);
 	
 	// draw 3px border
-	gfx_Rectangle(20, 120, 130, 81);
-	gfx_Rectangle(21, 121, 128, 79);
-	gfx_Rectangle(22, 122, 126, 77);
+	//gfx_Rectangle(20, 120, 130, 81);
+	//gfx_Rectangle(21, 121, 128, 79);
+	//gfx_Rectangle(22, 122, 126, 77);
 	// draw menu background
 	gfx_SetColor(SPLASH_BGCOLOR);
 	gfx_FillRectangle(23, 123, 124, 75);
@@ -118,10 +150,10 @@ void frame_render_splash(void){
 	
 	if(GET_FLAG(gamestate.inet.flags, INET_ACTIVE)){
 		gfx_SetTextFGColor(255);
-		gfx_RLETSprite((gfx_rletsprite_t*)icon_usb, 25, 201);
-		gfx_PrintStringXY(mm_devicestmp[gamestate.inet.device_id], 43, 205);
+		gfx_RLETSprite((gfx_rletsprite_t*)icon_usb, 25, 210);
+		gfx_PrintStringXY(mm_devicestmp[gamestate.inet.device_id], 43, 215);
 	}
-	else gfx_RLETSprite((gfx_rletsprite_t*)icon_usb_error, 25, 201);
+	else gfx_RLETSprite((gfx_rletsprite_t*)icon_usb_error, 25, 210);
 	gfx_SwapDraw();
 	MARK_FRAME_CLEAN;
 }
